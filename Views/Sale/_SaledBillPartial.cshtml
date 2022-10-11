@@ -1,0 +1,392 @@
+﻿
+<div class="col-md-7 offset-md-3">
+    <form asp-controller="Sale" data-ajax="true" class="form-inline" data-ajax-method="post" data-ajax-success="loadReport(data)" asp-action="FetchSaledBills">
+
+        <div id="specific"  class="col-md-12 row m-0 p-0">
+            <div class="col-md-4  m-0" style="display: flex; align-items: center;">
+                <label>د نیټې څخه</label>
+                <input class="form-control" required name="fromDate" type="date" style="height:45px;">
+            </div>
+            <div class="col-md-4  m-0" style="display: flex; align-items: center;">
+                <label>تر نیټې پورې</label>
+                <input class="form-control" required name="toDate" type="date" style="height:45px;">
+            </div>
+            <div class="col-md-4  m-0" style="display: flex; align-items: center;">
+                <button type="submit" class="btn btn-default  btn-info"> ښودل</button>
+                &nbsp;
+                <button type="reset" id="btnLoadCurrentMonth" class="btn btn-default  btn-warning">پاکول</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<table class="table dtr-inline table-striped table-bordered " id="tblContracted">
+    <thead>
+        <tr role="row">
+            <th>#</th>
+            <th>بیل نمبر</th>
+            <th>مشترې</th>
+            <th>پولې واحد</th>
+            <th>بیل مجموعه</th>
+            <th>بارګیرې / تخلیه</th>
+            <th>سابقه بقایه</th>
+            <th>ټوټل مجموعه</th>
+            <th>وصول</th>
+            <th>باقې</th>
+            <th>نیټه</th>
+            <th>کارمند</th>
+            <th>چاپ</th>
+            <th>ګودام چاپ</th>
+            <th>واپس </th>
+            <th>حذف </th>
+            <th>تفصیل</th>
+
+        </tr>
+    </thead>
+    
+    <tbody></tbody>
+</table>
+
+<script>
+    $(function () {
+        allSaledItems()
+    })
+
+    function allSaledItems() {
+        $.ajax({
+            url: '/Sale/FetchSaledBills/',
+            type: 'POST',
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+
+                TableDataShow(result);
+            }
+        })
+    }
+
+    function loadReport(data) {
+        TableDataShow(data);
+    }
+
+    function TableDataShow(data) {
+
+        var tr = "";
+        $.each(data, function (i, col) {
+
+            var remain = (col.total + col.loading + col.prev) - col.paid;
+
+
+            tr += "  <tr> ";
+            tr += "      <td> " + (i + 1) + "</td> ";
+            tr += "      <td> " + col.bill + "</td> ";
+            tr += "      <td>" + col.customer + "</td> ";
+            tr += "      <td>" + col.currency + "</td> ";
+            tr += "      <td>" + parseFloat(col.total).toFixed(3) + "</td> ";
+            tr += "      <td>" + parseFloat(col.loading).toFixed(3) + "</td> ";
+            tr += "      <td>" + parseFloat(col.prev).toFixed(3) + "</td> ";
+            tr += "      <td>" + parseFloat(col.total + col.loading + col.prev).toFixed(3) + "</td> ";
+            tr += "      <td>" + parseFloat(col.paid).toFixed(3) + "</td> ";
+            tr += "      <td>" + parseFloat(remain).toFixed(3) + "</td> ";
+            tr += "      <td>" + col.date + "</td> ";
+            tr += "      <td>" + col.employee + "</td> ";
+            tr += "      <td><button class='btn btn-outline-success' onclick='ForPrint(\"" + col.bill + "\",\"" + col.date + "\",\"" + col.stock + "\",\"" + col.stockId + "\",\"" + col.customerid + "\",\"" + col.customer + "\",\"" + col.currency + "\",\"" + col.prev + "\",\"" + col.loading + "\",\"" + col.paid + "\")'><i class='fa fa-print'></i></button></td> ";
+            tr += "      <td><button class='btn btn-outline-primary' onclick='ForPrintStock(\"" + col.bill + "\",\"" + col.date + "\",\"" + col.stock + "\",\"" + col.stockId + "\",\"" + col.customerid + "\",\"" + col.customer + "\",\"" + col.currency + "\",\"" + col.prev + "\",\"" + col.loading + "\",\"" + col.paid + "\")'><i class='fa fa-print'></i></button></td> ";
+            tr += "      <td><button class='btn btn-outline-info'onclick='FnReturnBill(\"" + col.id + "\",\"" + col.customerid + "\",\"" + col.bill + "\",\"" + col.date + "\")'><i class='ft-refresh-cw'></i>&nbsp; <strong> </strong></button></td> ";
+            tr += "      <td><button class='btn btn-outline-danger ' onclick='DeleteDealRecord(\"" + col.id + "\")'><i class='fa fa-trash'></i></button></td> ";
+            tr += "      <td>" + col.desc + "</td> ";
+            tr += "  </tr>";
+        });
+
+        var table = $("#tblContracted").dataTable();
+        table.fnDestroy();
+
+        $("#tblContracted>tbody").html("").html(tr);
+        $("#tblContracted").DataTable({
+
+            dom: 'Blfrtip',
+
+            buttons: [
+                'colvis',
+                {
+                    extend: 'print',
+
+                    footer: true,
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+
+                },
+                { extend: 'excel', footer: true },
+                { extend: 'copy', footer: true },
+            ],
+
+            responsive: true,
+
+            colReorder: true,
+            stateSave: true,
+            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+            "pageLength": 5,
+            "language": {
+                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                "infoPostFix": "",
+
+                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                "searchPlaceholder": "پلټنه",
+                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                "paginate": {
+                    "first": "لومړۍ پاڼه",
+                    "previous": "مخکې",
+                    "next": "وروسته",
+                    "last": "پای"
+                },
+            },
+
+        });
+        $(".buttons-print").text("").html("<i class='ft-printer'></i>");
+        $(".buttons-copy").text("").html("<i class='ft-copy'></i>");
+        $(".buttons-excel").text("").html("<i class='fa fa-file-excel-o'></i>");
+        $(".buttons-colvis").text("").html("<i class='ft-eye-off'></i>");
+        $('.buttons-copy, .buttons-print, .buttons-excel,.buttons-colvis').addClass('btn btn-primary ');
+    }
+
+    function DeleteDealRecord(id) {
+
+        swal({
+            title: "آیا غواړی چې  ریکارډ حذف شې؟",
+            text: "",
+            icon: "warning",
+            buttons: {
+                cancel: {
+                    text: "نه",
+                    value: null,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "هو",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+
+        }).then((isConfirm) => {
+            if (isConfirm) {
+
+                $.ajax({
+                    url: '/Sale/DeleteSaledItem/?printId=' + id + '',
+                    type: 'POST',
+                    contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (result) {
+                        toast(result, 'success');
+                        allSaledItems()
+                        allItems()
+                    }
+                })
+            }
+        });
+    }
+
+    $("#btnLoadCurrentMonth").click(function () {
+        allSaledItems();
+    })
+
+    function fnDeleteLastSaled() {
+        swal({
+            title: "آیا غواړی چې اخرنی بیل حذف شې؟",
+            text: "",
+            icon: "warning",
+            buttons: {
+                cancel: {
+                    text: "نه",
+                    value: null,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "هو",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+        }).then((isConfirm) => {
+            if (isConfirm) {
+
+                $("#btnDeletePurchase").addClass("d-none");
+
+                $.ajax({
+                    url: '/Sale/DeleteLastSaled/',
+                    type: 'POST',
+                    contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (result) {
+
+                        toast(result, 'success');
+
+                        $("#btnDeletePurchase").removeClass("d-none");
+
+                        allSaledItems();
+                    }
+                })
+            }
+        });
+
+    }
+
+    function FnReturnBill(id,customer,bill,date) {
+        swal({
+            title: "آیا غواړی چې نوموړی بیل واپس شې؟",
+            text: "",
+            icon: "warning",
+            buttons: {
+                cancel: {
+                    text: "نه",
+                    value: null,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "هو",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+        }).then((isConfirm) => {
+            if (isConfirm) {
+
+                $("#btnDeletePurchase").addClass("d-none");
+
+                $.ajax({
+                    url: '/Sale/ReturnBill/?id=' + id + '&customerId=' + customer +'&bill='+bill+'&date='+date+'',
+                    type: 'POST',
+                    contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (result) {
+
+                        toast(result, 'success');
+
+                        $("#btnDeletePurchase").removeClass("d-none");
+                        allSaledItems();
+                        tblItems();
+                        allItems();
+                    }
+                })
+            }
+        });
+
+    }
+
+    function ForPrint(serial, date, stock, stockId, customerNo, customerName, currency, prev, loading, paid) {
+       
+        $.ajax({
+            url: '/Sale/FetchBillItems/?customerId=' + customerNo + '&bill=' + serial+'',
+            type: 'POST',
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+                var tr = "";
+                let total = 0.0;
+             
+                $.each(result, function (i, col) {
+
+                    tr += "  <tr> ";
+                    tr += "      <td> " + (i + 1) + "</td> ";
+                    tr += "      <td> " + col.item + "</td> ";
+                    tr += "      <td> " + col.unit + "</td> ";
+                    tr += "      <td>" + parseFloat(col.qty).toFixed(3) + "</td> ";
+                    tr += "      <td>" + parseFloat(col.saleprice).toFixed(3) + "</td> ";
+                    tr += "      <td>" + parseFloat(col.discount).toFixed(3) + "</td> ";
+                    tr += "      <td>" + parseFloat((col.qty * col.saleprice) - col.discount).toFixed(3) + "</td> ";
+                    tr += "  </tr>";
+
+                    total = parseFloat(total) + parseFloat((col.qty * col.saleprice) - col.discount);
+                });
+
+               
+
+                $("#PrintBillBody").html(tr);
+
+                print(serial, date, stock, stockId, customerNo, customerName, currency, total, prev, loading, paid)
+
+                setTimeout(function () {
+                   $("#PrintBillBody").empty()
+                   
+                }, 3000)
+            }
+        })
+    }
+
+    function ForPrintStock(serial, date, stock, stockId, customerNo, customerName, currency, prev, loading, paid) {
+
+        $.ajax({
+            url: '/Sale/FetchBillItems/?customerId=' + customerNo + '&bill=' + serial + '',
+            type: 'POST',
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+                var tr = "";
+                var total = 0.0;
+                $("#tblAmount").addClass("d-none");
+
+                var tr2 = `
+                    <tr role="row">
+                        <th>شماره </th>
+                        <th>نام جنس  </th>
+                        <th> واحد</th>
+                        <th>تعداد  </th>
+                    </tr>`;
+
+                $(".tblThead").html(tr2);
+
+                $.each(result, function (i, col) {
+
+                    tr += "  <tr> ";
+                    tr += "      <td> " + (i + 1) + "</td> ";
+                    tr += "      <td> " + col.item + "</td> ";
+                    tr += "      <td> " + col.unit + "</td> ";
+                    tr += "      <td>" + parseFloat(col.qty).toFixed(3) + "</td> ";
+                    tr += "  </tr>";
+                });
+
+               
+
+                $("#PrintBillBody").html(tr);
+
+                print(serial, date, stock, stockId, customerNo, customerName, currency, total, prev, loading, paid)
+
+                setTimeout(function () {
+                    $("#PrintBillBody").empty()
+                    $("#tblAmount").removeClass("d-none");
+                    var tr2 = `
+                     <tr role="row">
+                        <th>شماره </th>
+                        <th>نام جنس  </th>
+                        <th> واحد</th>
+                        <th>تعداد  </th>
+                        <th>مبلغ  </th>
+                        <th>تخفیف </th>
+                        <th>قیمت کل</th>
+                    </tr>`;
+
+                    $(".tblThead").html(tr2);
+                }, 3000)
+            }
+
+
+        })
+
+    }
+</script>

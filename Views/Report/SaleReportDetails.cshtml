@@ -1,0 +1,19 @@
+﻿
+<div class="card">
+    <div class="col-md-12 px-2 pt-1">
+        <h2 class="text-center alert bg-yellow bg-darken-2 box-shadow-1" style="background-color:#ffffff;">د خرڅ شویو اجناسو مکمل تفصیل</h2>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <div class="tab-pane " id="tabIcon15" aria-labelledby="baseIcon-tab15">
+                @await Html.PartialAsync("~/views/Sale/_SaledItemsPartial.cshtml")
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+}

@@ -1,0 +1,453 @@
+﻿@model AllViewModel
+@{
+    ViewData["Title"] = "";
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#itemRegistration").addClass("active")</script>
+
+
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorize
+
+@if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    @await Html.PartialAsync("AccessDeniedPartial")
+    ViewBag.view = "d-none";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+@if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+@if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+@if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "";
+}
+
+<div class="card m-0 @ViewBag.view">
+    <div class="row border border-after-blue m-0 pt-1" style="display: flex; align-items: stretch; flex-direction: row; justify-content: space-around;">
+        <div class="col-md-2 m-md-0" style="text-align:right;">
+            <button type="button" data-target="#large" data-toggle="modal" class="btn btn-success" id="btnAddCategory">
+                <span class="fa fa-plus"></span> د جنس کټګورې
+            </button>
+        </div>
+        <div class="col-md-10">
+            <h2 class="text-center alert bg-info  box-shadow-1">داجناسو ذخیره کولو فارم</h2>
+        </div>
+        @*<div class="col-md-2 m-md-0" style="text-align:left;">
+            <button type="button" data-target="#Brand" data-toggle="modal" class="btn btn-success" id="btnAddBrand">
+                <span class="fa fa-plus"></span>  د جنس برانډ او رنګ
+            </button>
+        </div>*@
+    </div>
+    <div class="row m-0 p-0">
+        <div class="col-md-4 pt-5 p-2" style="border: 1px #3434 solid;">
+            <form data-ajax="true" asp-controller="Item" asp-action="ItemSave" data-ajax-success="funSuccess(data)" data-ajax-method="post" id="frm">
+                <input hidden asp-for="item.ItemId" value="0" />
+                <div class="form-group">
+                    <label asp-for="item.Name" class=""></label>
+                    <input asp-for="item.Name" placeholder="د جنس نوم" class="form-control" />
+                    <span asp-validation-for="item.Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="item.CategoryId" class=""></label>
+                    <select asp-for="item.CategoryId" class=" form-control" asp-items="@ViewBag.Category">
+                        <option value="">کټګورې انتخاب کړی</option>
+                    </select>
+                    <span asp-validation-for="item.CategoryId" class="text-danger"></span>
+                </div><br />
+               
+                <div class="form-group text-center @ViewBag.Insert" style="margin-top:10px;">
+                    <button type="reset" id="btnitemreset" class="btn btn-warning btn-icon-md">پاکول</button>
+                    <button type="submit" id="btnSubmit" class="btn btn-primary btn-icon-md">ذخیره</button>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-md-8 m-0 p-0">
+            <table class="table  table-responsive-md table-striped table-condensed table-bordered " id="itemTable">
+                <thead class="">
+                    <tr role="row">
+                        <th style="max-width:1%;">#</th>
+                        <th class="col-md-3">د جنس نوم</th>
+                        <th class="col-md-1"> د جنس کټګورې</th>
+                        <th class="@ViewBag.Edit" style="max-width:1%;">  تغیرول</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+@* ItemCategory modal *@
+
+<div class="modal fade text-left" id="large" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info white">
+                <h4 class="modal-title" id="myModalLabel17">کټګوری لیست او د کټګوری اضافه کول</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            @Html.AntiForgeryToken()
+            <form data-ajax="true" asp-controller="Item" asp-action="SaveItemCategory" data-ajax-success="funSuccessCategory(data)" data-ajax-method="post" id="frmCategory">
+                <div class="row col-md-12 @ViewBag.Insert">
+                    <div class="col-md-7 offset-1">
+                        <input hidden asp-for="itemCategory.CategoryId" value="0" />
+                        <div class="form-group">
+                            <label asp-for="itemCategory.Category" class=""></label>
+                            <input asp-for="itemCategory.Category" class="form-control" />
+                            <span asp-validation-for="itemCategory.Category" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                    <div class="form-group col-md-3 " style="margin-top:37px;">
+
+                        <button type="reset" id="btncategoryreset" class="btn btn-warning btn-icon-md">پاکول</button>
+                        <button type="submit" id="btnSubmitCategory" class="btn btn-primary btn-icon-md">ذخیره</button>
+
+                    </div>
+                </div>
+            </form>
+            <div class="card-header ">
+                <h4 class="card-title "><strong>د موجوده کټګوریو لیست</strong></h4>
+            </div>
+            <table class="table table-responsive-md table-striped table-condensed  table-bordered dataTables_scrollHead" id="categoryTable">
+                <thead class="scrollable-container ps--scrolling-x ">
+                    <tr role="row">
+
+                        <th style="max-width:10px;">#</th>
+                        <th class="col-md-1">د کټګوری نوم</th>
+                        <th class="col-md-1 @ViewBag.Edit "> تغیرول </th>
+                        <th class="col-md-1 @ViewBag.Delete">  حذف</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+
+            </table>
+            <div class="modal-footer">
+                <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">بندول</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<form data-ajax="true" asp-action="DeleteCategory" data-ajax-method="post" asp-controller="Item" data-ajax-success="deleted(data)">
+    <input hidden id="deleteId" asp-for="itemCategory.CategoryId" />
+    <button type="submit" class="d-none" id="btnDelete"></button>
+</form>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+
+    <script>
+        var show = true;
+        $(document).ready(function () {
+            loadTableData();
+            $("#item_BrandId").select2();
+        })
+    </script>
+
+    @* item script functions *@
+    <script>
+
+        function loadTableData() {
+            $.ajax({
+                url: "/Item/LoadItem/",
+                type: "POST",
+                contentType: "application/json",
+
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    console.log(result)
+                    $.each(result, function (i, col) {
+
+                        tr += '<tr  role="row">' +
+                            '<td >' + (i + 1) + '</td>' +
+                            '<td >' + col.name + '</td>' +
+                            ' <td>' + col.category1 + '</td>' +
+                            ' <td class="@ViewBag.Edit"><button type="button" onclick="fn(' + col.itemId + ',\'' + col.name + '\',\'' + col.categoryId + '\')" class="btn btn-primary"><i class="fa fa-edit"></i></button></td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#itemTable").dataTable();
+                    table.fnDestroy();
+
+                    $("#itemTable>tbody").html("").html(tr);
+
+                    $("#itemTable").dataTable({
+
+                       stateSave: true,
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+
+                        });
+
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+                complete: function () {
+
+                }
+
+            })
+        }
+        function funSuccess(data) {
+
+            loadTableData();
+
+            $("#frm")[0].reset();
+
+            toast(data,'primary')
+
+            $("#btnSubmit").text("ذخیره ");
+        }
+        var list = true;
+        function fn(id, name, category) {
+            $("#item_ItemId").val(id);
+            $("#item_Name").val(name);
+            $("#item_CategoryId").val(category);
+            $("#btnSubmit").text("تغیرول");
+
+            $("#divInput").animate({
+                left: '250px',
+                opacity: '0.9',
+
+            }).show(400);
+
+
+            $("#divTable").animate({
+
+            }).hide(400);
+
+            $("#btnList").text("د اجناسو لیست ")
+            list = true;
+
+        }
+    </script>
+
+
+    @* Category script functions *@
+    <script>
+        function LoadCategory() {
+
+            $.ajax({
+                url: "/Item/LoadCategory/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+
+                    var tr = "";
+                    console.log(result)
+                    $.each(result, function (i, col) {
+
+                        tr += '<tr class="odd" role="row">' +
+
+                            '<td>' + (i + 1) + '</td>' +
+                            ' <td class="col-md-4">' + col.category1 + '</td>' +
+                            ' <td class="@ViewBag.Edit"><button type="button" onclick="EditCategory(' + col.categoryId + ',\'' + col.category1 + '\')" class="btn btn-primary"><i class="fa fa-edit"></i></button></td>' +
+                            ' <td class="@ViewBag.Delete"><button type="button" onclick="fnDeleteCategory(' + col.categoryId + ')" class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#categoryTable").dataTable();
+                    table.fnDestroy();
+
+                    $("#categoryTable>tbody").html("").html(tr);
+
+                    $("#categoryTable").DataTable({
+
+                            stateSave: true,
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+                        });
+
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+                complete: function () {
+
+                }
+
+            })
+        }
+        function funSuccessCategory(data) {
+
+            LoadCategory();
+
+            $("#frmCategory")[0].reset();
+            $("#btnCloseCategory").trigger("click");
+
+            toast(data,'primary')
+            $("#btnSubmitCategory").text("ذخیره ");
+        }
+
+        function EditCategory(id, name) {
+
+            //  alert(id + "," + name + "," + latinname + "," + category)
+            $("#itemCategory_Category").val(name);
+            $("#itemCategory_CategoryId").val(id);
+
+            $("#btnSubmitCategory").text("تغیرول");
+        }
+        function fnDeleteCategory(comId) {
+            $("#deleteId").val(comId);
+            swal({
+                title: "آیا غواړی چې نوموړی ریکارډ حذف شې؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    $("#btnDelete").trigger("click");
+                }
+            });
+
+        }
+
+        function deleted(data) {
+
+            toast(data, 'primary')
+            LoadCategory();
+
+        }
+    </script>
+
+    <script>
+
+        $("#btnAddCategory").click(function () {
+
+            LoadCategory();
+        })
+        $("#btnitemreset").click(function () {
+
+            $("#btnSubmit").text("ذخیره");
+        })
+        $("#btncategoryreset").click(function () {
+
+            $("#btnSubmitCategory").text("ذخیره");
+        })
+
+
+        $("#btnList").click(function () {
+            if (list) {
+
+                $("#divInput").animate({
+                    left: '250px',
+                    opacity: '0.9',
+
+                }).hide(400);
+
+
+                $("#divTable").animate({
+
+                }).show(400);
+                $("#divTable").removeClass("d-none")
+
+                $("#btnList").text("د اجناسو ذخیره کول")
+                list = false;
+
+
+            } else {
+                $("#divInput").animate({
+                    left: '250px',
+                    opacity: '0.9',
+
+                }).show(400);
+
+
+                $("#divTable").animate({
+
+                }).hide(400);
+
+                $("#btnList").text("د اجناسو لیست ")
+                list = true;
+            }
+
+        });
+    </script>
+
+}

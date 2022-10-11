@@ -1,0 +1,687 @@
+﻿@model AllViewModel
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#registerActive").addClass("active")</script>
+
+
+
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorize
+
+@if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+
+    @await Html.PartialAsync("AccessDeniedPartial")
+
+
+    ViewBag.view = "d-none";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+
+@if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "";
+}
+<style>
+    .dataTables_scroll {
+        overflow: auto;
+    }
+
+    .camera {
+        /*padding: 8px;*/
+        background-color: antiquewhite;
+        /*border-radius: 48%;*/
+        color: whitesmoke;
+        position: relative;
+        margin-top: 0px;
+        margin-left: 0px;
+        cursor: pointer;
+        border-radius: 3%;
+    }
+
+        .camera:hover {
+            margin-top: -5.90px;
+            margin-left: 54px;
+            border: 1.5px solid white;
+        }
+
+    .profileImage {
+        /*border: 5px solid white;*/
+        width: 200px;
+        height: 143px;
+        /*border-radius: ;*/
+        object-fit: fill;
+        margin-top: 0px;
+        /*position:absolute;*/
+        margin-left: 100px;
+        left: 0px;
+        right: 0px;
+    }
+</style>
+
+
+
+<div class="container col-md-12 @ViewBag.view">
+    <div class="card">
+        <div class="col-md-12 row" style="max-width:100%">
+            <div class="col-md-2" style="text-align:right">
+                <button id="btnList" class="btn btn-info "><strong>د موجوده اکاونټونو لیست</strong>  </button>
+            </div>
+            <div class=" col-md-10 ">
+                <h2 class="text-center alert bg-info box-shadow-1">د کارمند لپاره د اکاونټ جوړلو فارم</h2>
+                <hr />
+            </div>
+        </div>
+        <div class="card-body row @ViewBag.Insert" style="justify-content:center">
+            <div id="divInput" class="col-md-5 " style="">
+                <form asp-action="Register" asp-controller="Account" data-ajax="true" data-ajax-success="funSuccessAccount(data)" data-ajax-method="post" id="frmRegister">
+
+
+                    @*<div asp-validation-summary="All" class="text-danger"></div>*@
+                    <div class="form-group">
+                        <label asp-for="register.EmployeeId" class=""></label>
+                        <select asp-for="register.EmployeeId" class=" form-control" asp-items="@ViewBag.Employee">
+                            <option value=""> کارمندانو لیست</option>
+                        </select>
+                        <span asp-validation-for="register.EmployeeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="register.Password"></label>
+                        <div class="input-group">
+
+                            <input asp-for="register.Password" class="form-control" placeholder="پټ نوم" aria-describedby="basic-addon4">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="firstPass" style="cursor:pointer"><i class="ft-eye"></i></span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="register.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="register.ConfirmPassword"></label>
+                        <div class="input-group">
+
+                            <input asp-for="register.ConfirmPassword" class="form-control" placeholder="پټ نوم تایدې" aria-describedby="basic-addon4">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="secondPass" style="cursor:pointer"><i class="ft-eye"></i></span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="register.ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="register.id" class=""></label>
+                        <select asp-for="register.id" class=" form-control" asp-items="@ViewBag.Roles">
+                            <option value=""> ډیپارټمنټ لیست</option>
+                        </select>
+                        <span asp-validation-for="register.id" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">ذخیره</button>
+                </form>
+            </div>
+
+            <div id="divTable" class="col-md-12 dt-ext table-responsive" style="display:none">
+
+                <table class="table  table-striped table-condensed table-bordered " id="tblEmployee">
+                    <thead class="">
+                        <tr role="row">
+
+                            <th style="max-width:10px;">#</th>
+                            <th class="col-md-3">د کارمند نوم</th>
+                            <th class="col-md-1"> بریښنالیک</th>
+                            <th class="col-md-1"> د کارمند تصویر</th>
+                            <th class="col-md-1  @ViewBag.Edit"> حالت</th>
+                            <th class="col-md-1 @ViewBag.Delete">  تفصیل</th>
+                            <th class="col-md-1 @ViewBag.Delete">  حذف</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+
+            </div>
+
+            <section id="divDetails" class="col-md-12" style="display:none">
+                <button class="btn btn-outline-blue-grey" id="accountlistshow" style="float:left">اکاونټونو لیست</button>
+                <div class="text-center">
+                    <div class="">
+                        <div class=""><img src="~/images/StaticImages/browse.png" class="rounded" id="employeeImages" style="height:100px;width:100px; padding:0px;margin:0px;margin-right:100px;cursor:pointer;" /></div><br />
+                        <div class="row text-center font-medium-3" style="justify-content:center">&nbsp;  د کارمند نوم :&nbsp;&nbsp; <h4 id="empName" class="font-medium-4"> </h4></div><hr />
+                    </div>
+                </div>
+
+                <form asp-action="ChangeUserRole" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-success="fnRoleSet(data)">
+
+                    <div class="row col-md-8 offset-md-3" style="justify-content:center">
+                        <div class="col-md-4 ">
+                            <label class=" "> د نوموړی کارمند رول :</label>
+                            <select asp-for="register.id2" class=" form-control role" asp-items="@ViewBag.Roles2">
+                                <option value=""> ډیپارټنټ لیست</option>
+                            </select>
+                            <span asp-validation-for="register.id2" class="text-danger"></span>
+                        </div>
+                        <input type="hidden" asp-for="register.email2" value="" />
+                        <input type="hidden" asp-for="register.role" value="" />
+                        <div class="col-md-4" style="margin-top:30px">
+                            <button type="submit" id="btnChangeRole" class="btn btn-primary">تغیرول</button>
+                        </div>
+                    </div>
+                </form>
+
+                <hr />
+                <div class="col-md-12 text-center" style="justify-content:center">
+
+                    <div class="col-md-3 offset-md-4 "><h2>کارمند ته د صلاحیت انتخابول</h2></div>
+                    <br />
+
+                    <form asp-action="AddClaimToUser" asp-controller="Account" data-ajax="true" data-ajax-method="post" data-ajax-success="fnClaimSet(data)">
+                        <div class="col-md-8 offset-md-3 " style="display:flex">
+
+                            <input type="hidden" asp-for="claim.Email" value="" />
+
+                            <fieldset class="">
+                                <div class="font-medium-3 border-info rounded" style="background-color:#efe9ea;">
+
+                                    <input type="radio" id="not" style="height:20px;width:20px;margin-top:5px;margin-right:5px;" name="radio" class="input-group-lg " value="None">
+                                    <span style="font-size:20px;padding:10px;" class="">هیڅ یو</span>
+                                </div>
+                            </fieldset>
+                            &nbsp;&nbsp;&nbsp;
+
+
+                            <fieldset class="">
+                                <div class="font-medium-3 border-success rounded" style="background-color:beige">
+
+                                    <input type="radio" id="view" style="height:20px;width:20px;margin-top:5px;margin-right:5px;" class="input-group-lg" name="radio" value="View">
+                                    <span style="font-size:20px;padding:10px;" class="">لیدل</span>
+                                </div>
+                            </fieldset>
+
+                            &nbsp;&nbsp;&nbsp;
+                            <fieldset class=" ">
+                                <div class="font-medium-3 border-success rounded" style="background-color:aliceblue">
+
+                                    <input type="radio" id="insert" style="height:20px;width:20px;margin-top:5px;margin-right:5px;" name="radio" class="input-group-lg" value="Insert">
+                                    <span style="font-size:20px;padding:10px;" class="">ذخیره کول</span>
+                                </div>
+                            </fieldset>
+                            &nbsp;&nbsp;&nbsp;
+                            <fieldset class=" ">
+                                <div class="font-medium-3 border-info rounded" style="background-color:#dcfefd">
+
+                                    <input type="radio" id="edit" style="height:20px;width:20px;margin-top:5px;margin-right:5px;" name="radio" class="input-group-lg" value="Edit">
+                                    <span style="font-size:20px;padding:10px;" class="">تغیرول</span>
+                                </div>
+                            </fieldset>
+                            &nbsp;&nbsp;&nbsp;
+                            <fieldset class=" ">
+                                <div class="font-medium-3 border-danger rounded" style="background-color:#fae3e2;">
+
+                                    <input type="radio" id="delet" style="height:20px;width:20px;margin-top:5px;margin-right:5px;" name="radio" class="input-group-lg" value="Delete">
+                                    <span style="font-size:20px;padding:10px;" class="">حذف</span>
+                                </div>
+                            </fieldset>
+                            &nbsp;&nbsp;&nbsp;
+
+                        </div>
+                        <br />
+
+                        <div class="form-group col-md-2 offset-md-5" style="margin-top:8px;display:contents">
+                            @*<button type="reset" id="btnReset" class="btn btn-warning btn-icon-md">پاکول</button>*@
+                            <button type="submit" id="" class="btn col-md-2 btn-success btn-block btn-icon-md " style=" display: initial;">ذخیره  </button>
+                        </div>
+
+
+                        <hr />
+                    </form>
+                </div><h3 class="text-center">سیستم ته د ننوتلو او وتلو نیټه  </h3>
+                <div class="col-md-12 dt-ext table-responsive">
+
+                    <table class="table  table-striped table-bordered " id="tblLogDetails">
+                        <thead class="">
+                            <tr>
+                                @*<th style="min-width:10px;float:right">#</th>*@
+                                <th class="col-md-4" style="float:right">سیستم ته د داخلیدو نیټه</th>
+                                <th class="col-md-4" style="float:left"> سیستم څخه د وتلو نیټه </th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody></tbody>
+
+                    </table>
+                </div>
+            </section>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<form data-ajax="true" asp-action="LockAccount" data-ajax-method="post" asp-controller="Account">
+    <input hidden id="emailToLock" asp-for="register.email" />
+    <input hidden id="tf" asp-for="register.trueOrfalse" />
+    <button type="submit" class="d-none" id="btnLock"></button>
+</form>
+
+<form data-ajax="true" asp-action="DeleteAccount" data-ajax-method="post" asp-controller="Account" data-ajax-success="deleted(data)">
+    <input hidden id="deleteId" asp-for="register.email" />
+    <button type="submit" class="d-none" id="btnDelete"></button>
+</form>
+
+<form data-ajax="true" asp-action="LoadUserClaims" data-ajax-method="post" asp-controller="Account" data-ajax-success="UserClaims(data)">
+    <input hidden id="userClaim" asp-for="claim.Email" />
+    <button type="submit" class="d-none" id="btnLoadClaims"></button>
+</form>
+<input type="hidden" name="name" id="roleForChange" />
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+
+
+    @* employee script functions *@
+<script>
+        $(document).ready(function () {
+            LoadAccounts();
+        })
+
+        var pass1 = true;
+        var pass2 = true;
+        $("#firstPass").click(function () {
+            if (pass1) {
+                $("#register_Password").attr("type", "text");
+                pass1 = false
+            } else {
+                $("#register_Password").attr("type", "password");
+                pass1 = true
+            }
+        })
+        $("#secondPass").click(function () {
+            if (pass2) {
+                $("#register_ConfirmPassword").attr("type", "text");
+                pass2 = false
+            } else {
+                $("#register_ConfirmPassword").attr("type", "password");
+                pass2 = true
+            }
+        })
+
+
+        //$(".dataTable").wrap("<div class='dataTables_scroll'/>");
+        $("#btnChangeRole").click(function () {
+            $("#roleForChange").val($("#register_id2").val());
+
+        })
+        var show = true;
+        var showLog = true;
+        function LoadAccounts() {
+            $.ajax({
+                url: "/Account/LoadAccounts/",
+                type: "POST",
+                contentType: "application/json",
+                // data: '{txt:"' + $("#txt").val() + '"}',
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    console.log(result)
+                    var cls = "";
+                    var spn = "";
+                    $.each(result, function (i, col) {
+
+                        if (col.emailConfirmed == true) {
+                            cls = "btn-primary";
+                            spn = "fa fa-unlock";
+
+                        } else {
+
+                            cls = "btn-danger";
+                            spn = "fa fa-lock";
+                        }
+
+                        tr += '<tr  role="row">' +
+                            '<td >' + (i + 1) + '</td>' +
+                            '<td >' + col.employeeName + '</td>' +
+                            '<td>' + col.email + '</td>' +
+                            '<td><img src=' + col.imagePath + ' height="60" width="60"/></td>' +
+                            '<td ><button onclick="fnToggleBtnLock(' + i + ',\'' + col.email + '\')" id=' + i + ' class="btn btn-float btn-round btn-float-md   ' + cls + '"><i id="span' + i + '" class="' + spn + '" ></i></button></td>' +
+                            '<td ><button onclick="fnRole(\'' + col.email + '\',\'' + col.employeeName + '\',\'' + col.imagePath+'\')"  class="btn btn-warning"><i /*id="span' + i + '"*/ class="ft-alert-octagon" ></i></button></td>' +
+
+                            //'<td><input type="checkbox" id="switchery" class="switchery" checked="" data-switchery="true" style="display: none;"></td>' +
+
+                            ' <td class=" @ViewBag.Hide  @ViewBag.Delete"><button type="button" onclick="fnDeleteAccount(\'' + col.email + '\')" class="btn btn-danger"><i class="fa fa-trash "></i></button></td>' +
+                            '</tr>';
+
+                    })
+
+                    var table = $("#tblEmployee").dataTable();
+                    table.fnDestroy();
+
+                    $("#tblEmployee>tbody").html("").html(tr);
+
+                        $("#tblEmployee").DataTable({
+
+
+                            stateSave: true,
+
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+
+                        });
+
+
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+                complete: function () {
+
+                }
+
+            })
+        }
+        function fnRoleSet(data) {
+
+            $("#register_role").val($("#roleForChange").val());
+            toast(data, 'success');
+        }
+        function fnRole(email,name,imagePath) {
+
+            $("#userClaim").val(email);
+            $("#claim_Email").val(email);
+            $("#register_email2").val(email);
+            $("#employeeImages").attr("src", imagePath);
+            $("#empName").text(name);
+            $("#btnLoadClaims").trigger("click");
+            $("#divTable").hide();
+            $("#divInput").hide();
+            $("#divDetails").show();
+
+        }
+        function UserClaims(data) {
+
+
+            $("#register_role").val(data.role);
+                $("#register_id2").val(data.role);
+
+            if (data.claims == 4) {
+                $("#not").removeAttr("checked");
+                $("#edit").removeAttr("checked");
+                $("#view").removeAttr("checked");
+                $("#insert").removeAttr("checked");
+            $("#delet").attr("checked","checked");
+            }
+            if (data.claims == 3) {
+                $("#not").removeAttr("checked");
+                $("#view").removeAttr("checked");
+                $("#insert").removeAttr("checked");
+                $("#delet").removeAttr("checked");
+                $("#edit").attr("checked", "checked");
+            }
+            if (data.claims == 2) {
+                $("#not").removeAttr("checked");
+                $("#delet").removeAttr("checked");
+                $("#edit").removeAttr("checked");
+                $("#view").removeAttr("checked");
+                $("#insert").attr("checked", "checked");
+
+
+            }
+            if (data.claims == 1) {
+                $("#not").removeAttr("checked");
+                $("#insert").removeAttr("checked");
+                $("#delet").removeAttr("checked");
+                $("#edit").removeAttr("checked");
+               $("#view").attr("checked","checked");
+            }
+            if (data.claims == 0) {
+                $("#insert").removeAttr("checked");
+                $("#delet").removeAttr("checked");
+                $("#edit").removeAttr("checked");
+                $("#view").removeAttr("checked");
+                $("#not").attr("checked", "checked");
+            }
+            var tr = "";
+
+            $.each(data.logs, function (i, col) {
+
+                var date = "";
+                var out = "";
+                if (col.loginDate == "0001/01/01 12:00:00") {
+                    date = "";
+                    out = "";
+                } else {
+
+                    date = col.loginDate;
+                    out = col.logoutDate;
+                }
+                if (col.logoutDate == "0001/01/01 12:00:00") {
+
+                    out = "";
+                } else {
+
+
+                    out = col.logoutDate;
+                }
+                tr += '<tr  role="row">' +
+
+                    //'<td style="float:right;min-width:10px;">' + (i + 1) + '</td>' +
+                    ' <td class="col-md-4" dir="ltr"style="float:right">' + date + '</td>' +
+                    ' <td class="col-md-4" dir="ltr"style="float:left">' + out + '</td>' +
+
+                    '</tr>';
+
+            })
+            var table = $("#tblLogDetails").dataTable();
+            table.fnDestroy();
+
+            $("#tblLogDetails>tbody").html("").html(tr);
+
+                $("#tblLogDetails").DataTable({
+                    stateSave: true,
+
+                    "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                    "pageLength": 5,
+                    "language": {
+                        "emptyTable": "په جدول کې معلومات شتون نه لري",
+                        "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                        "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                        "infoPostFix": "",
+
+                        "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                        "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                        "searchPlaceholder": "پلټنه",
+                        "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                        "paginate": {
+                            "first": "لومړۍ پاڼه",
+                            "previous": "مخکې",
+                            "next": "وروسته",
+                            "last": "پای"
+                        },
+                    },
+                    //bStateSave: !0, pagingType: "bootstrap_extended", lengthMenu: [[5, 15, 20, -1], [5, 15, 20, "All"]], pageLength: 10, columnDefs: [{
+                    //    orderable: !1, targets: [0]
+                    //}],
+                    //lengthMenu: [[5, 10, 25, 100, -1], [5, 10, 25, 100, "All"]],
+                    //buttons: [{ extend: "excel", className: "btn red moveTop ", text: "<i class='fa fa-file-excel-o' aria-hidden='true'>&nbsp;<b>Excel</b>" },
+                    //{ extend: "pdf", className: "btn dark moveTop", text: "<b>Pdf</b>&nbsp;<i class='fa fa-arrow-circle-down' aria-hidden='true'></i>" }],
+
+                    //dom: "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+
+
+
+
+        }
+        function fnToggleBtnLock(i, email) {
+            if ($("#" + i).hasClass("btn-danger")) {
+                $("#tf").val("unlock");
+                $("#emailToLock").val(email);
+                $("#btnLock").trigger("click");
+                $("#" + i).removeClass("btn-danger").addClass("btn-primary");
+                $("#span" + i).removeClass("fa fa-lock").addClass("fa fa-unlock");
+
+            } else {
+                $("#tf").val("lock");
+                $("#emailToLock").val(email);
+                $("#btnLock").trigger("click");
+                $("#" + i).removeClass("btn-primary").addClass("btn-danger");
+                $("#span" + i).removeClass("fa fa-unlock").addClass("fa fa-lock");
+
+            }
+
+
+            //< a href = "#" onclick = "fnToggleBtnLock('+i+')" id = '+i+' class="btn btn-float btn-round btn-float-md btn-danger" > <i class="fa fa-unlock"></i></a >
+        }
+        function funSuccessAccount(data) {
+
+            LoadAccounts();
+
+            $("#frmRegister")[0].reset();
+            if (data == "پټ نوم باید شپږ حروفه یو عدد او یو سیمبول ولرې") {
+                toast(data, 'error');
+
+            } else {
+                toast(data, 'success');
+
+            }
+            $("#btnSubmitAccount").text("ذخیره ");
+        }
+        var list = true;
+        function fnDeleteAccount(comId) {
+
+            $("#deleteId").val(comId);
+            swal({
+                title: "آیا غواړی چې نوموړی اکاونټ حذف شې؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    $("#btnDelete").trigger("click");
+                }
+            });
+
+        }
+        function deleted(data) {
+            toast(data, 'success');
+            LoadAccounts();
+        }
+        function fnClaimSet(data) {
+            toast(data, 'success');
+        }
+</script>
+    <script>
+
+        $("#accountlistshow").click(function () {
+            $("#divTable").show();
+            $("#divDetails").hide();
+
+        })
+        var list = true;
+        $("#btnList").click(function () {
+            if (list) {
+
+                $("#divInput").animate({
+
+
+                }).hide();
+
+
+                $("#divTable").animate({
+
+                }).show();
+                $("#divTable").removeClass("d-none")
+
+                $("#btnList").text("داکاونټ جوړول")
+                list = false;
+
+                $("#divDetails").hide();
+            } else {
+                $("#divInput").animate({
+
+
+                }).show();
+
+
+                $("#divTable").animate({
+
+                }).hide();
+
+                $("#btnList").text(" د موجوده اکاونټونو لیست ")
+                list = true;
+                $("#divDetails").hide();
+            }
+
+        });
+
+
+    </script>
+}

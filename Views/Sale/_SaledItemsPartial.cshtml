@@ -1,0 +1,296 @@
+﻿@model ReturnItemsViewModel
+
+
+
+<div class="col-md-7 offset-md-3">
+    <form asp-controller="Sale" data-ajax="true" class="form-inline" data-ajax-method="post" data-ajax-success="loadReport2(data)" asp-action="FetchSaledItems">
+
+        <div id="specific" class="col-md-12 row m-0 p-0">
+            <div class="col-md-4  m-0" style="display: flex; align-items: center;">
+                <label>د نیټې څخه</label>
+                <input class="form-control" required name="fromDate" type="date" style="height:45px;">
+            </div>
+            <div class="col-md-4  m-0" style="display: flex; align-items: center;">
+                <label>تر نیټې پورې</label>
+                <input class="form-control" required name="toDate" type="date" style="height:45px;">
+            </div>
+            <div class="col-md-4  m-0" style="display: flex; align-items: center;">
+                <button type="submit" class="btn btn-default  btn-info"> ښودل</button>
+                &nbsp;
+                <button type="reset" id="btnLoadCurrentMonth2" class="btn btn-default  btn-warning">پاکول</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<table class="table dtr-inline table-striped table-bordered " id="tblItems">
+    <thead>
+        <tr role="row">
+            <th>#</th>
+            <th>بیل نمبر</th>
+            <th>مشترې</th>
+            <th>جنس</th>
+            <th>واحد </th>
+            <th>واحد ظرفیت </th>
+            <th>تعداد </th>
+            <th> اخستلو قیمت</th>
+            <th>خرڅ قیمت</th>
+            <th>تخفیف</th>
+            <th>ګټه</th>
+            <th>پولې واحد</th>
+            <th>نیټه</th>
+            <th>کارمند</th>
+            <th>واپس کول</th>
+            <th> مجموعه</th>
+
+        </tr>
+    </thead>
+
+    <tbody></tbody>
+    <tfoot>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>
+
+
+<!--return modal-->
+
+<div class="modal fade text-left" id="ItemReturnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel10"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary white">
+                <h4 class="modal-title" id="myModalLabel10">د جنس واپس کول </h4>
+                <button type="button" id="" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-2">
+                <form data-ajax="true" asp-action="ReturnItems" asp-controller="Sale" data-ajax-success="funSuccessReturny(data)" data-ajax-method="post" id="frm">
+                    <input hidden id="purId" name="purId" />
+                    <input hidden id="dealerIdd" name="dealerIdd" />
+                    <input hidden id="inUnitt" name="inUnitt" />
+
+                    <div class="form-group">
+                        <label class="">خرڅ تعداد  :</label>
+                        <input id="purchasedQty" disabled class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="">واحد:</label>
+                        <input id="unitt" disabled class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="">خرڅ قیمت:</label>
+                        <input id="itempricee" disabled class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="">واپسی تعداد:</label>
+                        <input asp-for="ReturnQty" class="form-control " />
+                        <span asp-validation-for="ReturnQty" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="">تفصیل:</label>
+                        <input asp-for="Details" class="form-control " />
+                    </div>
+
+                    <div class="modal-footer" id="btnSubmits">
+                        <button type="button" class="btn grey btn-outline-secondary " id="btnClosee" data-dismiss="modal">بندول</button>
+                        <button type="submit" id="btnSubmit" class="btn btn-outline-primary">واپس کول</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    $(function () {
+        allItems()
+    })
+
+    function ReturnItems(purchaseid, dealerid, price, purchasedQty, unit, inunit) {
+
+        $("#purId").val(purchaseid)
+        $("#dealerIdd").val(dealerid)
+        $("#itempricee").val(price)
+        $("#purchasedQty").val(purchasedQty)
+        $("#unitt").val(unit)
+        $("#inUnitt").val(inunit)
+
+        $("#ItemReturnModal").modal("show")
+    }
+
+    function funSuccessReturny(data) {
+        $("#ItemReturnModal").modal("hide")
+
+        toast(data, 'success');
+        allItems()
+    }
+
+    function allItems() {
+        $.ajax({
+            url: '/Sale/FetchSaledItems/',
+            type: 'POST',
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+
+                TableDataShow2(result);
+            }
+        })
+    }
+
+    function loadReport2(data) {
+        TableDataShow2(data);
+    }
+
+    function TableDataShow2(data) {
+
+        var tr = "";
+        $.each(data, function (i, col) {
+
+            tr += "  <tr> ";
+            tr += "      <td> " + (i + 1) + "</td> ";
+            tr += "      <td> " + col.bill + "</td> ";
+            tr += "      <td>" + col.customer + "</td> ";
+            tr += "      <td>" + col.item + "</td> ";
+            tr += "      <td>" + col.unit + "</td> ";
+            tr += "      <td>" + col.inunit + "</td> ";
+            tr += "      <td>" + parseFloat(col.qty).toFixed(2) + "</td> ";
+            tr += "      <td>" + parseFloat(col.price).toFixed(3) + "</td> ";
+            tr += "      <td>" + parseFloat(col.saleprice).toFixed(3) + "</td> ";
+            tr += "      <td>" + parseFloat(col.discount).toFixed(2) + "</td> ";
+            tr += "      <td>" + parseFloat((col.saleprice - col.price) * col.qty).toFixed(3) + "</td> ";
+            tr += "      <td>" + col.currency + "</td> ";
+            tr += "      <td>" + col.date + "</td> ";
+            tr += "      <td>" + col.employee + "</td> ";
+            tr += "      <td><button class='btn btn-outline-info'onclick='ReturnItems(\"" + col.id + "\",\"" + col.customerid + "\",\"" + col.saleprice + "\",\"" + col.qty + "\",\"" + col.unit + "\",\"" + col.inunit + "\")'><i class='ft-refresh-cw'></i>&nbsp; <strong> واپس</strong></button></td> ";
+            tr += "      <td>" + parseFloat((col.qty * col.saleprice) - col.discount).toFixed(3) + "</td> ";
+        });
+
+        var table = $("#tblItems").dataTable();
+        table.fnDestroy();
+
+        $("#tblItems>tbody").html("").html(tr);
+        var tab = $("#tblItems").DataTable({
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(),
+                    data;
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0
+                };
+
+                first = api
+                    .column(15, {
+                        page: 'current'
+                    })
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                $(api.column(15).footer()).html(
+                    'ټوټل' + parseFloat(first).toFixed(2)
+                );
+            },
+            dom: 'Blfrtip',
+
+            buttons: [
+                'colvis',
+                {
+                    extend: 'print',
+                    orientation:'landscape',
+                    footer: true,
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+
+                },
+                { extend: 'excel', footer: true },
+                { extend: 'copy', footer: true },
+            ],
+
+            responsive: true,
+
+            colReorder: true,
+            stateSave: true,
+            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+            "pageLength": 5,
+            "language": {
+                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                "infoPostFix": "",
+
+                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                "searchPlaceholder": "پلټنه",
+                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                "paginate": {
+                    "first": "لومړۍ پاڼه",
+                    "previous": "مخکې",
+                    "next": "وروسته",
+                    "last": "پای"
+                },
+            },
+
+        });
+
+        $('#tblItems tfoot th').each(function () {
+            var title = $(this).text();
+            if (title != '') return false;
+            $(this).html('<input type="text" style="height:35px !important;" class="form-control" placeholder="پلټنه ' + title + '" />');
+        });
+
+
+        // Apply the search
+        tab.columns().every(function () {
+            var that = this;
+
+            $('input', this.footer()).on('keyup change', function () {
+                if (that.search() !== this.value) {
+                    that
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+
+        $(".buttons-print").text("").html("<i class='ft-printer'></i>");
+        $(".buttons-copy").text("").html("<i class='ft-copy'></i>");
+        $(".buttons-excel").text("").html("<i class='fa fa-file-excel-o'></i>");
+        $(".buttons-colvis").text("").html("<i class='ft-eye-off'></i>");
+        $('.buttons-copy, .buttons-print, .buttons-excel,.buttons-colvis').addClass('btn btn-primary ');
+    }
+
+    $("#btnLoadCurrentMonth2").click(function () {
+        allItems();
+    })
+
+</script>

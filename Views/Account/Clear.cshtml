@@ -1,0 +1,66 @@
+﻿<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#cleardatabase").addClass("active")</script>
+
+<div class="col-md-8 col-sm-12 offset-md-2">
+    <div class="card text-white bg-warning text-center" style="height: 40%;">
+        <div class="card-content">
+            <div class="card-body pb-4 pt-3">
+                <img src="~/images/StaticImages/warning.png" alt="element 03" width="170" class="float-right mt-4">
+                <h2 style="font-size:30px;" class="card-title mt-3">د موجوده ریکارډونو حذف کول</h2>
+                <p class="card-text" style="display:flex;font-size:25px;">  که چیرې تاسې غواړې چې موجوده ریکارډونه حذف شې نو  لاندې بټنه کلیک کړې د یادونې وړ ده چې د بټنې د کلیک نه وروسته موجود ریکارډونه نه واپس کیږې!!!</p>
+                <br />
+                <button class="btn btn-danger btn-darken-3" onclick="fnClear()">حذف کول <span class="fa fa-trash-o"></span></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    
+    <script>
+        function fnClear() {
+            swal({
+                title: "آیا تاسې مطمئن یاست؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    Clear();
+                }
+            });
+
+        }
+        function Clear() {
+            $.ajax({
+                url: "/Account/ClearAllTables/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    toastr.success(result, '', { "progressBar": true, positionClass: 'toast-top-left', containerId: 'toast-top-left' });
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            })
+        }
+    </script>
+}

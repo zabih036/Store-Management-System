@@ -1,0 +1,195 @@
+﻿@model ManulReprotViewModel
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#salaryReport").addClass("active")</script>
+
+<div class="col-md-12 container-fluid card">
+    <form asp-controller="Report" data-ajax="true" data-ajax-method="post" data-ajax-success="fnManul(data)" asp-action="ManualSalaryReprot">
+        <div class="row card-body box-shadow-1 border-purple border-accent-1">
+
+            <div class="col-md-6 p-0 m-0">
+                <button type="button" onclick="fnCurrentMonth()" class="btn btn-info"> د روان میاشت ورکړل شوې معاشات</button>
+                <button id="btnManualReport" type="button" style="height:45px;" class="btn  btn-warning">معلوم وخت معاشات</button>
+
+            </div>
+            <div id="specific" class="col-md-6 row m-0 p-0" style="display:none">
+
+                <div class="row col-md-5 p-0 m-0">
+                    <h3 class="col-md-push-4 p-0 m-0 mt-1">
+                        د نیټې څخه
+                    </h3>
+                    &nbsp;
+                    <div class="col-md-8 p-0 m-0">
+                        <input class="form-control " style="height:45px;" asp-for="FromDate">
+                    </div>
+
+                </div>
+
+
+                <div class="row col-md-5 p-0 m-0">
+                    <h3 class=" col-md-5 p-0 m-0 mt-1"> تر نیټې پورې</h3>
+
+                    <div class="col-md-7 p-0 m-0">
+                        <input class="form-control " style="height:45px;" asp-for="ToDate">
+                    </div>
+                </div>
+                &nbsp;
+                <div class=" col-md-1 p-0 m-0">
+                    <button type="submit" class="btn btn-default  btn-info">راپور ښودل</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<br />
+<style>
+    .dt-buttons {
+        float: left;
+    }
+</style>
+<div class="card border-purple border-accent-2" id="divTableSalary" style="margin-top:-40px;">
+    <div style="display: flex;align-items: center; " class="mt-1">
+        <div class="text-center offset-md-1  p-1  col-md-6 mb-1">
+            <h2 id="title" class="blue"> </h2>
+        </div>
+        &nbsp;   &nbsp;   &nbsp;
+        <div class="text-center offset-md-1  p-1  col-md-3 row ">
+            <h3 class="font-weight-bold ">ټوټل تادیه شوې معاشات :</h3>
+            <h3 id="totalSalary"></h3>
+        </div>
+    </div>
+    <div id="divCurrentMonth">
+        <table class="table table-responsive-md  table-striped table-condensed table-bordered dataTables_scrollHead" id="tblCurrentMonth">
+            <thead class="scrollable-container ps--scrolling-x">
+                <tr role="row">
+                    <th style="max-width:10px;">#</th>
+                    <th class="col-md-3">د کارمند نوم</th>
+                    <th class="col-md-1"> موبایل نمبر</th>
+                    <th class="col-md-1">  بریښنالیک</th>
+                    <th class="col-md-1">  اخیستل شوی معاش</th>
+                    <th class="col-md-2">  نیټه</th>
+                    <th class="col-md-1">  تادیه ورکونکی</th>
+
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+    </div>
+</div>
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $(document).ready(function () {
+            fnCurrentMonth();
+            $("#btn").click(function () {
+                $("#divTableSalary").printThis({
+                    debug: false,
+                    importStyle: true,
+                    printContainer: true,
+                    loadCSS: "",
+                    pageTitle: "",
+                    removeInline: false,
+                    removeInlineSelector: "*",
+                    base: false,
+                    formValues: true,
+                    canvas: false,
+                    doctypeString: '...',
+                    removeScripts: false,
+                    copyTagClasses: true,
+                    beforePrintEvent: null,
+                    beforePrint: null,
+                    afterPrint: null
+                });
+
+            })
+        })
+
+        function TableData(result) {
+            var tr = "";
+            var total = 0.0;
+            $.each(result, function (i, col) {
+                total += col.paidAmount;
+                tr += '<tr  role="row">' +
+                    '<td >' + (i + 1) + '</td>' +
+                    '<td >' + col.name + '</td>' +
+                    '<td>' + col.phone + '</td>' +
+                    '<td>' + col.email + '</td>' +
+                    '<td>' + col.paidAmount + '</td>' +
+                    ' <td class="col-md-3">' + col.paidDate + '</td>' +
+                    ' <td>' + col.paidBy + '</td>' +
+                    '</tr>';
+
+            })
+            $("#totalSalary").text(parseFloat(total).toFixed(2));
+
+            var table = $("#tblCurrentMonth").dataTable();
+            table.fnDestroy();
+
+            $("#tblCurrentMonth>tbody").html("").html(tr);
+            $("#tblCurrentMonth").DataTable({
+
+                dom: 'Blfrtip', buttons: ['excel', 'print', 'copy'],
+                stateSave: true,
+                "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                "pageLength": 5,
+                "language": {
+                    "emptyTable": "په جدول کې معلومات شتون نه لري",
+                    "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                    "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                    "infoPostFix": "",
+
+                    "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                    "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                    "searchPlaceholder": "پلټنه",
+                    "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                    "paginate": {
+                        "first": "لومړۍ پاڼه",
+                        "previous": "مخکې",
+                        "next": "وروسته",
+                        "last": "پای"
+                    },
+                },
+
+            });
+            $(".buttons-print").text("چاپ")
+            $(".buttons-copy").text("کاپي")
+            $(".buttons-excel").text("ایکسل")
+            $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+        }
+
+        function fnCurrentMonth() {
+            $("#divManual").hide();
+            $("#specific").hide();
+
+            $("#title").text("د روان میاشت معاشات");
+            $.ajax({
+                url: "/Report/LoadCurrentMonthsSalaries/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    TableData(result)
+                }
+            })
+        }
+
+        function fnManul(result) {
+            $("#divManual").show();
+            $("#specific").show();
+
+            $("#title").text("د معلومې نیټې معاشات");
+
+            TableData(result)
+        }
+
+        $("#btnManualReport").click(function () {
+            $("#specific").show();
+        })
+
+    </script>
+}

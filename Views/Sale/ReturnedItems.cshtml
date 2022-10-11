@@ -1,0 +1,95 @@
+﻿<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#returnsaleActive").addClass("active")</script>
+
+<div class="card p-0" id="purchaseList">
+    <h2 class="text-center alert bg-info box-shadow-1">د پلورل شویو اجناسو د واپسیو لېست</h2>
+    <table class="table  table-responsive-md table-bordered dataex-fixh-basic dataTable" id="tblList">
+        <thead>
+            <tr role="row">
+                <th>بیل نمبر</th>
+                <th>مشتري</th>
+                <th>جنس</th>
+                <th>واحد</th>
+                <th>واحد ظرفیت</th>
+                <th> تعداد</th>
+                <th>خرڅ قیمت</th>
+                <th>تخفیف</th>
+                <th>مجموعه</th>
+                <th>پولې واحد</th>
+                <th>واپسي نیټه</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+
+    </table>
+</div>
+
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        $(document).ready(function () {
+            fetchReturnedSales();
+        })
+        function fetchReturnedSales() {
+            $.ajax({
+                url: '/Sale/FetchSaledReturned/',
+                type: 'POST',
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    $.each(result, function (i, col) {
+
+                        tr += "  <tr> ";
+                        tr += "      <td>" + col.bill + "</td> ";
+                        tr += "      <td>" + col.customer + "</td> ";
+                        tr += "      <td>" + col.item + "</td> ";
+                        tr += "      <td>" + col.unit + "</td> ";
+                        tr += "      <td>" + col.inunit + "</td> ";
+                        tr += "      <td>" + parseFloat(col.qty).toFixed(2) + "</td> ";
+                        tr += "      <td>" + col.price + "</td> ";
+                        tr += "      <td>" + col.discount + "</td> ";
+                        tr += "      <td> " + parseFloat((col.qty * col.price) - col.discount).toFixed(3) + "</td> ";
+                        tr += "      <td>" + col.currency + "</td> ";
+                        tr += "      <td>" + col.date + "</td> ";
+
+                        tr += "  </tr>";
+                    });
+                    $("#tblList>tbody").html("").html(tr);
+
+                    $("#tblList").DataTable({
+                        stateSave: true,
+                        dom: 'Blfrtip', buttons: ['excel', 'print', 'copy'],
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+                    });
+                    $(".buttons-print").text("چاپ")
+                    $(".buttons-copy").text("کاپي")
+                    $(".buttons-excel").text("ایکسل")
+                    $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+                }
+            })
+        }
+    </script>
+}
+
+

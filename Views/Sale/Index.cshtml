@@ -1,0 +1,40 @@
+﻿
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#saleActive").addClass("active")</script>
+
+<div class="card">
+    <div class="col-md-12 px-2 pt-1">
+        <h2 class="text-center alert bg-yellow bg-darken-2 box-shadow-1" style="background-color:#ffffff;">د اجناسو د خرڅولو فارم</h2>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <ul class="nav nav-tabs nav-top-border no-hover-bg">
+                <li class="nav-item">
+                    <a class="nav-link active" id="baseIcon-tab11" data-toggle="tab" aria-controls="tabIcon11" href="#tabIcon11" aria-expanded="true"><i class="fa fa-shopping-cart"></i> اجناسو خرڅول </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " id="baseIcon-tab12" data-toggle="tab" aria-controls="tabIcon12" href="#tabIcon12" aria-expanded="false"><i class="fa fa-file-text-o"></i> خرڅ شوی بیل</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " id="baseIcon-tab13" data-toggle="tab" aria-controls="tabIcon13" href="#tabIcon13" aria-expanded="false"><i class="fa fa-shopping-basket"></i> خرڅ شوې اجناس</a>
+                </li>
+            </ul>
+            <div class="tab-content pt-1">
+                <div role="tabpanel" class="tab-pane active" id="tabIcon11" aria-expanded="true" aria-labelledby="baseIcon-tab11">
+                    @await Html.PartialAsync("~/views/Sale/_SalePartial.cshtml")
+                </div>
+                <div class="tab-pane " id="tabIcon12" aria-labelledby="baseIcon-tab12">
+                    @await Html.PartialAsync("~/views/Sale/_SaledBillPartial.cshtml")
+                </div>
+                <div class="tab-pane " id="tabIcon13" aria-labelledby="baseIcon-tab13">
+                    @await Html.PartialAsync("~/views/Sale/_SaledItemsPartial.cshtml")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

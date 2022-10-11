@@ -1,0 +1,626 @@
+﻿@model AllViewModel
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#financialreport").addClass("active")</script>
+
+<section id="custom-listgroup">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-center alert bg-info box-shadow-1">مالي راپور</h2>
+            <div class="card"style="height:100%">
+                <div class="card-header">
+
+
+                    <div class="col-md-12" id="reportbtns">
+
+
+                        @* //////////////////////  د معلوم وخت راپور///////////////// *@
+                        <div class="col-md-12 container-fluid card">
+                            <form asp-controller="Item" data-ajax="true" data-ajax-method="post" data-ajax-success="loadReport(data)" asp-action="ManualReprot">
+                                <button type="button" class="btn btn-info btn-md" onclick="todaysreport()">د نن ورځې</button>
+                                <button type="button" class="btn btn-success btn-md" onclick="currentMonth()">روان میاشت</button>
+                                <button type="button" class="btn btn-warning btn-md" onclick="lastMonth()">تېر میاشت</button>
+                                <button type="button" class="btn btn-info btn-md" onclick="currentYear()">روان کال </button>
+                                <button type="button" class="btn btn-success btn-md" onclick="lastYear()">تېر کال</button>
+                                <button type="button" class="btn btn-info btn-md" id="btnManualReport">معلوم وخت</button>
+
+                                <div id="specific" class="col-md-6 row m-0 p-0" style="display:none">
+                                    <div class="row col-md-5 p-0 m-0">
+                                        <h3 class="col-md-push-4 p-0 m-0 mt-1">
+                                            د نیټې څخه
+                                        </h3>
+                                        &nbsp;
+                                        <div class="col-md-8 p-0 m-0">
+                                            <input class="form-control" style="height:45px;" asp-for="manulReport.FromDate">
+                                        </div>
+                                    </div>
+                                    <div class="row col-md-5 p-0 m-0">
+                                        <h3 class=" col-md-5 p-0 m-0 mt-1"> تر نیټې پورې</h3>
+                                        <div class="col-md-7 p-0 m-0">
+                                            <input class="form-control" style="height:45px;" asp-for="manulReport.ToDate">
+                                        </div>
+                                    </div>
+                                    &nbsp;
+                                    <div class=" col-md-1 p-0 m-0">
+                                        <button type="submit" class="btn btn-default  btn-info">راپور ښودل</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+
+                        @* /////////////////////////////////////////////////// *@
+                        <div class="d-none">
+                            <form data-ajax="true" data-ajax-url="/Item/FetchFinanceReport" data-ajax-success="loadReport(data)" data-ajax-method="post">
+                                <input type="hidden" class="" value="1" name="reportType" id="reportType" />
+                                <button type="submit" id="btnsubmitReport">submit</button>
+                            </form>
+                        </div>
+                    </div>
+                    <a class="heading-elements-toggle"><i class="fa fa-ellipsis font-medium-3"></i></a>
+                    <div class="heading-elements" style="float:left">
+                        <ul class="list-inline mb-0 row">
+
+                            <li><a class="btn btn-primary" onclick="printReport()"><i class="ft-printer"></i>&nbsp;&nbsp; چاپ</a></li>
+                            @*<li><a class="btn btn-primary" onclick="singleItem()"><i class="" id="btnreport">د یو جنس مالي راپور</i></a></li>*@
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-content collapse show">
+                    <div class="card-body" id="printable">
+
+                        <div class="row">
+                            <div class="col-md-12 text-center d-none" id="corporation">
+                                <p style="font-style:oblique">
+                                    <label style="font-size:x-large">فابریکه تولیدی مواد شوینده میربت زاده</label><br />
+                                    <label style="font-size:x-large">مالي راپور</label><br />
+                                    <label class="float-right" style="font-size:x-large" id="date"></label>
+                                </p>
+                                <br /><br /><br />
+                            </div>
+                            <div class="col-md-4" id="financial1">
+                                <div class="media d-flex">
+                                    <div class="media-body text-left">
+                                        <span class=" alert" style="font-size:21px;font-weight:bold;">افغانۍ مالي راپور (ګټه یا زیان)</span>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="icon-book-open primary font-large-2 float-right"></i>
+                                    </div>
+                                </div>
+                                <div class="list-group" style="height:100%;">
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه اخیستل:</strong> <strong class="float-right" id="afghanipurchase" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه خرڅ:</strong> <strong class="float-right" id="afghanisale" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه پر مشتریانو قرضونه:</strong> <strong class="float-right" id="oncustomeraf" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مشتریانو تادیه شوې:</strong> <strong class="float-right" id="afpaid" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه پر مونږ قرضونه:</strong> <strong class="float-right" id="afonus" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه تادیه شوې:</strong> <strong class="float-right" id="wepaidaf" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-acti nger" style="height:16%"><strong class="float-left">مجموعه مصارف:</strong> <strong class="float-right" id="afghaniexpences" dir="ltr">0</strong></a>
+
+                                    <a href="#" dir="ltr" class="list-group-item list-group-item-action " style="height:16%;border:1px solid;font-size:xx-large"><strong class="float-left">:<label id="afghanilost">زیان</label> ګټه یا </strong> <strong class="float-right" id="afghanibenefit" dir="ltr">0</strong></a>
+                                    <a href="#" dir="ltr" class="list-group-item list-group-item-action " style="height:16%;border:1px solid;font-size:xx-large"><strong class="float-left">:<label id=""></label>  موجود سیف </strong> <strong class="float-right" id="afghaniCash" dir="ltr">0</strong></a>
+                                    @*<a href="#" dir="ltr" class="list-group-item list-group-item-action " style="height:16%;border:1px solid;font-size:xx-large"><strong class="float-left">:<label id=""></label>  موجود اجناس </strong> <strong class="float-right" id="afghaniItem">0</strong></a>*@
+                                </div>
+                            </div>
+                            <div class="col-md-4" id="financial2">
+                                <div class="media d-flex">
+                                    <div class="media-body text-left">
+                                        <span class=" alert" style="font-size:21px;font-weight:bold;">کلداري مالي راپور (ګټه یا زیان)</span>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="icon-book-open primary font-large-2 float-right"></i>
+                                    </div>
+                                </div>
+                                <div class="list-group" style="height:100%;">
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه اخیستل:</strong> <strong class="float-right" id="rupepurchase" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه خرڅ:</strong> <strong class="float-right" id="rupesale" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه پر مشتریانو قرضونه:</strong> <strong class="float-right" id="oncustomerpk" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مشتریانو تادیه شوې:</strong> <strong class="float-right" id="pkpaid" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه پر مونږ قرضونه:</strong> <strong class="float-right" id="pkonus" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه تادیه شوې:</strong> <strong class="float-right" id="wepaidpk" dir="ltr">0</strong></a>
+                                 @*   <a href="#" class="list-group-item list-group-item-acti nger" style="height:16%"><strong class="float-left">مجموعه مصارف:</strong> <strong class="float-right" id="rupeexpence">0</strong></a>*@
+                                    <a href="#" dir="ltr" class="list-group-item list-group-item-action " style="height:16%;border:1px solid;font-size:large"><strong class="float-left">:<label id="rupelost">زیان</label> ګټه یا</strong> <strong class="float-right" id="rupebenefit" dir="ltr">0</strong></a>
+                                    <a href="#" dir="ltr" class="list-group-item list-group-item-action " style="height:16%;border:1px solid;font-size:large"><strong class="float-left">:<label id=""></label> موجود سیف</strong> <strong class="float-right" id="rupeCash" dir="ltr">0</strong></a>
+                                   @* <a href="#" dir="ltr" class="list-group-item list-group-item-action " style="height:16%;border:1px solid;font-size:large"><strong class="float-left">:<label id=""></label> موجود اجناس</strong> <strong class="float-right" id="rupeItem">0</strong></a>*@
+                                </div>
+                            </div>
+                            <div class="col-md-4" id="financial3">
+                                <div class="media d-flex">
+                                    <div class="media-body text-left">
+                                        <span class=" alert" style="font-size:21px;font-weight:bold;">ډالري مالي راپور (ګټه یا زیان)</span>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="icon-book-open primary font-large-2 float-right"></i>
+                                    </div>
+                                </div>
+                                <div class="list-group" style="height:100%">
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه اخیستل:</strong> <strong class="float-right" id="dollerpurchase" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه خرڅ:</strong> <strong class="float-right" id="dollersale" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه پر مشتریانو قرضونه:</strong> <strong class="float-right" id="oncustomerus" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مشتریانو تادیه شوې:</strong> <strong class="float-right" id="uspaid" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه پر مونږ قرضونه:</strong> <strong class="float-right" id="usonus" dir="ltr">0</strong></a>
+                                    <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه تادیه شوې:</strong> <strong class="float-right" id="wepaidus" dir="ltr">0</strong></a>
+
+                                   @* <a href="#" class="list-group-item list-group-item-actionger" style="height:16%"><strong class="float-left">مجموعه مصارف:</strong> <strong class="float-right" id="dollerexpece">0</strong></a>*@
+                                    <a href="#" dir="ltr" class="list-group-item list-group-item-action " style="height:16%;border:1px solid;font-size:large"><strong class="float-left">:<label id="dollerlost">زیان</label> ګټه یا</strong> <strong class="float-right" id="dollerbenefit" dir="ltr">0</strong></a>
+                                    <a href="#" dir="ltr" class="list-group-item list-group-item-action " style="height:16%;border:1px solid;font-size:large"><strong class="float-left">:<label id=""></label>  موجود سیف</strong> <strong class="float-right" id="dollerCash" dir="ltr">0</strong></a>
+                                   @* <a href="#" dir="ltr" class="list-group-item list-group-item-action " style="height:16%;border:1px solid;font-size:large"><strong class="float-left">:<label id=""></label>  موجود اجناس</strong> <strong class="float-right" id="dollerItem">0</strong></a>*@
+                                </div>
+                            </div>
+
+                            <div class="col-md-12" id="singleitemReport" style="display:none">
+                                <form data-ajax="true" asp-controller="Item" asp-action="SingleItemFinancialReport" data-ajax-success="frmSuccess(data)" data-ajax-method="post" id="frmCustomerReg">
+                                    <div class="col-md-8 offset-2 row" style="display: flex; flex-direction: row; justify-content: space-around; text-align: center; ">
+                                        @*<div class="form-group">
+                                            <label asp-for="purchase.ItemID" class=""></label>
+                                            <select asp-for="purchase.ItemID" onchange="fnSubmit()" asp-items="@ViewBag.item" class="form-control select2 select2-container select2-container--default select2-container--above" dir="rtl" style="width:100%">
+                                                <option value="">جنس انتخاب کړئ</option>
+                                            </select>
+                                            <span asp-validation-for="purchase.ItemID" class="text-danger"></span>
+                                        </div>*@
+
+                                        @*<div class="form-group ">
+                                            <label asp-for="purchase.CurrencyID" class=""></label>
+                                            <select asp-for="purchase.CurrencyID" onchange="fnSubmit()" asp-items="@ViewBag.Currency" class="form-control select2 select2-container select2-container--default select2-container--above" dir="rtl" style="width: 100%;min-height:40px;">
+                                                <option value="">د پیسو ډول انتخاب کړئ</option>
+                                            </select>
+                                            <span asp-validation-for="purchase.CurrencyID" class="text-danger"></span>
+                                        </div>*@
+                                        <div class="form-group">
+                                            <label class="">د راپور ډول</label>
+                                            <select name="itemReportType" onchange="fnSubmit()" class="form-control select2 select2-container select2-container--default select2-container--above" dir="rtl" style="width:100%;min-height:40px;">
+                                                <option value="0">عمومي راپور</option>
+                                                <option value="1">د نن ورځې راپور</option>
+                                                <option value="2">د روان میاشت راپور</option>
+                                                <option value="3">د تیرې میاشتې راپور</option>
+                                                <option value="4">د روان کال راپور</option>
+                                                <option value="5">د تیر کال رابور</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 float-right" style="margin-top:5% ;display:none">
+                                            <button type="submit" id="btnSubmit" class="btn btn-primary btn-icon-md"><i class="ft-save" id="btnsubmiticon"></i>&nbsp;<lable id="btnsubmitText">تایید</lable></button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="list-group col-md-8 offset-2">
+
+                                    <div class="text-center">
+                                        <h2>اخستلو تفصیل</h2>
+                                    </div>
+                                    <table id="tblpurchase" class="table-bordered " style=" background: repeating-linear-gradient( 45deg, azure, transparent 100px);">
+                                        <thead class="box-shadow-0">
+                                            <tr>
+                                                <th>عمده تعداد</th>
+                                                <th>پرچون تعداد</th>
+                                                <th>واحد ظرفیت</th>
+                                                <th> قیمت</th>
+                                                <th>مجموعه</th>
+                                                <th>اخستلو نیټه</th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th rowspan="1" colspan="1" id="purcarton"></th>
+                                                <th rowspan="1" colspan="1" id="purpacket"></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1" id="singletotal"></th>
+                                                <th rowspan="1" colspan="1">ټوټل</th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody></tbody>
+                                    </table>
+
+
+                                    <div class="text-center">
+                                        <h2>د خرڅ تفصیل</h2>
+                                    </div>
+                                    <table id="tblsale" class="table-bordered " style="background: repeating-linear-gradient( 45deg, aliceblue, transparent 100px);">
+                                        <thead class="box-shadow-0">
+                                            <tr>
+                                                <th>عمده تعداد</th>
+                                                <th>پرچون تعداد</th>
+                                                <th>واحد ظرفیت</th>
+                                                <th> قیمت</th>
+                                                <th>مجموعه</th>
+                                                <th>خرڅ نیټه</th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th rowspan="1" colspan="1" id="salecarton"></th>
+                                                <th rowspan="1" colspan="1" id="salepacket"></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1" id="singletotalsale"></th>
+                                                <th rowspan="1" colspan="1">ټوټل</th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody></tbody>
+                                    </table>
+
+                                    <div class="text-center">
+                                        <h2>د ګودام تفصیل</h2>
+                                    </div>
+                                    <table id="tblstock" class="table-bordered " style="background: repeating-radial-gradient(aliceblue, transparent 100px); ">
+                                        <thead class="box-shadow-0">
+                                            <tr>
+                                                <th>عمده تعداد</th>
+                                                <th>پرچون تعداد</th>
+                                                <th>واحد ظرفیت</th>
+                                                <th> قیمت</th>
+                                                <th>مجموعه</th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th rowspan="1" colspan="1" id="stockcarton"></th>
+                                                <th rowspan="1" colspan="1" id="stockpacket"></th>
+                                                <th rowspan="1" colspan="1"></th>
+                                                <th rowspan="1" colspan="1" id="singletotalstock"></th>
+                                                <th rowspan="1" colspan="1">ټوټل</th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+<script>
+    $(document).ready(function () {
+        todaysreport();
+        //LoadCashInHand();
+       // FetchStockItems();
+        $("#purchase_CurrencyID").val(3)
+        $("#purchase_ItemID").select2();
+    })
+    function fnSubmit() {
+        $("#btnSubmit").trigger("click");
+    }
+    function frmSuccess(data) {
+        console.log(data.item2);
+        //////purchase
+        var pur = "";
+        var total = 0.0;
+        var purcarton = 0.0;
+        var purpacket = 0.0;
+        $.each(data.itempurchase, function (i, col) {
+            var carton = col.quantity / col.amountInPackage;
+            var packet = col.quantity % col.amountInPackage;
+            var date = new Date(col.purchaseDate)
+            pur += `<tr>
+                                <td>${Math.floor(carton)}</td>
+                                <td>${Math.floor(packet)}</td>
+                                <td>${col.amountInPackage}</td>
+                                <td>${parseFloat(col.purchasePrice + col.expensePerItem).toFixed(3)}</td>
+                                <td>${parseFloat((col.purchasePrice + col.expensePerItem) * col.quantity / col.amountInPackage).toFixed(3)}</td>
+                                <td>${date.toLocaleDateString()}</td>
+                                </tr>`;
+            total += parseFloat((col.purchasePrice + col.expensePerItem) * col.quantity / col.amountInPackage);
+            purcarton += Math.floor(carton);
+            purpacket += Math.floor(packet);
+        })
+        $("#singletotal").text(parseFloat(total).toFixed(3));
+        $("#purcarton").text((purcarton));
+        $("#purpacket").text((purpacket));
+        $("#tblpurchase>tbody").html('').html(pur);
+
+        //////sale
+        var sale = "";
+        var totalsale = 0.0;
+        var salecarton = 0.0;
+        var salepacket = 0.0;
+        $.each(data.itemsale, function (i, col) {
+            var carton = 0.0;
+            var packet = 0.0;
+            if (col.saleType == "عمده") {
+                carton = col.quantity / col.amountInPackage;
+            } else {
+                carton = 0;
+                packet = col.quantity;
+            }
+
+
+            var date = new Date(col.saleDate)
+            sale += `<tr>
+                                <td>${Math.floor(carton)}</td>
+                                <td>${Math.floor(packet)}</td>
+                                <td>${col.amountInPackage}</td>
+                                <td>${parseFloat(col.salePrice).toFixed(3)}</td>
+                                <td>${parseFloat(col.salePrice * col.quantity / col.amountInPackage).toFixed(3)}</td>
+                                <td>${date.toLocaleDateString()}</td>
+                                </tr>`;
+            totalsale += parseFloat(col.salePrice * col.quantity / col.amountInPackage);
+            salecarton += Math.floor(carton);
+            salepacket += Math.floor(packet);
+        })
+        $("#singletotalsale").text(parseFloat(totalsale).toFixed(3));
+        $("#salecarton").text(salecarton);
+        $("#salepacket").text(salepacket);
+        $("#tblsale>tbody").html('').html(sale);
+
+        //////stock
+        var stock = "";
+        var totalstock = 0.0;
+        var stockcarton = 0.0;
+        var stockpacket = 0.0;
+        $.each(data.item2, function (i, col) {
+            var carton = col.totalQuantity / col.amountInPackage;
+            var packet = col.totalQuantity % col.amountInPackage;
+            stock += `<tr>
+                                <td>${Math.floor(carton)}</td>
+                                <td>${Math.floor(packet)}</td>
+                                <td>${col.amountInPackage}</td>
+                                <td>${parseFloat(col.purchasePrice).toFixed(3)}</td>
+                                <td>${parseFloat(col.purchasePrice * col.totalQuantity / col.amountInPackage).toFixed(3)}</td>
+                                </tr>`;
+            totalstock += parseFloat(col.purchasePrice * col.totalQuantity / col.amountInPackage);
+            stockcarton += Math.floor(carton);
+            stockpacket += Math.floor(packet);
+        })
+        $("#singletotalstock").text(parseFloat(totalstock).toFixed(3));
+        $("#stockcarton").text(stockcarton);
+        $("#stockpacket").text(stockpacket);
+        $("#tblstock>tbody").html('').html(stock);
+    }
+    //function LoadCashInHand() {
+    //    $.ajax({
+    //        url: '/Item/FetchCashInHandReport/',
+    //        type: 'GET',
+    //        contentType: "application/json",
+    //        success: function (result) {
+    //            console.log(result)
+    //            var afDebit = 0;
+    //            var afCredit = 0;
+    //            var pkDebit = 0;
+    //            var pKCredit = 0;
+    //            var usDebit = 0;
+    //            var usCredit = 0;
+    //            $.each(result, function (i, col) {
+    //                if (col.currency == 1) {
+    //                    afDebit += col.debit;
+    //                    afCredit += col.credit;
+    //                }
+    //                if (col.currency == 2) {
+    //                    pkDebit += col.debit;
+    //                    pKCredit += col.credit;
+    //                }
+    //                if (col.currency == 3) {
+    //                    usDebit += col.debit;
+    //                    usCredit += col.credit;
+    //                }
+    //            })
+
+    //            var afRec = afCredit - afDebit ;
+    //            var pkRec = pKCredit - pkDebit ;
+    //            var usRec = usCredit - usDebit;
+
+    //            $("#afghaniCash").text(afRec.toFixed(2));
+    //            $("#rupeCash").text(pkRec.toFixed(2));
+    //            $("#dollerCash").text(usRec.toFixed(2));
+
+    //        },
+    //        error: function (err) {
+    //            console.log(err)
+    //        }
+    //    })
+    //}
+    function printReport() {
+
+        $("#corporation").removeClass("d-none");
+        $("#btnSubmit").addClass("d-none");
+
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        today = yyyy + "-" + mm + "-" + dd;
+        $("#date").text(today);
+
+        let mainLayout = document.getElementById('printable').innerHTML;
+        var originalContent = document.body.innerHTML;
+        document.body.innerHTML = mainLayout;
+        $(document.body).css({ "background-color": "white" });
+        window.print();
+        document.body.innerHTML = originalContent;
+
+        $("#corporation").addClass("d-none");
+        $("#btnSubmit").removeClass("d-none");
+
+    }
+
+    function loadReport(result) {
+        $("#afghanipurchase").text(result.afghaniPur.toFixed(3));
+        $("#afghanisale").text(result.afghaniSale.toFixed(3));
+        $("#oncustomeraf").text(result.afoncus.toFixed(3));
+        $("#afpaid").text(result.afpaid.toFixed(3));
+        $("#afonus").text(result.afonus.toFixed(3));
+        $("#wepaidaf").text(result.afpaidd.toFixed(3));
+        $("#afghaniexpences").text(result.afghaniExpence.toFixed(2));
+        $("#afghaniCash").text(result.afcash.toFixed(2));
+
+        $("#afghanibenefit").text(((result.afghaniSale - result.afghaniSalepur) - result.afghaniExpence).toFixed(2));
+        if (((result.afghaniSale - result.afghaniSalepur) - result.afghaniExpence) < 0) {
+
+            $("#afghanibenefit").addClass("text-danger");
+            $("#afghanilost").addClass("text-danger");
+        } else {
+            $("#afghanibenefit").removeClass("text-danger");
+            $("#afghanilost").removeClass("text-danger");
+        }
+
+        ///////////////////////  Rupe  report  //////////////////////
+        $("#rupepurchase").text((result.rupePur).toFixed(3));
+        $("#rupesale").text(result.rupeSale.toFixed(3));
+        $("#oncustomerpk").text(result.pkoncus.toFixed(3));
+        $("#pkpaid").text(result.pkpaid.toFixed(3));
+        $("#pkonus").text(result.pkonus.toFixed(3));
+        $("#wepaidpk").text(result.pkpaidd.toFixed(3));
+        $("#rupeCash").text(result.pkcash.toFixed(3));
+        //$("#rupeexpence").text(result.rupeExpence.toFixed(2));
+        $("#rupebenefit").text(((result.rupeSale - result.rupeSalepur) /*- result.rupeExpence*/).toFixed(3));
+        if (((result.rupeSale - result.rupeSalepur) /*- result.rupeExpence*/) < 0) {
+
+            $("#rupebenefit").addClass("text-danger");
+            $("#rupelost").addClass("text-danger");
+        } else {
+            $("#rupebenefit").removeClass("text-danger");
+            $("#rupelost").removeClass("text-danger");
+        }
+        ///////////////////////// Doller  Report  //////////////////
+        $("#dollerpurchase").text((result.dollerPur + result.purExpense).toFixed(3));
+        $("#dollersale").text(result.dollerSale.toFixed(3));
+        $("#oncustomerus").text(result.usoncus.toFixed(3));
+        $("#uspaid").text(result.uspaid.toFixed(3));
+        $("#usonus").text(result.usonus.toFixed(3));
+        $("#wepaidus").text(result.uspaidd.toFixed(3));
+        $("#dollerCash").text(result.uscash.toFixed(3));
+        //$("#dollerexpece").text(result.dollerExpence.toFixed(3));
+        $("#dollerbenefit").text(((result.dollerSale - result.dollerSalepur) /*- result.dollerExpence*/).toFixed(3));
+        if (((result.dollerSale - result.dollerSalepur) /*- result.dollerExpence*/) < 0) {
+
+            $("#dollerbenefit").addClass("text-danger");
+            $("#dollerlost").addClass("text-danger");
+        } else {
+            $("#dollerbenefit").removeClass("text-danger");
+            $("#dollerlost").removeClass("text-danger");
+        }
+    }
+    //function fetchLastMonthReport() {
+    //    var titleMessage = "د تیرې میاشتې مصارف: ";
+    //    $.ajax({
+    //        type: "GET",
+    //        url: "/Item/lastMontFinancialReport",
+    //        contentType: "application/json",
+    //        dataType: "json",
+    //        success: function (result) {
+    //            LoadReport(result);
+    //        }
+    //    })
+    //}
+    //function fetchLastYearReport() {
+    //    var titleMessage = "د تیرې میاشتې مصارف: ";
+    //    $.ajax({
+    //        type: "GET",
+    //        url: "/Item/lastYearFinancialReport",
+    //        contentType: "application/json",
+    //        dataType: "json",
+    //        success: function (result) {
+    //            LoadReport(result);
+    //        }
+    //    })
+    //}
+    //function loadReport(result) {
+    //    if (!(isNaN(result.afghaniPur) && isNaN(result.rupePur) && isNaN(result.dollerPur))) {
+    //        $("#afghanipurchase").text(parseFloat(result.afghaniPur).toFixed(2));
+    //        $("#afghanisale").text(parseFloat(result.afghaniSale).toFixed(2));
+    //        $("#afghanidebit").text(parseFloat(result.oncustomeraf).toFixed(2));
+    //        $("#afghanicredit").text(parseFloat(result.dealeraf).toFixed(2));
+    //        $("#afghaniexpences").text(parseFloat(result.afghaniExpence).toFixed(2));
+
+    //        $("#afghanibenefit").text(parseFloat((result.afghaniSale - result.afghaniSalepur) - result.afghaniExpence).toFixed(2));
+    //        if (((result.afghaniSale - result.afghaniSalepur) - result.afghaniExpence) < 0) {
+
+    //            $("#afghanibenefit").addClass("text-danger");
+    //            $("#afghanilost").addClass("text-danger");
+    //        } else {
+    //            $("#afghanibenefit").removeClass("text-danger");
+    //            $("#afghanilost").removeClass("text-danger");
+    //        }
+
+    //        ///////////////////////  Rupe  report  //////////////////////
+    //        $("#rupepurchase").text(parseFloat(result.rupePur).toFixed(2));
+    //        $("#rupesale").text(parseFloat(result.rupeSale).toFixed(2));
+    //        $("#rupedebit").text(parseFloat(result.oncustomerpk).toFixed(2));
+    //        $("#rupecredit").text(parseFloat(result.dealerpk).toFixed(2));
+    //        //$("#rupeexpence").text(result.rupeExpence.toFixed(2));
+    //        /*- result.rupeExpence*/
+    //        /*- result.rupeExpence*/
+    //        $("#rupebenefit").text(parseFloat((result.rupeSale - result.rupeSalepur)).toFixed(2));
+    //        if (((result.rupeSale - result.rupeSalepur)) < 0) {
+    //            $("#rupebenefit").addClass("text-danger");
+    //            $("#rupelost").addClass("text-danger");
+    //        } else {
+    //            $("#rupebenefit").removeClass("text-danger");
+    //            $("#rupelost").removeClass("text-danger");
+    //        }
+    //        ///////////////// Doller  Report  //////////////////
+    //        $("#dollerpurchase").text(parseFloat(result.dollerPur).toFixed(2));
+    //        $("#dollersale").text(parseFloat(result.dollerSale).toFixed(2));
+    //        $("#dollerdebit").text(parseFloat(result.oncustomerus).toFixed(2));
+    //        $("#dollercredit").text(parseFloat(result.dealerus).toFixed(2));
+    //        //$("#dollerexpece").text(result.dollerExpence.toFixed(2));
+    //        /*- result.dollerExpence*/
+    //        /*- result.dollerExpence*/
+    //        $("#dollerbenefit").text(parseFloat((result.dollerSale - result.dollerSalepur)).toFixed(2));
+    //        if (((result.dollerSale - result.dollerSalepur)) < 0) {
+
+    //            $("#dollerbenefit").addClass("text-danger");
+    //            $("#dollerlost").addClass("text-danger");
+    //        } else {
+    //            $("#dollerbenefit").removeClass("text-danger");
+    //            $("#dollerlost").removeClass("text-danger");
+    //        }
+    //    }
+    //}
+    function singleItem() {
+        if ($("#btnreport").text() == "د یو جنس مالي راپور") {
+            $("#singleitemReport").show(500);
+            $("#financial1").hide();
+            $("#financial2").hide();
+            $("#financial3").hide();
+            $("#reportbtns").hide();
+            $("#btnreport").text("عمومي مالي راپور")
+        }
+        else {
+            $("#singleitemReport").hide();
+            $("#financial1").show(500);
+            $("#financial2").show(500);
+            $("#financial3").show(500);
+            $("#reportbtns").show();
+
+            $("#btnreport").text("د یو جنس مالي راپور")
+
+        }
+
+    }
+    ////////////////////// Assigning report type  //////
+    function todaysreport() {
+        $("#specific").hide();
+        $("#reportType").val(1);
+        $("#btnsubmitReport").trigger("click");
+    }
+    function currentMonth() {
+        $("#specific").hide();
+        $("#reportType").val(2);
+        $("#btnsubmitReport").trigger("click");
+    }
+    function lastMonth() {
+        $("#specific").hide();
+        $("#reportType").val(3);
+        $("#btnsubmitReport").trigger("click");
+    }
+    function currentYear() {
+        $("#specific").hide();
+        $("#reportType").val(4);
+        $("#btnsubmitReport").trigger("click");
+    }
+    function lastYear() {
+        $("#specific").hide();
+        $("#reportType").val(5);
+        $("#btnsubmitReport").trigger("click");
+    }
+    /////////////   Manual report  ////////////////
+    $("#btnManualReport").click(function () {
+        $("#specific").show();
+    })
+</script>
+}

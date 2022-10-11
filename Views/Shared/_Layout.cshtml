@@ -1,0 +1,737 @@
+﻿
+
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="rtl">
+
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="description" content="عبدالرحمن نواب زاده لمیتد">
+    <meta name="keywords" content="عبدالرحمن نواب زاده لمیتد ">
+    <meta name="author" content="Q.Links">
+    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico">
+
+    <title style="float:right;font-size:30px;" class="font-large-1">عبدالرحمن نواب زاده لمیتد</title>
+
+
+    <link rel="stylesheet" type="text/css" href="~/app-assets/css-rtl/vendors.css">
+    <link href="~/app-assets/vendors/css/toggle/switchery.css" rel="stylesheet" />
+
+    <link href="~/app-assets/selects/select2.min.css" rel="stylesheet" />
+
+
+    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/tables/datatable/datatables.min.css">
+    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/tables/extensions/colReorder.dataTables.min.css">
+
+    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/extensions/toastr.css">
+    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/extensions/sweetalert.css">
+
+
+    <link rel="stylesheet" type="text/css" href="~/app-assets/css-rtl/app.css">
+    <link rel="stylesheet" type="text/css" href="~/app-assets/css-rtl/custom-rtl.css">
+
+    <link href="~/app-assets/css-rtl/plugins/extensions/toastr.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="~/app-assets/css-rtl/core/menu/menu-types/vertical-menu.css">
+    <link href="~/app-assets/css-rtl/plugins/forms/switch.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/app-assets/css-rtl/core/colors/palette-gradient.css">
+    <link rel="stylesheet" type="text/css" href="~/app-assets/css-rtl/core/colors/palette-callout.css">
+    <link rel="stylesheet" type="text/css" href="~/app-assets/fonts/simple-line-icons/style.css">
+    <link rel="stylesheet" type="text/css" href="~/app-assets/css-rtl/plugins/extensions/toastr.css">
+
+    <link href="~/css/style.css" rel="stylesheet" />
+
+</head>
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar"
+      data-open="click" data-menu="vertical-menu" data-col="2-columns">
+    <!--Nav bar list-->
+    <nav class="header-navbar navbar-expand-md navbar navbar-with-menu fixed-top navbar-dark  navbar-shadow " id="navColor">
+        <div class="navbar-wrapper">
+            <div class="navbar-header">
+                <ul class="nav navbar-nav flex-row">
+                    <li class="nav-item mobile-menu d-md-none mr-auto"><a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i class="ft-menu font-large-1"></i></a></li>
+                    <li class="nav-item">
+                        <a class="navbar-brand">
+                            <h3 class="brand-text"> عبدالرحمن نواب زاده لمیتد </h3>
+                        </a>
+                    </li>
+                    <li class="nav-item d-md-none">
+                        <a class="nav-link open-navbar-container" data-toggle="collapse" data-target="#navbar-mobile"><i class="fa fa-ellipsis-v"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="navbar-container content">
+                <div class="collapse navbar-collapse" id="navbar-mobile">
+                    <ul class="nav navbar-nav mr-auto float-left">
+                        <li class="nav-item d-none d-md-block" id="collapseNav"><a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i class="ft-menu"></i></a></li>
+
+                        <li class="nav-item d-none d-md-block"><a class="nav-link nav-link-expand" href="#"><i class="ficon ft-maximize"></i></a></li>
+
+                    </ul>
+
+                    <ul class="nav navbar-nav float-right">
+
+                        @*<li>
+                                <a title="بانک / صراف حساب" asp-action="Dealing" asp-controller="HDealing" class="nav-link nav-link-label"><i class="font-large-1 fa fa-money" style="margin-left: 10px; margin-top: -6px;"></i></a>
+
+                            </li>*@
+                        <li>
+                            <a title="اسعارو تبادله" class="nav-link nav-link-label" onclick="assignRate()" data-toggle="modal" data-target="#bootstrapChangeCurrency" style="font-size:large">
+                                <i class="font-large-1 fa fa-balance-scale" style="margin-top:-8px;margin-left:10px;"></i>
+                            </a>
+                        </li>
+                        @*<li>
+                                <a title="د بیل معلومات" class="nav-link nav-link-label" onclick="assignbillInfo()" data-toggle="modal" data-target="#AddingBillInfo" style="font-size:large;margin-top:-7px;">
+                                    <i class="font-large-1 ft-file-text" style="margin-top:-8px;margin-left:10px;"></i>
+                                </a>
+                            </li>*@
+                        <li>
+                            <a title="حساب ماشین" class="nav-link nav-link-label" data-target="#calculatormodal" data-toggle="modal" style="font-size:large">
+                                <i class="font-large-1 fa fa-calculator" style="margin-top:-8px;margin-left:10px;"></i>
+                            </a>
+                        </li>
+                        <li class="dropdown dropdown-notification nav-item">
+                            <a title="خبرتیا" class="nav-link nav-link-label" href="#" data-toggle="dropdown">
+                                <i class="ficon ft-bell"></i>
+                                <span class="badge badge-pill badge-default badge-danger badge-default badge-up" id="notificationCount">0</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-media dropdown-menu-right">
+                                <li class="dropdown-menu-header">
+                                    <h6 class="dropdown-header m-0">
+                                        <span class="grey darken-2">خبرتیا</span>
+                                        <span class="notification-tag badge badge-default badge-danger float-right m-0"></span>
+                                    </h6>
+                                </li>
+
+
+                                <li class="scrollable-container media-list" id="noteList">
+                                    @if (User.IsInRole("Admin Department"))
+                                    {
+
+                                        <a id="EmployeeSalaryToPay" class="d-none" href="/Employee/Employee/?Salary">
+                                            <div class="media">
+                                                <div class="media-left align-self-center"><i class="ft-alert-triangle icon-bg-circle bg-blue bg-darken-3"></i></div>
+                                                <div class="media-body">
+                                                    <h6 class="media-heading blue darken-3"><strong>کارمندانو معاشات!</strong></h6>
+                                                    <h7 class="notification-text  text-muted">ستاسې د <strong id="EmployeeSalaryCount">0</strong> کارمندانو معاش وخت پوره شوی، دلیدلو لپاره یې دلته کلیک وکړی.</h7>
+
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div id="shortageQty"></div>
+
+                                        <div id="expiryContracts"></div>
+                                    }
+
+
+                                    <a href="javascript:void(0)" onclick="LoadActiveNotes()" class="d-none" id="notesNotification" data-toggle="modal" data-target="#warning">
+                                        <div class="media">
+                                            <div class="media-left align-self-center"><i class="ft-edit-3 icon-bg-circle bg-cyan"></i></div>
+                                            <div class="media-body">
+                                                <h6 class="media-heading text-cyan darken-3"><strong>یاد داښتونه!</strong></h6>
+                                                <p class="notification-text @*font-small-3*@ text-muted">ستاسې د <strong id="notecount">0</strong> <label id="noteGreaterThenOne">یاد داښتونو</label> وخت نږدې شوی.</p>
+
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li title="یاداشت" class="nav-item">
+                            <a class="nav-link nav-link-label" asp-controller="Employee" asp-action="Notes">
+                                <i class="ft-edit-3 font-medium-3" style="margin-top:-10px;"></i>
+                                <span class="badge badge-pill badge-default badge-warning badge-default badge-up">یادداښت</span>
+                            </a>
+
+                        </li>
+                        @await Html.PartialAsync("_LoginPartial")
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Menu list-->
+    <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow " style="background: #2e0435d6; " data-scroll-to-active="false">
+        <div class="main-menu-content box-shadow-3" id="mainDiv">
+            <ul class="navigation navigation-main " id="sideMenu " style=" padding-top: 10px;" data-menu="menu-navigation">
+
+                <li class=" border-top-0 has-sub">
+                    @await Html.PartialAsync("_ClockPartial")
+                </li>
+
+                @if (User.IsInRole("Sale Department") || User.IsInRole("Purchase Department") || User.IsInRole("Stock Department"))
+                {
+                    <li id="dashboardActive">
+                        <a asp-action="Index" asp-controller="Home"> <i class=" ft-trending-up" style="margin-top:1px;"></i><span class="menu-title" data-i20n=""> <strong style="font-size:20px;"> ‌عمومې صفحه</strong></span></a>
+                    </li>
+                }
+
+                @if (User.IsInRole("Admin Department") || User.IsInRole("Finance Department"))
+                {
+                    <li id="dashboardActive">
+                        <a asp-action="dashboard" asp-controller="Home"> <i class=" ft-trending-up" style="margin-top:1px;"></i><span class="menu-title" data-i20n=""> <strong style="font-size:20px;"> ‌عمومې صفحه</strong></span></a>
+                    </li>
+                    <li id="roznamchaActive">
+                        <a asp-action="Index" asp-controller="Deal"> <i class="fa fa-money" style="margin-top:1px;"></i><span class="menu-title" data-i20n=""> <strong style="font-size:20px;"> روزنامچه</strong></span></a>
+                    </li>
+                }
+
+                @if (User.IsInRole("Admin Department") || User.IsInRole("Finance Department"))
+                {
+                    <li class="nav-item has-sub ">
+                        <a href="#"><i class="ft-home menue"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;"> ‌راپورونه</strong></span><span class="badge badge badge-primary badge-pill float-right mr-2"></span></a>
+                        <ul class="menu-content">
+
+                            <li class="" id="dailyReport">
+
+                                <a class="menu-item" asp-controller="Report" asp-action="Daily"> <i class="ft-bar-chart" style="margin-top:9px;"></i> <strong style="font-size:20px;"> نن ورځ راپور</strong></a>
+
+                            </li>
+
+                            <li class="" id="generalReport">
+
+                                <a class="menu-item" asp-controller="Report" asp-action="Index"> <i class="ft-bar-chart-2 " style="margin-top:9px;"></i> <strong style="font-size:20px;"> عمومې راپور</strong></a>
+
+                            </li>
+                            <li class="" id="expenseReport">
+                                <a class="menu-item" asp-controller="Report" asp-action="Expense"><span class="" data-i20n=""><i class="ft-activity " style="margin-top:9px;"></i><strong style="font-size:20px;">مصارفو راپور</strong></span></a>
+
+                            </li>
+
+                            <li id="salaryReport">
+
+                                <a class="menu-item" asp-controller="Report" asp-action="Salaries"><span class="" data-i20n=""><i class=" fa fa-money" style="margin-top:9px;"></i><strong style="font-size:20px;">معاشاتو راپور</strong></span></a>
+
+                            </li>
+
+                            <li id="itemreport">
+
+                                <a class="menu-item" asp-controller="Report" asp-action="Item"><span class="" data-i20n=""><i class="ft-box" style="margin-top:9px;"></i><strong style="font-size:20px;">اجناسو راپور</strong></span></a>
+
+                            </li>
+
+                        </ul>
+
+                    </li>
+                }
+
+                @if (User.IsInRole("Admin Department") || User.IsInRole("Finance Department") || User.IsInRole("Purchase Department") || User.IsInRole("Stock Department"))
+                {
+                    <li class="nav-item has-sub">
+                        <a href="#"><i class="ft-save menue"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;"> ‌ذخیره کول</strong></span><span class="badge badge badge-primary badge-pill float-right mr-2"></span></a>
+                        <ul class="menu-content">
+                            <li id="itemRegistration">
+                                <a class="menu-item" asp-controller="Item" asp-action="Item"><i class="ft-layout" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> اجناس </strong></span></a>
+                            </li>
+
+                            <li id="unitActive">
+                                <a class="menu-item" asp-controller="ManageSmallTables" asp-action="Unit"><i class="ft-underline" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> واحد</strong></span></a>
+                            </li>
+
+                            <li id="stockActive">
+                                <a class="menu-item" asp-controller="ManageSmallTables" asp-action="Currency_Stock"><i class="ft-box" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> ګودام </strong></span></a>
+                            </li>
+
+                            <li id="employeeActive">
+                                <a class="menu-item" asp-controller="Employee" asp-action="Employee"><i class="ft-users" style="margin-top:8px;"></i><span class=""><strong style="font-size:20px;"> کارمندان</strong> </span></a>
+                            </li>
+
+                            <li id="dealerRegisterActive">
+                                <a asp-controller="Dealer" asp-action="Index"><i class="ft-users" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> کهاتدار، مشترې  </strong></span></a>
+                            </li>
+                        </ul>
+
+                    </li>
+
+                }
+
+                @if (User.IsInRole("Admin Department") || User.IsInRole("Sale Department"))
+                {
+                    <li class="nav-item has-sub">
+                        <a href="#">
+                            <i class="ft-shopping-cart menue"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;"> ‌خرڅول</strong></span><span class="badge badge badge-primary badge-pill float-right mr-2"></span>
+                        </a>
+                        <ul class="menu-content">
+                            <li id="saleActive">
+                                <a asp-controller="Sale" asp-action="Index"><i class="ft-layout" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> اجناسو خرڅول </strong></span></a>
+
+                            </li>
+                            <li id="returnsaleActive">
+                                <a asp-controller="Sale" asp-action="ReturnedItems"><i class="ft-rotate-cw" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  واپسې  </strong></span></a>
+
+                            </li>
+                        </ul>
+
+                    </li>
+                }
+
+                @if (User.IsInRole("Admin Department") || User.IsInRole("Stock Department") || User.IsInRole("Purchase Department"))
+                {
+                    <li class=" nav-item">
+                        <a href="#">
+                            <i class="fa fa-money menue"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;">اخستل ‌</strong></span><span class="badge badge badge-primary badge-pill float-right mr-2"></span>
+                        </a>
+                        <ul class="menu-content">
+                            <li id="purchaseStockItemActive">
+                                <a asp-controller="Purchase" asp-action="Index"><i class="ft-shopping-cart" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  اجناسو اخستل </strong></span></a>
+                            </li>
+
+                            <li id="StockItemReturned">
+                                <a asp-controller="Purchase" asp-action="ReturnedStockItems"><i class="ft-rotate-cw" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> اخستلو واپسې </strong></span></a>
+
+                            </li>
+
+                            <li id="stockPurchaseActiveMali">
+                                <a asp-controller="Purchase" asp-action="Stock"><i class="ft-layers" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> ګودام </strong></span></a>
+
+                            </li>
+
+                        </ul>
+                    </li>
+                }
+
+                @if (User.IsInRole("Admin Department") || User.IsInRole("Finance Department"))
+                {
+                    <li class=" nav-item">
+                        <a href="#">
+                            <i class="fa fa-money menue"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;"> مصارف</strong></span><span class="badge badge badge-primary badge-pill float-right mr-2"></span>
+                        </a>
+                        <ul class="menu-content">
+                            <li id="expenseActive">
+                                <a class="menu-item" asp-controller="Expense" asp-action="Expense"><i class="fa fa-money" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">مصارفو ثبتول </strong> </span></a>
+                            </li>
+                            <li id="purExpense">
+                                <a class="menu-item" asp-controller="Expense" asp-action="BillExpenses"><i class="fa fa-money" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">بیل مصارف </strong> </span></a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+
+                @if (User.IsInRole("Admin Department") || User.IsInRole("Finance Department"))
+                {
+                    <li class=" nav-item">
+                        <a href="#">
+                            <i class="ft-file-text menue"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;"> ‌کهاتې</strong></span><span class="badge badge badge-primary badge-pill float-right mr-2"></span>
+                        </a>
+                        <ul class="menu-content">
+                            <li id="customerActive">
+                                <a asp-controller="Deal" asp-action="Customers"><i class="fa fa-wpforms" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  مشتریان</strong></span></a>
+                            </li>
+                            <li id="dealerActive">
+                                <a asp-controller="Deal" asp-action="Dealers"><i class="fa fa-files-o" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> کهاتدار </strong></span></a>
+                            </li>
+
+                            <li id="bankActive">
+                                <a asp-controller="Deal" asp-action="Banks"><i class="fa fa-home" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> بانک / صراف </strong></span></a>
+                            </li>
+
+                            <li id="remainOnCustomers">
+                                <a asp-controller="Deal" asp-action="CustomerRemainList"><i class="ft-users" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> مشتریانو لیست </strong></span></a>
+
+                            </li>
+
+                            <li id="remainOnUsDealer">
+                                <a asp-controller="Deal" asp-action="DealersRemainList"><i class="ft-users" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> کهاتدارو لیست </strong></span></a>
+
+                            </li>
+
+                            <li id="remainwithBanks">
+                                <a asp-controller="Deal" asp-action="BankRemainList"><i class="fa fa-home" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:18px;"> بانک / صراف لیست </strong></span></a>
+
+                            </li>
+
+                            <li id="cashRemainList">
+                                <a asp-controller="Deal" asp-action="CashRemainList"><i class="fa fa-money" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:18px;"> دخل پیسو لیست </strong></span></a>
+
+                            </li>
+                        </ul>
+                    </li>
+                }
+
+                @if (User.IsInRole("Admin Department") || User.IsInRole("Finance Department"))
+                {
+                    <li class=" nav-item">
+                        <a href="#">
+                            <i class="ft-users menue"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;"> ‌سرمایه</strong></span><span class="badge badge badge-primary badge-pill float-right mr-2"></span>
+                        </a>
+                        <ul class="menu-content">
+                            <li id="investorActive">
+                                <a asp-controller="Investment" asp-action="Investor"><i class="ft-user-plus" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> شراکتې راجستر </strong></span></a>
+
+                            </li>
+                            <li id="investmentActive">
+                                <a asp-controller="Investment" asp-action="AddInvestment"><i class="ft-plus-circle" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  پانګونه  </strong></span></a>
+
+                            </li>
+
+                            <li id="addAssetsActive">
+                                <a asp-controller="Investment" asp-action="LastYearAssets"><i class="fa fa-money" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  سرمایه ثبتول  </strong></span></a>
+
+                            </li>
+                            @if (User.IsInRole("Admin Department"))
+                            {
+                                <li id="addCash">
+                                    <a asp-controller="Investment" asp-action="Cash"><i class="fa fa-money" style="margin-top:9px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  پیسو اضافه کول  </strong></span></a>
+
+                                </li>
+                            }
+                        </ul>
+
+                    </li>
+                }
+
+                @if (User.IsInRole("Admin Department"))
+                {
+                    <li class="nav-item has-sub ">
+                        <a href="#"><i class="fa fa-user-o"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;"> اډمین</strong> </span><span class="badge badge badge-primary badge-pill float-right mr-2"></span></a>
+                        <ul class="menu-content">
+                            <li id="registerActive">
+                                <a class="menu-item" asp-controller="Account" asp-action="Register"><i class="ft-lock" style="margin-top:8px;"></i><strong style="font-size:20px;"> اکاونټ </strong> </a>
+                            </li>
+                            <li id="attendance">
+                                <a class="menu-item" asp-controller="Attendance" asp-action="EmployeeAttendance"><i class="fa fa-list-alt" style="margin-top:8px;"></i><strong style="font-size:20px;"> کارمند حاضرې </strong> </a>
+                            </li>
+                            <li id="backActive">
+                                <a class="menu-item" asp-controller="Backup" asp-action="Index"><i class="ft-shield" style="margin-top:8px;"></i><strong style="font-size:20px;"> بیک اپ  </strong> </a>
+                            </li>
+                            <li id="cleardatabase">
+                                <a class="menu-item" asp-controller="Account" asp-action="Clear"><i class="ft-shield" style="margin-top:8px;"></i><strong style="font-size:20px;"> ډاټا ختمول  </strong> </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+
+                @if (User.IsInRole("Super Admin") || User.IsInRole("Developer"))
+                {
+                    <li class="nav-item has-sub ">
+                        <a href="#"><i class="fa fa-user-o"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;">  سوپر اډمین</strong> </span><span class="badge badge badge-primary badge-pill float-right mr-2"></span></a>
+                        <ul class="menu-content">
+                            @if (User.IsInRole("Developer"))
+                            {
+                                <li id="departmentaddActive">
+                                    <a class="menu-item" asp-controller="Admin" asp-action="Department"><i class="fa fa-university" style="margin-top:8px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  څانګه</strong> </span></a>
+                                </li>
+                            }
+                            <li id="departmentreport">
+                                <a class="menu-item" asp-controller="Admin" asp-action="Index"><i class="fa fa-line-chart" style="margin-top:8px;"></i><span class="" data-i20n=""><strong style="font-size:20px;"> عمومې راپور</strong> </span></a>
+                            </li>
+                            <li id="dealersSuper">
+                                <a class="menu-item" asp-controller="Admin" asp-action="Dealers"><i class="fa fa-users" style="margin-top:8px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  کهاتداران</strong> </span></a>
+                            </li>
+                            <li id="customerSuper">
+                                <a class="menu-item" asp-controller="Admin" asp-action="Customers"><i class="fa fa-users" style="margin-top:8px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  مشتریان</strong> </span></a>
+                            </li>
+                            <li id="bankSuper">
+                                <a class="menu-item" asp-controller="Admin" asp-action="Banks"><i class="fa fa-bank" style="margin-top:8px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  بانک / صراف</strong> </span></a>
+                            </li>
+                            <li id="allacounts">
+                                <a class="menu-item" asp-controller="Admin" asp-action="AllAcounts"><i class="fa fa-user-circle-o" style="margin-top:8px;"></i><span class="" data-i20n=""><strong style="font-size:20px;">  کارمند اکاونټ</strong> </span></a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+
+                <li class="">
+                    <a asp-controller="Home" asp-action="About"><i class="ft-airplay" style="margin-top:8px;"></i><span class="menu-title" data-i20n=""><strong style="font-size:20px;">  Q.Links </strong> </span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- render body div-->
+    <div class="app-content content" style="padding:5px;">
+        @RenderBody()
+    </div>
+
+
+    <!-- Footer details-->
+    <footer class="footer footer-static footer-light navbar-border">
+        <p class="clearfix blue-grey lighten-2 text-sm-center mb-0 px-2">
+            <span class="float-md-left d-block d-md-inline-block">
+                Copyright &copy; 2022 <a class="text-bold-800 grey darken-2" href="https://www.facebook.com/104885307946888"
+                                         target="_blank">Q.Links ICT Solutions</a>, All rights reserved.
+            </span>
+            <span class="float-md-right d-block d-md-inline-block d-none d-lg-block">ْQ.Links <i class="fa fa-database pink"></i></span>
+        </p>
+    </footer>
+
+    <!-- Modal calculator -->
+    <div class="modal fade text-left" id="calculatormodal" tabindex="-1" style="padding:0px;margin:0px;" role="dialog" aria-labelledby="myModalLabel10"
+         aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content" style="background-color:transparent;border:0px;">
+                <div class="modal-body ">
+
+                    <link href="~/css/caculator.css" rel="stylesheet" />
+                    <div id="total" style="border:1px solid;border-radius:1%;">
+                        <div class="calc" id="calc">
+                            <button data-dismiss="modal" style="margin-top:-4px;" class="close left"><span class="fa fa-close"></span></button>
+                            <main>
+                                <ul id="list" style="height:400px;">
+                                    <input type="text" name="result" id="ans" readonly="readonly" style="margin-top:-15px;" />
+                                    <li id="2nd" onclick="getnum()">2nd</li>
+                                    <li id="sin" onclick="getnum()">sin</li>
+                                    <li id="cos" onclick="getnum()">cos</li>
+                                    <li id="tan" onclick="getnum()">tan</li>
+                                    <li id="←" onclick="getnum()">←</li>
+                                    <li id="mode" onclick="getnum()">deg</li>
+                                    <li id="lg" onclick="getnum()">lg</li>
+                                    <li id="ln" onclick="getnum()">ln</li>
+                                    <li id="×" onclick="getnum()">×</li>
+                                    <li id="÷" onclick="getnum()">÷</li>
+                                    <li id="^" onclick="getnum()">^</li>
+                                    <li id="1" onclick="getnum()">1</li>
+                                    <li id="2" onclick="getnum()">2</li>
+                                    <li id="3" onclick="getnum()">3</li>
+                                    <li id="+" onclick="getnum()">+</li>
+                                    <li id="√" onclick="getnum()">√</li>
+                                    <li id="4" onclick="getnum()">4</li>
+                                    <li id="5" onclick="getnum()">5</li>
+                                    <li id="6" onclick="getnum()">6</li>
+                                    <li id="-" onclick="getnum()">-</li>
+                                    <li id="!" onclick="getnum()">!</li>
+                                    <li id="7" onclick="getnum()">7</li>
+                                    <li id="8" onclick="getnum()">8</li>
+                                    <li id="9" onclick="getnum()">9</li>
+                                    <li id="(" onclick="getnum()">(</li>
+                                    <li id="π" onclick="getnum()">π</li>
+                                    <li id="%" onclick="getnum()">%</li>
+                                    <li id="0" onclick="getnum()">0</li>
+                                    <li id="." onclick="getnum()">.</li>
+                                    <li id=")" onclick="getnum()">)</li>
+                                    <li id="e" onclick="getnum()">e</li>
+                                    <li id="clear" onclick="getnum()">AC</li>
+                                    <li id="=" onclick="getnum()">=</li>
+                                </ul>
+                            </main>
+                        </div>
+                    </div>
+                    <script src="~/calculator1/Calculate Core.js"></script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal note -->
+    <div class="modal fade text-left" id="warning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel12"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-info white">
+                    <h4 class="modal-title" id="myModalLabel12"><i class="ft-edit-3"></i>&nbsp;&nbsp;یاد داښتونه</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <table class="table  table-bordered dataex-fixh-basic dataTable" id="tblActiveNotes">
+                            <thead>
+                                <tr role="row">
+                                    <th>شماره</th>
+                                    <th>یاد داشت</th>
+                                    <th>د یاد داښت نیټه</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblNotesBody"></tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal currency-->
+    <div class="modal fade text-left " id="bootstrapChangeCurrency" tabindex="-1" role="dialog" aria-labelledby="myModalLabel35"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-info white col-md-12 row " style="margin-right:0px">
+                    <div class="float-left">
+                        <h3 class="modal-title" id="myModalLabel35"><label id="lblrating" style="color:whitesmoke">د اسعارو تبادله</label></h3>
+                    </div>
+                    <div class="float-right">
+                        <button class="btn btn-success" onclick="changeMode()" id="btnrate">د نرخ رسؤل</button>
+                    </div>
+
+                </div>
+                <div class="modal-body">
+                    <div class="" id="rating" style="display:none">
+                        <fieldset class="form-group floating-label-form-group">
+                            <label for="total">افغانۍ - ډالر</label>
+                            <input type="text" onkeyup="hideAfghaniError()" class="form-control" id="txtafghanirate" placeholder="د افغانۍ ډالر ته نرخ  ولیکئ!!">
+                            <div class="" id="afghanierror" style="display:none">
+                                <span for="txtafghanirate" class="text-danger">د افغانۍ ډالر ته نرخ  ولیکئ</span>
+                            </div>
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class="">افغانۍ - کلدارې</label>
+                                <input id="txtdollerrate" onkeyup="hideDollerError()" dir="rtl" placeholder="د افغانۍ کلدارو ته نرخ  ولیکئ" class="form-control" />
+                                <div id="dollererror" style="display:none">
+                                    <span for="txtdollerrate" class="text-danger">د افغانۍ کلدارو ته نرخ  ولیکئ</span>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class="">ډالر - کلدارې</label>
+                                <input id="txtruperate" onkeyup="hideRupeError()" dir="rtl" placeholder="د ډالر کلدارو ته نرخ  ولیکئ" class="form-control" />
+                                <div class="" id="rupeerror" style="display:none">
+                                    <label class="text-danger">د ډالر کلدارو ته نرخ  ولیکئ</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="text-center">
+                            <label class="text-success text-bold-500 d-none" id="lblrateSaved" style="font-size:x-large">نرخونه په موفقانه ډول ذخیره شول</label>
+                        </div>
+                    </div>
+                    <div class="" id="exchanging">
+                        <fieldset class="form-group floating-label-form-group">
+                            <label for="total">افغانۍ</label>
+                            <input type="text" onkeyup="afghaniExchange()" class="form-control " id="txtafghaniamount" placeholder="د افغانیو مقدار ولیکئ!!">
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class="">ډالر:</label>
+                                <input onkeyup="dollerExchange()" id="txtdolleramount" dir="rtl" placeholder="د ډالرو مقدار ولیکئ!!" class="form-control" />
+                            </div>
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class="">کلدارې:</label>
+                                <input onkeyup="rupeExchange()" id="txtrupeamount" dir="rtl" placeholder="د کلدارو مقدار ولیکئ!!" class="form-control" />
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="reset" class="btn btn-outline-secondary" data-dismiss="modal" value="بندول">
+                    <input type="submit" onclick="addRate()" class="btn btn-outline-primary d-none" id="btnsaveRate" value="ذخیره">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!--Modal ‌‌Bill Info-->
+    <div class="modal fade text-left " id="AddingBillInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel35"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-info white col-md-12 row " style="margin-right:0px">
+                    <div class="float-left">
+                        <h3 class="modal-title" id="myModalLabel35"><label id="lblrating" style="color:whitesmoke">د بیل د معلوماتو ثبتول </label></h3>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <fieldset class="form-group floating-label-form-group">
+                            <label for="total"> د څانګې مکمل نوم:</label>
+                            <input type="text" required class="form-control" id="txtname" placeholder="د څانګې مکمل نوم!!">
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class="">آدرس:</label>
+                                <input id="txtaddress" required placeholder="د څانګې مکمل آدرس ولیکئ" class="form-control" />
+                            </div>
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class="">موبایل 1</label>
+                                <input id="txtphone1" required placeholder="د موبایل نمبر ولیکې" class="form-control" />
+                            </div>
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class="">موبایل 2</label>
+                                <input id="txtphone2" required placeholder="دویم موبایل نمبر ولیکې" class="form-control" />
+                            </div>
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class="">لوګو </label>
+                                <input id="txtimage" required placeholder="د بیل لوګو " class="form-control" />
+                            </div>
+                        </fieldset>
+                        <div class="text-center">
+                            <label class="text-success text-bold-500 d-none" id="lblrateSaved2" style="font-size:x-large">بیل معلومات په موفقانه ډول ذخیره شول</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="reset" class="btn btn-outline-secondary" data-dismiss="modal" value="بندول">
+                    <input type="submit" onclick="AddBillInfo()" class="btn btn-outline-primary " id="" value="ذخیره">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    @inject SignInManager<ApplicationUser> SignInManager
+
+    @inject UserManager<ApplicationUser> UserManager
+
+
+    <script src="~/app-assets/vendors/js/vendors.min.js" type="text/javascript"></script>
+    <script src="~/app-assets/vendors/js/toggle/bootstrap-checkbox.js" type="text/javascript"></script>
+    <script src="~/app-assets/vendors/js/toggle/switchery.min.js" type="text/javascript"></script>
+
+
+    <script src="~/app-assets/vendors/js/tables/datatable/datatables.min.js" type="text/javascript"></script>
+
+    <script src="~/app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js" type="text/javascript"></script>
+    <script src="~/app-assets/vendors/js/tables/datatable/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="~/app-assets/vendors/js/tables/datatable/datatable-api.js"></script>
+
+    <script src="~/app-assets/vendors/js/extensions/toastr.min.js" type="text/javascript"></script>
+    <script src="~/app-assets/vendors/js/extensions/sweetalert.min.js" type="text/javascript"></script>
+    <script src="~/app-assets/select/select2.full.js"></script>
+    <script src="~/app-assets/js/core/app-menu.js" type="text/javascript"></script>
+    <script src="~/app-assets/js/core/app.js" type="text/javascript"></script>
+    <script src="~/app-assets/js/scripts/customizer.js" type="text/javascript"></script>
+    <script src="~/app-assets/vendors/js/toggle/switch.js" type="text/javascript"></script>
+    <script src="~/app-assets/js/scripts/extensions/toastr.js" type="text/javascript"></script>
+    <script src="~/app-assets/js/scripts/extensions/sweet-alerts.js" type="text/javascript"></script>
+    <script src="~/app-assets/select/select2.js"></script>
+    <script src="~/js/printThis.js"></script>
+    <script src="~/js/ToastMessage.js"></script>
+    <script src="~/js/functions.js"></script>
+
+    @if (User.IsInRole("Admin Department") || User.IsInRole("Finance Department") || User.IsInRole("Purchase Department"))
+    {
+        <script>
+            $(document).ready(function () {
+
+                LoadEmployeesSalary();
+
+                ShowItemQuantity();
+
+
+            })
+        </script>
+    }
+
+    <script>
+        $(document).ready(function () {
+            activeNoteCount();
+
+            $(".dt-button").click(function () {
+                $(".dataTable").attr("width", "100%");
+            })
+        })
+    </script>
+
+    @RenderSection("Scripts", false)
+
+</body>
+</html>

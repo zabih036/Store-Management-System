@@ -1,0 +1,195 @@
+﻿
+@model ExpenseViewModel
+
+
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorize
+
+<style>
+    @@media (min-width: 576px) {
+        .col-md-2 {
+            -webkit-box-flex: 0;
+            -webkit-flex: 0 0 14%;
+            -moz-box-flex: 0;
+            -ms-flex: 0 0 14%;
+            flex: 0 0 14% !important;
+            max-width: 14% !important;
+        }
+    }
+</style>
+
+@if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    @await Html.PartialAsync("AccessDeniedPartial")
+    ViewBag.view = "d-none";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+@if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+@if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+@if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "";
+}
+
+
+<div class="modal-content">
+    <div class="modal-header bg-primary white">
+        <h4 class="modal-title" id="myModalLabel100">مصارفو ذخیره کول</h4>
+    </div>
+    <div class="modal-body">
+        <form data-ajax="true" asp-action="SaveExpense" asp-controller="Deal" data-ajax-success="fnSuccess(data)" data-ajax-method="post">
+            <div class="row px-2 @ViewBag.Insert">
+
+                <div class="form-group col-md-2">
+                    <label class="">مصرف شوې پیسې</label>
+                    <input asp-for="Expense" class="form-control " />
+                    <span asp-validation-for="Expense" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label asp-for="ECurrencyId" class=""></label>
+                    <select asp-for="ECurrencyId" class="form-control">
+                        <option value=""> انتخاب کړی</option>
+                        <option value="1">افغانۍ</option>
+                        <option value="2">کلدارې</option>
+                        <option value="3">ډالر</option>
+                    </select>
+                    <span asp-validation-for="ECurrencyId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">مصرف نوع</label>
+                    <select asp-for="ExpenseTypeId" asp-items="@ViewBag.expenseType" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                        <option value="">مصرف نوع انتخاب کړئ</option>
+                    </select>
+                    <span asp-validation-for="ExpenseTypeId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">مصرف نیټه</label>
+                    <input asp-for="ExpenseDate" asp-format="{0:yyyy-MM-dd}" type="datetime-local" class="form-control ">
+                    <span asp-validation-for="ExpenseDate" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">تفصیل</label>
+                    <input asp-for="Detail" class="form-control " />
+                </div>
+
+                <div class="form-group col-md-2 " style="display:flex;align-items:flex-end">
+                    <button type="submit" class="btn btn-primary btn-icon-sm">ذخیره </button>&nbsp;&nbsp;
+                    <button type="reset" id="btnReset" class="btn btn-warning btn-icon-sm">پاکول </button>
+                </div>
+            </div>
+        </form>
+
+
+        <table class=" table table-responsive-md  table-striped table-condensed table-bordered dataTables_scrollHead " id="tblExpense">
+            <thead class="scrollable-container ps--scrolling-x" style="width:100%">
+                <tr role="row">
+                    <th class="col-md-1">#</th>
+                    <th class="col-md-3"> مصرف شوې پیسې</th>
+                    <th class="col-md-3"> پولې واحد</th>
+                    <th class="col-md-1"> مصرف نوع </th>
+                    <th class="col-md-2"> نیټه</th>
+                    <th class="col-md-3"> تفصیل </th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+    </div>
+</div>
+
+
+
+<script>
+    $(function () {
+        loadExpense();
+    })
+
+    function loadExpense() {
+        $.ajax({
+            url: "/Deal/LoadExpense/",
+            type: "POST",
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+                var tr = "";
+                $.each(result, function (i, col) {
+                    tr += '<tr role="row">' +
+                        '<td>' + (i + 1) + '</td>' +
+                        ' <td>' + parseFloat(col.expenceAmount).toFixed(3) + '</td>' +
+                        ' <td>' + col.currency + '</td>' +
+                        ' <td>' + col.expenceType + '</td>' +
+                        ' <td>' + col.expenceDateShow + '</td>' +
+                        ' <td>' + col.detail + '</td>' +
+                        '</tr>';
+                })
+                var table = $("#tblExpense").dataTable();
+                table.fnDestroy();
+                $("#tblExpense>tbody").html("").html(tr);
+                $("#tblExpense").dataTable({
+                    stateSave: true,
+
+                    "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                    "pageLength": 5,
+                    "language": {
+                        "emptyTable": "په جدول کې معلومات شتون نه لري",
+                        "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                        "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                        "infoPostFix": "",
+
+                        "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                        "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                        "searchPlaceholder": "پلټنه",
+                        "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                        "paginate": {
+                            "first": "لومړۍ پاڼه",
+                            "previous": "مخکې",
+                            "next": "وروسته",
+                            "last": "پای"
+                        },
+                    },
+
+                });
+
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    }
+
+    function fnSuccess(data) {
+        toast(data, 'success')
+        $("#btnReset").trigger("click");
+        loadExpense();
+    }
+</script>

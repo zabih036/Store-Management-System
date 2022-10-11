@@ -1,0 +1,674 @@
+﻿
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#dailyReport").addClass("active")</script>
+
+<style>
+    h2 {
+        font-size: 23px !important;
+    }
+
+    h3 {
+        direction: ltr;
+    }
+
+    .card-header {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .amountDiv {
+        justify-content: space-evenly;
+    }
+
+    .desc {
+        font-size: 19px !important;
+    }
+
+    .card {
+        border: 1px solid #22c2dc82;
+        box-shadow: 0 16px 28px 0 rgb(255 255 255), 0 25px 55px 0 #2dcee32b !important;
+    }
+</style>
+
+<section id="card-heading-color-options" class="">
+
+    <div class="col-md-12 col-sm-12 p-0">
+        <div class="card box-shadow-0 border-info">
+            <div class="card-header card-head-inverse bg-info">
+                <h2 class="text-center ">د نن ورځ عمومې راپور</h2>
+                <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+                <div class="heading-elements">
+                    <ul class="list-inline mb-0">
+                        <li><a data-action="collapse"><i class="ft-plus"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-content collapse">
+                <dsiv class="card-body">
+
+                    <form data-ajax="true" asp-action="FetchDailyReportData" asp-controller="Report" data-ajax-success="DataFetchedByDate(data)" data-ajax-method="post" id="frmDealerDeal">
+
+                        <div class="row" style="align-items: center; justify-content: center;">
+
+                            <div class="col-md-3  m-0 p-0" style="display: flex; align-items: center;">
+                                <label class="col-md-4">د نیټې څخه</label>
+                                <input class="form-control" required name="fromDate" id="fromDate" type="date" style="height:45px;">
+                            </div>
+                            <div class="col-md-3  m-0 p-0" style="display: flex; align-items: center;">
+                                <label class="col-md-4">تر نیټې پورې</label>
+                                <input class="form-control" required name="toDate" id="toDate" type="date" style="height:45px;">
+                            </div>
+                            &nbsp; &nbsp;
+                            <div class="col-md-1  m-0 p-0" style="display: flex; align-items: center;">
+                                <button type="submit" class="btn btn-default  btn-info"> ښودل</button>
+                                &nbsp;
+                                <button type="reset" id="btnLoadCurrentMonth" onclick=" FetchDailyReportData()" class="btn btn-default  btn-warning">پاکول</button>
+
+                            </div>
+                        </div>
+                    </form>
+                </dsiv>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Purchase cash loan and all  -->
+    <div class="row">
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-purple">
+                    <h2 class="card-title"> نغدو خریدارې</h2>
+                </div>
+                <div class="card-content bg-purple bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afPurchaseCash">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkPurchaseCash">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usPurchaseCash">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-success">
+                    <h2 class="card-title"> قرضو خریدارې</h2>
+                </div>
+                <div class="card-content bg-success bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afPurchaseLoan">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkPurchaseLoan">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usPurchaseLoan">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-primary">
+                    <h2 class="card-title">ټوټل خریدارې</h2>
+                </div>
+                <div class="card-content bg-primary bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afPurchase">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkPurchase">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usPurchase">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Sale cash loan and all  -->
+    <div class="row">
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-danger">
+                    <h2 class="card-title">نغدو فروشات</h2>
+                </div>
+                <div class="card-content bg-danger bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afSaleCash">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkSaleCash">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usSaleCash">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-blue">
+                    <h2 class="card-title">قرضو فروشات</h2>
+                </div>
+                <div class="card-content bg-blue bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afSaleLoan">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkSaleLoan">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usSaleLoan">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-blue-grey">
+                    <h2 class="card-title">  ټوټل فروشات</h2>
+                </div>
+                <div class="card-content bg-blue-grey bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afSale">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkSale">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usSale">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- RawStock HalfRawStock SickGulStock GeneralStock  -->
+    <div class="row">
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-cyan">
+                    <h2 class="card-title">شرکتونو ته تادیه</h2>
+                </div>
+                <div class="card-content bg-cyan bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afDealer">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkDealer">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usDealer">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-teal">
+                    <h2 class="card-title">مشتریانو نه تادیه</h2>
+                </div>
+                <div class="card-content bg-teal bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afCustomer">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkCustomer">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usCustomer">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-pink">
+                    <h2 class="card-title">بانک / صراف ته جمع</h2>
+                </div>
+                <div class="card-content bg-pink bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afBankCredit">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkBankCredit">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usBankCredit">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-purple">
+                    <h2 class="card-title">بانک / صراف نه اخستل</h2>
+                </div>
+                <div class="card-content bg-purple  bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afBankDebit">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkBankDebit">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usBankDebit">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $(document).ready(function () {
+
+            FetchDailyReportData();
+
+        })
+
+        function FetchDailyReportData() {
+
+            $.ajax({
+                url: '/Report/FetchDailyReportData/',
+                type: 'POST',
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (data) {
+                    ShowDataInFields(data)
+                }
+            })
+
+        }
+
+        function DataFetchedByDate(data) {
+            ShowDataInFields(data);
+        }
+
+        function ShowDataInFields(data) {
+
+            var afPurchaseCash = 0.0;
+            var pkPurchaseCash = 0.0;
+            var usPurchaseCash = 0.0;
+
+            var afPurchaseLoan = 0.0;
+            var pkPurchaseLoan = 0.0;
+            var usPurchaseLoan = 0.0;
+
+            var afPurchase = 0.0;
+            var pkPurchase = 0.0;
+            var usPurchase = 0.0;
+
+            var afSaleCash = 0.0;
+            var pkSaleCash = 0.0;
+            var usSaleCash = 0.0;
+
+            var afSaleLoan = 0.0;
+            var pkSaleLoan = 0.0;
+            var usSaleLoan = 0.0;
+
+            var afSale = 0.0;
+            var pkSale = 0.0;
+            var usSale = 0.0;
+
+            var afDealer = 0.0;
+            var pkDealer = 0.0;
+            var usDealer = 0.0;
+
+            var afCustomer = 0.0;
+            var pkCustomer = 0.0;
+            var usCustomer = 0.0;
+
+            var afBankCredit = 0.0;
+            var pkBankCredit = 0.0;
+            var usBankCredit = 0.0;
+
+            var afBankDebit = 0.0;
+            var pkBankDebit = 0.0;
+            var usBankDebit = 0.0;
+
+            var afExpense = 0.0;
+            var pkExpense = 0.0;
+            var usExpense = 0.0;
+
+            var afBenifit = 0.0;
+            var pkBenifit = 0.0;
+            var usBenifit = 0.0;
+
+            console.log(data.bank)
+            /////  Purchase //////
+            $.each(data.purchase, function (i, col) {
+
+                if (col.loan == "Cash") {
+                   
+                    if (col.currencyId == 1) {
+                        afPurchaseCash += col.debit
+                    } else if (col.currencyId == 2) {
+
+                        pkPurchaseCash += col.debit
+                    } else if (col.currencyId == 3) {
+                        usPurchaseCash += col.debit
+                    }
+                }
+
+                if (col.type == "Purchase") {
+                    if (col.currencyId == 1) {
+                        afPurchase += col.credit
+                    } else if (col.currencyId == 2) {
+                        pkPurchase += col.credit
+                    } else if (col.currencyId == 3) {
+                        usPurchase += col.credit
+                    }
+                }
+
+                if (col.type == "Debit") {
+
+                    if (col.currencyId == 1) {
+                        afDealer += col.debit
+                    } else if (col.currencyId == 2) {
+
+                        pkDealer += col.debit
+                    } else if (col.currencyId == 3) {
+                        usDealer += col.debit
+                    }
+                }
+            })
+
+            ///// Loan purhcase //////
+            afPurchaseLoan = (afPurchase - afPurchaseCash);
+            pkPurchaseLoan = (pkPurchase - pkPurchaseCash);
+            usPurchaseLoan = (usPurchase - usPurchaseCash);
+
+            ///// Sale Item //////
+            $.each(data.sale, function (i, col) {
+                if (col.loan == "Cash") {
+
+                    if (col.currencyId == 1) {
+                        afSaleCash += col.credit
+                    } else if (col.currencyId == 2) {
+
+                        pkSaleCash += col.credit
+                    } else if (col.currencyId == 3) {
+                        usSaleCash += col.credit
+                    }
+                }
+
+                if (col.type == "Sale") {
+                    if (col.currencyId == 1) {
+                        afSale += col.debit
+                    } else if (col.currencyId == 2) {
+                        pkSale += col.debit
+                    } else if (col.currencyId == 3) {
+                        usSale += col.debit
+                    }
+                }
+
+                if (col.type == "Credit") {
+
+                    if (col.currencyId == 1) {
+                        afCustomer += col.credit
+                    } else if (col.currencyId == 2) {
+
+                        pkCustomer += col.credit
+                    } else if (col.currencyId == 3) {
+                        usCustomer += col.credit
+                    }
+                }
+            })
+
+            ///// Loan sale //////
+            afSaleLoan = (afSale - afSaleCash);
+            pkSaleLoan = (pkSale - pkSaleCash);
+            usSaleLoan = (usSale - usSaleCash);
+
+            ///// bank //////
+            $.each(data.bank, function (i, col) {
+                if (col.currencyId == 1) {
+                    afBankCredit += col.credit
+                    afBankDebit += col.debit
+                } else if (col.currencyId == 2) {
+                    pkBankCredit += col.credit
+                    pkBankDebit += col.debit
+                } else if (col.currencyId == 3) {
+                    usBankCredit += col.credit
+                    usBankDebit += col.debit
+                }
+            })
+           
+
+            ///// Expense Item //////
+            //$.each(data.expense, function (i, col) {
+            //    if (col.currency == 1) {
+            //        afExpense += col.price
+            //    } else if (col.currency == 2) {
+            //        pkExpense += col.price
+            //    } else if (col.currency == 3) {
+            //        usExpense += col.price
+            //    }
+            //})
+
+            /// purchase show data ////
+            $("#afPurchaseCash").text(parseFloat(afPurchaseCash).toFixed(2))
+            $("#pkPurchaseCash").text(parseFloat(pkPurchaseCash).toFixed(2))
+            $("#usPurchaseCash").text(parseFloat(usPurchaseCash).toFixed(2))
+
+            $("#afPurchaseLoan").text(parseFloat(afPurchaseLoan).toFixed(2))
+            $("#pkPurchaseLoan").text(parseFloat(pkPurchaseLoan).toFixed(2))
+            $("#usPurchaseLoan").text(parseFloat(usPurchaseLoan).toFixed(2))
+
+            $("#afPurchase").text(parseFloat(afPurchase).toFixed(2))
+            $("#pkPurchase").text(parseFloat(pkPurchase).toFixed(2))
+            $("#usPurchase").text(parseFloat(usPurchase).toFixed(2))
+
+            /// sale show data ////
+            $("#afSaleCash").text(parseFloat(afSaleCash).toFixed(2))
+            $("#pkSaleCash").text(parseFloat(pkSaleCash).toFixed(2))
+            $("#usSaleCash").text(parseFloat(usSaleCash).toFixed(2))
+
+            $("#afSaleLoan").text(parseFloat(afSaleLoan).toFixed(2))
+            $("#pkSaleLoan").text(parseFloat(pkSaleLoan).toFixed(2))
+            $("#usSaleLoan").text(parseFloat(usSaleLoan).toFixed(2))
+
+            $("#afSale").text(parseFloat(afSale).toFixed(2))
+            $("#pkSale").text(parseFloat(pkSale).toFixed(2))
+            $("#usSale").text(parseFloat(usSale).toFixed(2))
+
+              /// dealer show data ////
+            $("#afDealer").text(parseFloat(afDealer).toFixed(2))
+            $("#pkDealer").text(parseFloat(pkDealer).toFixed(2))
+            $("#usDealer").text(parseFloat(usDealer).toFixed(2))
+
+             /// customer show data ////
+            $("#afCustomer").text(parseFloat(afCustomer).toFixed(2))
+            $("#pkCustomer").text(parseFloat(pkCustomer).toFixed(2))
+            $("#usCustomer").text(parseFloat(usCustomer).toFixed(2))
+
+              /// bank show data ////
+            $("#afBankCredit").text(parseFloat(afBankCredit).toFixed(2))
+            $("#pkBankCredit").text(parseFloat(pkBankCredit).toFixed(2))
+            $("#usBankCredit").text(parseFloat(usBankCredit).toFixed(2))
+
+            $("#afBankDebit").text(parseFloat(afBankDebit).toFixed(2))
+            $("#pkBankDebit").text(parseFloat(pkBankDebit).toFixed(2))
+            $("#usBankDebit").text(parseFloat(usBankDebit).toFixed(2))
+
+            //$("#afExpense").text(parseFloat(afExpense).toFixed(2))
+            //$("#pkExpense").text(parseFloat(pkExpense).toFixed(2))
+            //$("#usExpense").text(parseFloat(usExpense).toFixed(2))
+
+            //$("#afBenifit").text(parseFloat(afBenifit).toFixed(2))
+            //$("#pkBenifit").text(parseFloat(pkBenifit).toFixed(2))
+            //$("#usBenifit").text(parseFloat(usBenifit).toFixed(2))
+        }
+
+    </script>
+}

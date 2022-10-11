@@ -1,0 +1,184 @@
+﻿
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#purExpense").addClass("active")</script>
+
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorize
+
+@if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+
+    @await Html.PartialAsync("AccessDeniedPartial")
+
+
+    ViewBag.View = "d-none";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    ViewBag.View = "";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+{
+    ViewBag.View = "";
+    ViewBag.Insert = "";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+
+}
+
+@if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+{
+    ViewBag.View = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+{
+    ViewBag.View = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "";
+}
+
+<div class="card pt-2  @ViewBag.View">
+    <div class="row">
+        <div class=" col-md-12">
+            <h2 class="text-center alert bg-info box-shadow-1">د اخستلو شویو اجناسو مصارف لیست</h2>
+        </div>
+    </div>
+    <section id="divTable" >
+        <table class=" table table-responsive  table-striped table-condensed table-bordered dataTables_scrollHead " id="tblorder">
+            <thead class="scrollable-container ps--scrolling-x" style="width:100%">
+                <tr role="row">
+                    <th class="col-md-1">#</th>
+                    <th class="col-md-3"> بیل نمبر</th>
+                    <th class="col-md-3"> کهاتدار </th>
+                    <th class="col-md-3"> تفصیل</th>
+                    <th class="col-md-3"> نیټه </th>
+                    <th class="col-md-2"> پولې واحد </th>
+                    <th class="col-md-1"> پیسو اندازه </th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th rowspan="1" colspan="1"></th>
+                    <th rowspan="1" colspan="1"></th>
+                    <th rowspan="1" colspan="1"></th>
+                    <th rowspan="1" colspan="1"></th>
+                    <th rowspan="1" colspan="1"></th>
+                    <th rowspan="1" colspan="1"></th>
+                    <th rowspan="1" colspan="1"></th>
+                </tr>
+            </tfoot>
+
+            <tbody></tbody>
+        </table>
+    </section>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        $(document).ready(function () {
+            OrderTable();
+        })
+    </script>
+    <script>
+        function OrderTable() {
+            $.ajax({
+                url: "/Expense/FetchPurchaseExpense/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    console.log(result)
+                    $.each(result, function (i, col) {
+                        tr += '<tr role="row">' +
+                            '<td>' + (i + 1) + '</td>' +
+                            ' <td>' + col.billNo + '</td>' +
+                            ' <td>' + col.dealer + '</td>' +
+                            ' <td>' + col.desc + '</td>' +
+                            ' <td>' + col.date + '</td>' +
+                            ' <td>' + col.currency + '</td>' +
+                            ' <td>' + col.amount + '</td>' +
+                            '</tr>';
+                    })
+                    var table = $("#tblorder").dataTable();
+                    table.fnDestroy();
+                    $("#tblorder>tbody").html("").html(tr);
+                    $("#tblorder").dataTable({
+                        "footerCallback": function (row, data, start, end, display) {
+                            var api = this.api(),
+                                data;
+
+                            // Remove the formatting to get integer data for summation
+                            var intVal = function (i) {
+                                return typeof i === 'string' ?
+                                    i.replace(/[\$,]/g, '') * 1 :
+                                    typeof i === 'number' ?
+                                        i : 0;
+                            };
+
+                            // Total over this page
+                            pageTotal = api
+                                .column(6, {
+                                    page: 'current'
+                                })
+                                .data()
+                                .reduce(function (a, b) {
+                                    return intVal(a) + intVal(b);
+                                }, 0);
+
+                            // Update footer
+                            $(api.column(6).footer()).html(
+                             parseFloat(pageTotal).toFixed(2) + ' ټوټل'
+                            );
+                        },
+                        dom: 'Blfrtip', buttons: [
+                        { extend: 'print', footer: true },
+                        { extend: 'excel', footer: true },
+                        { extend: 'copy', footer: true },
+                    ],
+                       stateSave: true,
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+                    });
+
+                    $(".buttons-print").text("چاپ")
+                    $(".buttons-copy").text("کاپي")
+                    $(".buttons-excel").text("ایکسل")
+                    $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+                }
+            })
+        }
+      
+    </script>
+}

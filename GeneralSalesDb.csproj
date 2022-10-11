@@ -1,0 +1,134 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web" ToolsVersion="Current">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>aspnet-GeneralSalesDb-7E9DE090-CB0F-41CF-BA4A-744C44FD332F</UserSecretsId>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>E:\QLinks projects\GeneralSalesDb\Backup\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE</DefineConstants>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="wwwroot\app-assets\fonts\flag-icon-css\**" />
+    <Compile Remove="wwwroot\DataTables-1.12.1\**" />
+    <Content Remove="wwwroot\app-assets\fonts\flag-icon-css\**" />
+    <Content Remove="wwwroot\DataTables-1.12.1\**" />
+    <EmbeddedResource Remove="wwwroot\app-assets\fonts\flag-icon-css\**" />
+    <EmbeddedResource Remove="wwwroot\DataTables-1.12.1\**" />
+    <None Remove="wwwroot\app-assets\fonts\flag-icon-css\**" />
+    <None Remove="wwwroot\DataTables-1.12.1\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\assets\external.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.4" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="System.Management" Version="6.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+    <Folder Include="wwwroot\images\DealerImage\" />
+    <Folder Include="wwwroot\images\DocumentImage\" />
+    <Folder Include="wwwroot\images\InvestorImage\" />
+    <Folder Include="wwwroot\images\CustomerImage\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Views\Attendance\MyAttendance.cshtml" />
+    <None Include="Views\Attendance\EmployeeAttendance.cshtml" />
+    <None Include="Views\Dealer\Index.cshtml" />
+    <None Include="Views\Dealer\_CustomerPartial.cshtml" />
+    <None Include="Views\Dealer\_DealerPartial.cshtml" />
+    <None Include="Views\Purchase\Index.cshtml" />
+    <None Include="Views\Purchase\ReturnedStockItems.cshtml" />
+    <None Include="Views\Purchase\Stock.cshtml" />
+    <None Include="Views\Purchase\_PurchasePartial.cshtml" />
+    <None Include="Views\Purchase\_StockItemPurchasedPartial.cshtml" />
+    <None Include="wwwroot\app-assets\.DS_Store" />
+    <None Include="wwwroot\app-assets\fonts\.DS_Store" />
+    <None Include="wwwroot\app-assets\fonts\feather\fonts\feather.svg" />
+    <None Include="wwwroot\app-assets\fonts\font-awesome\css\font-awesome.css.map" />
+    <None Include="wwwroot\app-assets\fonts\font-awesome\fonts\fontawesome-webfont.svg" />
+    <None Include="wwwroot\app-assets\fonts\font-awesome\fonts\fontawesome-webfont.woff2" />
+    <None Include="wwwroot\app-assets\fonts\meteocons\fonts\meteocons.svg" />
+    <None Include="wwwroot\app-assets\fonts\simple-line-icons\fonts\Simple-Line-Icons.dev.svg" />
+    <None Include="wwwroot\app-assets\fonts\simple-line-icons\fonts\Simple-Line-Icons.svg" />
+    <None Include="wwwroot\app-assets\js\core\app-menu.js" />
+    <None Include="wwwroot\app-assets\js\core\app-menu.min.js" />
+    <None Include="wwwroot\app-assets\js\core\app.js" />
+    <None Include="wwwroot\app-assets\js\core\app.min.js" />
+    <None Include="wwwroot\app-assets\js\core\libraries\bootstrap.min.js" />
+    <None Include="wwwroot\app-assets\js\core\libraries\jquery.min.js" />
+    <None Include="wwwroot\app-assets\js\scripts\customizer.js" />
+    <None Include="wwwroot\app-assets\js\scripts\customizer.min.js" />
+    <None Include="wwwroot\app-assets\js\scripts\datatable-advanced.js" />
+    <None Include="wwwroot\app-assets\js\scripts\datatable-advanced.min.js" />
+    <None Include="wwwroot\app-assets\js\scripts\documentation.js" />
+    <None Include="wwwroot\app-assets\js\scripts\documentation.min.js" />
+    <None Include="wwwroot\app-assets\js\scripts\extensions\sweet-alerts.js" />
+    <None Include="wwwroot\app-assets\js\scripts\extensions\toastr.js" />
+    <None Include="wwwroot\app-assets\js\scripts\extensions\toastr.min.js" />
+    <None Include="wwwroot\app-assets\js\scripts\forms\select\form-select2.js" />
+    <None Include="wwwroot\app-assets\js\scripts\forms\select\form-select2.min.js" />
+    <None Include="wwwroot\app-assets\js\scripts\modal\components-modal.js" />
+    <None Include="wwwroot\app-assets\js\scripts\modal\components-modal.min.js" />
+    <None Include="wwwroot\app-assets\js\scripts\navs\navs.js" />
+    <None Include="wwwroot\app-assets\js\scripts\navs\navs.min.js" />
+    <None Include="wwwroot\app-assets\select\select2.full.js" />
+    <None Include="wwwroot\app-assets\select\select2.full.min.js" />
+    <None Include="wwwroot\app-assets\select\select2.js" />
+    <None Include="wwwroot\app-assets\select\select2.min.js" />
+    <None Include="wwwroot\app-assets\vendors\.DS_Store" />
+    <None Include="wwwroot\app-assets\vendors\css\tables\.DS_Store" />
+    <None Include="wwwroot\app-assets\vendors\css\tables\datatable\.DS_Store" />
+    <None Include="wwwroot\app-assets\vendors\js\.DS_Store" />
+    <None Include="wwwroot\app-assets\vendors\js\extensions\sweetalert.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\extensions\toastr.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\extensions\transition.js" />
+    <None Include="wwwroot\app-assets\vendors\js\modal\sweetalert.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\.DS_Store" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\buttons.print.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\datatable\dataTables.bootstrap4.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\datatable\dataTables.buttons.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\datatable\dataTables.colReorder.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\datatable\dataTables.colVis.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\datatable\dataTables.fixedColumns.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\datatable\datatables.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\datatable\dataTables.responsive.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\jquery-1.12.3.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\jquery.dataTables.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\pdfmake.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\tables\vfs_fonts.js" />
+    <None Include="wwwroot\app-assets\vendors\js\toggle\bootstrap-checkbox.js" />
+    <None Include="wwwroot\app-assets\vendors\js\toggle\bootstrap-checkbox.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\toggle\switchery.js" />
+    <None Include="wwwroot\app-assets\vendors\js\toggle\switchery.min.js" />
+    <None Include="wwwroot\app-assets\vendors\js\vendors.min.js" />
+    <None Include="wwwroot\assetss\.DS_Store" />
+    <None Include="wwwroot\assetss\js\scripts.bundle.js" />
+    <None Include="wwwroot\assetss\js\scripts.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

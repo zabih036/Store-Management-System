@@ -1,0 +1,89 @@
+﻿
+@{
+    ViewData["Title"] = "NewlyExpired";
+
+}
+
+<div class="col-md-12 " id="purchaseList">
+    <section>
+        <div class="row">
+
+            <div class="card col-md-12">
+                <div class="card-header ">
+
+                    <hr />
+                    <a class="heading-elements-toggle">
+                        <i class="fa fa-ellipsis-v font-medium-3"></i>
+                    </a>
+                    <div class="heading-elements">
+                        <ul class="list-inline mb-0">
+
+                            <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
+
+                        </ul>
+                    </div>
+                    <h2 class="text-center alert bg-yellow bg-darken-2 box-shadow-1" style="background-color:rgb(231, 225, 246);">د جنس مکمل معلومات</h2>
+
+                </div>
+
+
+                <div class="col-md-12">
+                    <table class="table table-bordered dataex-fixh-basic dataTable" id="tblExpiredItems">
+                        <thead>
+                            <tr role="row">
+                                <th>جنس</th>
+                                <th>عمده تعداد</th>
+                                <th>پرچون تعداد</th>
+                                <th>واحد</th>
+                                <th> واحد ظرفیت</th>
+                                <th>اخستلو قیمت</th>
+                                <th>مجموعه</th>
+                                <th>پیسو ډول</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblBody"></tbody>
+
+                    </table>
+                </div>
+
+
+            </div>
+        </div>
+
+    </section>
+</div>
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+<script>
+
+    $(document).ready(function () {
+        showItems();
+    })
+    function showItems() {
+        $.ajax({
+            url: "/Item/showSpecificItemRecord/?id=@ViewBag.Id",
+            type: "POST",
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+                var tr = "";
+                $.each(result, function (i, col) {
+
+                    tr += "  <tr> ";
+                    tr += "      <td>" + col.itemname + "</td> ";
+                    tr += "      <td>" + Math.floor(col.quantity / col.amountinpackage) + "</td> ";
+                    tr += "      <td>" + Math.floor(col.quantity % col.amountinpackage) + "  </td> ";
+                    tr += "      <td>" + col.unit + "</td> ";
+                    tr += "      <td>" + col.amountinpackage + "</td> ";
+                    tr += "      <td>" + (col.purchaseprice).toFixed(3) + "</td> ";
+                    tr += "      <td>" + (col.quantity / col.amountinpackage * col.purchaseprice).toFixed(3) + "</td> ";
+                    tr += "      <td>" + col.currency + "</td> ";
+                    tr += "  </tr>";
+                })
+                $("#tblBody").html('').html(tr);
+            }
+        })
+    }
+
+</script>}

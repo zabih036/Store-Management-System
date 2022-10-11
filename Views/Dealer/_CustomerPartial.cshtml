@@ -1,0 +1,226 @@
+﻿
+@model CustomerViewModel
+
+
+
+<div class="modal-content user-view ">
+    <div class="modal-header bg-primary white">
+        <h4 class="modal-title" id="myModalLabel100">مشتریانو راجستر کول </h4>
+    </div>
+    <div class="modal-body">
+        <form asp-controller="Dealer" data-ajax="true" asp-action="CustomerRegistration" data-ajax-success="funSuccessCustomer(data)" method="post" id="frmCustomer">
+            <div class="row col-md-12 align-items-end justify-content-center pt-2 m-auto">
+                <input hidden asp-for="CustomerId" value="0" />
+                <div class="form-group">
+                    <label  class="">مشترې نوم:</label>
+                    <input asp-for="CusName" class="form-control" />
+                    <span asp-validation-for="CusName" class="text-danger"></span>
+                </div>
+                &nbsp;&nbsp;
+                <div class="form-group">
+                    <label  class="">د پلار نوم:</label>
+                    <input asp-for="CusFName" class="form-control" />
+                    <span asp-validation-for="CusFName" class="text-danger"></span>
+                </div>
+                &nbsp;&nbsp;
+                <div class="form-group">
+                    <label  class="">آدرس:</label>
+                    <input asp-for="CusAddress" class="form-control" />
+                    <span asp-validation-for="CusAddress" class="text-danger"></span>
+                </div>
+                &nbsp;&nbsp;
+                <div class="form-group">
+                    <label class="">موبایل:</label>
+                    <input asp-for="CusPhone" class="form-control" />
+                    <span asp-validation-for="CusPhone" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2  user-insert">
+                    <button type="submit" id="btnSubmitCustomer" class="btn btn-primary btn-icon-md">ذخیره</button>
+                    <button type="reset" id="btnResetCustomer" class="btn btn-warning btn-icon-md">پاکول</button>
+                </div>
+            </div>
+        </form>
+        <section id="divTable">
+            <table class="table table-responsive-md table-striped table-condensed table-bordered dataTables_scrollHead" id="tblCustomer">
+                <thead class="scrollable-container ps--scrolling-x">
+                    <tr role="row">
+                        <th style="max-width:1%;">#</th>
+                        <th class="col-md-1">مشترې نوم</th>
+                        <th class="col-md-1">پلار نوم</th>
+                        <th class="col-md-1">آدرس</th>
+                        <th class="col-md-1">موبایل </th>
+                        <th class="col-md-1">حالت </th>
+                        <th style="max-width:1%;" class="user-edit">  تغیرول</th>
+                        <th style="max-width:1%;" class="user-delete">حذف</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+    </div>
+</div>
+
+<form data-ajax="true" asp-action="DeleteCustomer" data-ajax-method="post" asp-controller="Dealer" data-ajax-success="deletedCustomer(data)">
+    <input hidden id="customerIdd" asp-for="CustomerId" />
+    <button type="submit" class="d-none" id="btnDeleteCustomer"></button>
+</form>
+
+<form data-ajax="true" asp-action="LockAccount" data-ajax-method="post" asp-controller="Dealer">
+    <input hidden id="dealerToLock" name="dealerId"  />
+    <input hidden id="tf" name="trueFalse"/>
+    <button type="submit" class="d-none" id="btnLock"></button>
+</form>
+
+<script>
+        $(document).ready(function () {
+
+            LoadCustomers();
+        })
+
+        function LoadCustomers() {
+            $.ajax({
+                url: "/Dealer/FetchCustomers/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    $.each(result, function (i, col) {
+
+                        if (col.status == "Unlocked") {
+                            cls = "btn-primary";
+                            spn = "fa fa-unlock";
+
+                        } else {
+
+                            cls = "btn-danger";
+                            spn = "fa fa-lock";
+                        }
+
+                        tr += '<tr  role="row">' +
+                            '<td >' + (i + 1) + '</td>' +
+                            '<td >' + col.name + '</td>' +
+                            '<td >' + col.fName + '</td>' +
+                            '<td >' + col.address + '</td>' +
+                            '<td>' + col.phone + '</td>' +
+                            '<td ><button onclick="fnToggleBtnLock(' + i + ',\'' + col.customerId + '\')" id=' + i + ' class="btn btn-float btn-round btn-float-md   ' + cls + '"><i id="span' + i + '" class="' + spn + '" ></i></button></td>' +
+                            ' <td  class="user-edit"><button type="button" onclick="fnEditCustomer(' + col.customerId + ',\'' + col.name + '\',\'' + col.fName + '\',\'' + col.address + '\',\'' + col.phone + '\')" class="btn btn-primary"><i class="fa fa-edit"></i></button></td>' +
+                            ' <td  class="user-delete"><button type="button" onclick="fnDeleteCustomer(' + col.customerId + ')" class="btn btn-danger"><i class="fa fa-trash"></i></button></td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#tblCustomer").dataTable();
+                    table.fnDestroy();
+                    $("#tblCustomer>tbody").html("").html(tr);
+
+                    $("#tblCustomer").DataTable({
+                            stateSave: true,
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه."
+                                ,
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+
+                        });
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            })
+    }
+
+    function fnToggleBtnLock(i, dealerId) {
+        if ($("#" + i).hasClass("btn-danger")) {
+            $("#tf").val("unlock");
+            $("#dealerToLock").val(dealerId);
+            $("#btnLock").trigger("click");
+            $("#" + i).removeClass("btn-danger").addClass("btn-primary");
+            $("#span" + i).removeClass("fa fa-lock").addClass("fa fa-unlock");
+
+        } else {
+            $("#tf").val("lock");
+            $("#dealerToLock").val(dealerId);
+            $("#btnLock").trigger("click");
+            $("#" + i).removeClass("btn-primary").addClass("btn-danger");
+            $("#span" + i).removeClass("fa fa-unlock").addClass("fa fa-lock");
+
+        }
+
+
+        //< a href = "#" onclick = "fnToggleBtnLock('+i+')" id = '+i+' class="btn btn-float btn-round btn-float-md btn-danger" > <i class="fa fa-unlock"></i></a >
+    }
+
+        function funSuccessCustomer(data) {
+                LoadCustomers();
+            $("#frmCustomer")[0].reset();
+              toast(data, 'success');
+            $("#btnSubmitCustomer").text("ذخیره");
+          }
+
+        function fnEditCustomer(id, name, fname, address, phone) {
+
+            $("#CustomerId").val(id);
+            $("#CusName").val(name);
+            $("#CusFName").val(fname);
+            $("#CusAddress").val(address);
+            $("#CusPhone").val(phone);
+
+            $("#btnSubmitCustomer").text("تغیرول");
+        }
+
+    function fnDeleteCustomer(comId) {
+            $("#customerIdd").val(comId);
+            swal({
+                title: "آیا غواړی چې نوموړی ریکارډ حذف شې؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    $("#btnDeleteCustomer").trigger("click");
+                }
+            });
+
+        }
+
+    function deletedCustomer(data) {
+             toast(data, 'success');
+
+            LoadCustomers();
+    }
+
+    $("#btnResetCustomer").click(function () {
+        $("#btnSubmitCustomer").text("ذخیره کول");
+    })
+</script>

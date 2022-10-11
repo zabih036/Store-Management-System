@@ -1,0 +1,995 @@
+﻿@model AllViewModel
+@{
+    ViewData["Title"] = "کارمندانو راجستر کولو فارم";
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#employeeActive").addClass("active")</script>
+<style>
+    .camera {
+        /*padding: 8px;*/
+        background-color: antiquewhite;
+        /*border-radius: 48%;*/
+        color: whitesmoke;
+        position: absolute;
+        margin-top: 0px;
+        margin-left: 0px;
+        cursor: pointer;
+    }
+
+        .camera:hover {
+            margin-top: -5.90px;
+            margin-left: 54px;
+            border: 1.5px solid white;
+        }
+
+    .profileImage {
+        /*border: 5px solid white;*/
+        width: 100%;
+        height: 100%;
+        /*border-radius: ;*/
+        object-fit: fill;
+        margin-top: 0px;
+        /*position:absolute;*/
+        margin-left: 100px;
+        left: 0px;
+        right: 0px;
+    }
+</style>
+
+@if (ViewBag.Alert != "empty")
+{
+    <div class="alert alert-success alert-dismissible" role="alert" id="divAlert" style="text-align:center;padding-top:3px; font-size:28px;height:45px;">
+        @ViewBag.Alert
+    </div>
+}
+
+
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorize
+
+@if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+
+    @await Html.PartialAsync("AccessDeniedPartial")
+
+
+    ViewBag.view = "d-none";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "";
+}
+
+<div class="card  @ViewBag.view">
+
+    <div class="row col-md-12 " style=" display: flex; justify-content: space-between;align-items: center; flex-direction: row; padding: 10px;">
+        <div class="col-md-2" style="text-align:right">
+            <button id="btnList" class="btn btn-info "><strong>د کارمندانو لیست</strong>  </button>
+        </div>
+        <div class="col-md-8">
+            <h2 class="text-center alert bg-info box-shadow-1">
+                د کارمندانو د راجستر کولو فارم
+            </h2>
+        </div>
+
+        <div class="col-md-2" style="text-align:left">
+            <button type="button" class="btn btn-success" id="btnEmployeeSalaryShow">
+                <span class="fa fa-plus"></span> د کارمندانو معاشات
+            </button>
+        </div>
+    </div><hr />
+
+    <section id="divInput" style="">
+        <form asp-controller="Employee" asp-action="EmployeeRegistration" enctype="multipart/form-data" data-ajax-success="funSuccessEmployee(data)" method="post" id="frmEmployee">
+            <div class="col-md-12 row @ViewBag.Insert">
+                <input hidden asp-for="employee.oldEmail" value="'0'" />
+                <input hidden asp-for="employee.defalut" value="0" />
+                <input hidden asp-for="employee.EmployeeId" value="0" />
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="employee.Name" class=""></label>
+                        <input asp-for="employee.Name" placeholder="د کارمند نوم" class="form-control" />
+                        <span asp-validation-for="employee.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="employee.FatherName" class=""></label>
+                        <input asp-for="employee.FatherName" placeholder="  د پلار نوم" class="form-control" />
+                        <span asp-validation-for="employee.FatherName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="employee.Address" class=""></label>
+                        <input asp-for="employee.Address" placeholder=" آدرس " class="form-control" />
+                        <span asp-validation-for="employee.Address" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="employee.TazkiraNo" class=""></label>
+                        <input asp-for="employee.TazkiraNo" placeholder="د تذکیرې نمبر" class="form-control" />
+                        <span asp-validation-for="employee.TazkiraNo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="employee.Job" class=""></label>
+                        <input asp-for="employee.Job" placeholder="دنده" class="form-control" />
+                        <span asp-validation-for="employee.Job" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="employee.Phone" class=""></label>
+                        <input asp-for="employee.Phone" placeholder="موبایل نمبر" class="form-control" />
+                        <span asp-validation-for="employee.Phone" class="text-danger"></span>
+                    </div>
+                   
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="employee.Email" class=""></label>
+                        <input asp-for="employee.Email" placeholder="بریښنالیک" class="form-control" />
+                        <span asp-validation-for="employee.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="employee.HireDate" class=""></label>
+                        <input asp-for="employee.HireDate" type="datetime-local" style="margin:0px;padding:8px;" placeholder="د ګومارلو نیټه" class="form-control" />
+                        <span asp-validation-for="employee.HireDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class=""> معاش پولی واحد:</label>
+                        <select asp-for="employee.CurrencyId" class="form-control">
+                            <option value=""> انتخاب کړئ </option>
+                            <option value="1">افغانۍ</option>
+                            <option value="2">کلدارې</option>
+                            <option value="3">ډالر</option>
+                        </select>
+                        <span asp-validation-for="employee.CurrencyId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="employee.Salary" class=""></label>
+                        <input asp-for="employee.Salary" placeholder="د کارمند معاش" class="form-control" />
+                        <span asp-validation-for="employee.Salary" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group ">
+
+                        <div class="col-md-12 row" style="margin:0px;padding:0px;">
+                            <div class="col-md-6" style="padding-right:0px;display:grid">
+                                <label asp-for="employee.Image" class=""></label>
+                                <button type="button" class="btn btn-info btn-block " style="margin-top:0px;" id="browseBtn">د تصویر انتخابول  </button>
+                                <button type="button" class="btn btn-danger btn-block " style="margin-top:52px;" id="browseCancel"> فسخ کول </button>
+                            </div>
+
+                            <div class="border col-md-6 text-center" style="margin-top:10px;">
+                                <input asp-for="employee.Image" class="d-none" accept="image/jpeg, image/jpg,image/png" name="img" style="border:1px solid" id="browseInput" />
+                                <img src="~/images/StaticImages/browse.png" class=" profileImage" id="browseImg" style="height:175px; padding:0px;margin:0px;cursor:pointer;" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group  " style="margin-top:13px;  ">
+                        <button type="reset" id="btnReset" class="btn btn-warning btn-icon-md">پاکول</button>
+                        <button type="submit" id="btnSubmitEmployee" class="btn btn-primary btn-icon-md">ذخیره</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <section id="divTable" class="p-0" style="display:none">
+        <table class="table table-responsive table-striped table-condensed table-bordered " id="tblEmployee">
+            <thead class="scrollable-container ps--scrolling-x">
+                <tr role="row">
+                    <th style="max-width:1%;">#</th>
+                    <th class="col-md-1">د کارمند نوم</th>
+                    <th class="col-md-1">د پلار نوم</th>
+                    <th class="col-md-1">آدرس</th>
+                    <th class="col-md-1">تذکیره </th>
+                    <th class="col-md-1">دنده</th>
+                    <th class="col-md-1">موبایل</th>
+                    <th class="col-md-1">بریښنالیک</th>
+                    <th class="col-md-1">پولې واحد</th>
+                    <th class="col-md-1">معاش</th>
+                    <th class="col-md-1">د ګمارنې نیټه</th>
+                    <th class="col-md-1">  تصویر</th>
+                    <th style="max-width:1%; " class=" @ViewBag.Edit">  اضافه کارې</th>
+                    <th style="max-width:1%; " class=" @ViewBag.Edit">  تغیرول</th>
+                    <th style="max-width:1%;" class=" @ViewBag.Delete">  حذف</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+    </section>
+
+    <section id="divTableSalary" class="p-0" style="display:none">
+        <table class="table table-responsive table-striped table-condensed table-bordered" id="tblEmployeeSalary">
+            <thead class="scrollable-container ps--scrolling-x">
+                <tr role="row">
+                    <th style="max-width:10px;">#</th>
+                    <th class="col-md-3">د کارمند نوم</th>
+                    <th class="col-md-1"> موبایل نمبر</th>
+                    <th class="col-md-1">  بریښنالیک</th>
+                    <th class="col-md-1">  پولې واحد</th>
+                    <th class="col-md-1">  معاش</th>
+                    <th class="col-md-1">  غیر حاضر</th>
+                    <th class="col-md-1">  اضافه کارې</th>
+                    <th class="col-md-1">  باقې</th>
+                    <th class="col-md-1">  تادیه شوې</th>
+                    <th class=""> نیټه</th>
+                    <th class="@ViewBag.Insert"> تادیه</th>
+                    <th class=" @ViewBag.Edit">  تغیرول</th>
+                    <th>تفصیل</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+    </section>
+
+    <button id="btnr" class="btn btn-info col-md-2" style="display:none;margin-top:-20px;"> چاپ  <span class="ft-printer"></span></button>
+
+    <section id="divDetails" class="col-md-12" style="display:none">
+        <div class="col-md-12" style="text-align:center;justify-content:center;">
+            <div class="">
+                <div class=""><img src="~/images/StaticImages/browse.png" class="round" id="employeeImage" style="height:100px;width:100px; padding:0px;margin:0px;cursor:pointer;" /></div><br />
+                <div class="row text-center font-medium-3" style="justify-content:center">&nbsp;  د کارمند نوم :&nbsp;&nbsp; <h4 id="name" class="font-medium-4"> ذبیح الله</h4></div><hr />
+            </div>
+        </div>
+        <div class="col-md-12  row" style="text-align:center;justify-content:center;">
+            <div class="col-md-6 text-left offset-md-1" style="max-width:40%;float:right;margin-right:10%;">
+                <h3>د وظیفې د شروع نیټه :</h3>
+                <h3>بریښنالیک :</h3>
+                <h3>موبایل نمبر :</h3>
+                <h3>کارمند آدرس :</h3>
+                <h3>کارمند معاش :</h3>
+                <h3>وظیفې وخت په میاشتو :</h3>
+                <h3>اضافه کارې :</h3>
+                <h3>غیر حاضر :</h3>
+            </div>
+            <div class="col-md-6 text-right" style="max-width:40%;float:left;">
+                <h3 id="hireDate"></h3>
+                <h3 id="email"></h3>
+                <h3 id="phone"></h3>
+                <h3 id="address"></h3>
+                <h3 id="salary"></h3>
+                <h3 id="duration"></h3>
+                <h3 id="overtime"></h3>
+                <h3 id="absent"></h3>
+            </div>
+
+        </div>
+        <hr />
+        <div class="col-md-12 row" style="text-align:center;justify-content:center;">
+            <div class="col-md-6 text-left offset-md-1" style="max-width:40%;float:right;margin-right:10%;">
+                <h3>اخیستل شوې پیسې </h3>
+
+
+            </div>
+            <div class="col-md-6 text-right " style="max-width:40%;float:left">
+                <h3>نیټه</h3>
+
+
+            </div>
+            <div class="col-md-6 text-left offset-md-1" id="divPaid" style="max-width:40%;float:right;margin-right:10%;">
+
+                <h3 id="paidMoney">0 </h3>
+
+            </div>
+            <div class="col-md-6 text-right " id="divDate" style="max-width:40%;float:left">
+
+                <h3 id="paidDate">0</h3>
+
+            </div>
+
+        </div><hr />
+        <div class="col-md-7 offset-md-3 row text-center" style="text-align:center;justify-content:center">
+
+            <div class="col-md-5 text-center" style="max-width:40%;float:right;margin-right:10%;">
+                <h3>ټوتل معاش : </h3>
+                <h3>ټوتل اضافه کارې : </h3>
+                <h3>ټوتل غیر حاضرې : </h3>
+                <h3>ټوتل اخیستل شوې پیسې : </h3>
+                <h3>بقایه : </h3>
+            </div>
+
+            <div class="col-md-5 " style="max-width:40%;float:left">
+                <h3 id="totalSalary"></h3>
+                <h3 id="totalOvertime"></h3>
+                <h3 id="totalAbsent"></h3>
+                <h3 id="totalPaid"></h3>
+                <h3 dir="ltr" id="totalRemain"></h3>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+<!--Add salary modal -->
+<div class="modal fade text-left" id="addEmployeeSalaryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <form data-ajax="true" asp-controller="Employee" asp-action="AddEmployeeSalary" data-ajax-success="funSuccessEmployeeSalary(data)" data-ajax-method="post" id="frmAddEmployeeSalary">
+            <div class="modal-content">
+                <div class="modal-header bg-info white">
+                    <h4 class="modal-title" id="myModalLabel17">د کارمند معاش تادیه کول</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body  @ViewBag.Insert">
+                    @Html.AntiForgeryToken()
+                    <div class="row text-center container">
+                        <dv class="col-md-10 offset-1">
+
+                            <input hidden asp-for="salary.CurrencyId" value="0" />
+                            <input hidden asp-for="salary.EmployeeId" value="0" />
+                            <input hidden asp-for="salary.SalaryId" value="0" />
+
+                            <div class="form-group">
+                                <label class="">معاش</label>
+                                <input type="number" dir="ltr" id="empSalary" disabled class="form-control" />
+                                <span class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="">پخوانی بقایه</label>
+                                <input type="number" disabled dir="ltr" id="lastRemain" class="form-control" />
+                                <span class="text-danger"></span>
+                            </div>
+                            @*<div class="form-group">
+                                    <label asp-for="salary.PaidUsd" class=""></label>
+                                    <input asp-for="salary.PaidUsd" dir="ltr" class="form-control" />
+                                    <span asp-validation-for="salary.PaidUsd" class="text-danger"></span>
+                                </div>*@
+
+                            <div class="form-group">
+                                <label class="" id="currencyLabel"></label>
+                                <input asp-for="salary.PaidAmount" dir="ltr" class="form-control" />
+                                <span asp-validation-for="salary.PaidAmount" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="">اوسنی بقایه </label>
+                                <input type="number" dir="ltr" disabled id="newRemain" class="form-control" />
+                                <span class="text-danger"></span>
+                            </div>
+
+                        </dv>
+                    </div>
+                </div>
+                <div class="modal-footer  ">
+                    <button type="button" id="btnCloseSalaryPayment" class="btn grey btn-outline-secondary" data-dismiss="modal">بندول</button>
+                    <button type="reset" id="btnResetSalary" class="btn btn-warning btn-icon-md">پاکول</button>
+                    <button type="submit" id="btnSubmitEmployeeSalary" class="btn btn-primary btn-icon-md">ذخیره</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--modal for adding over time -->
+<div class="col-lg-4 col-md-6 col-sm-12">
+    <div class="form-group">
+
+        <div class="modal fade text-left" id="OverTimeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel10"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary white">
+                        <h4 class="modal-title" id="myModalLabel100">د کارمند اضافه کارې ذخیره کول</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body  @ViewBag.Insert">
+                        <form data-ajax="true" asp-controller="Employee" asp-action="AddOverTime" data-ajax-success="fnSuccessPaid(data)" data-ajax-method="post" id="frmRawItem">
+                            <hr />
+                            <input hidden asp-for="overTime.EmployeeId" value="0" />
+                            <div class="form-group">
+                                <label class="">د اضافه کاری پیسې</label>
+                                <input asp-for="overTime.Amount" placeholder=" د پیسو اندازه ولیکئ" class="form-control" />
+                                <span asp-validation-for="overTime.Amount" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="">نیټه :</label>
+                                <input asp-for="overTime.Date" type="datetime-local" style="margin:0px;padding:8px;" placeholder=" نیټه انتخاب کړئ" class="form-control" />
+                                <span asp-validation-for="overTime.Date" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="">تفصیلات</label>
+                                <textarea asp-for="overTime.Details" placeholder=" تفصیلات" class="form-control"></textarea>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn grey btn-outline-secondary" id="btnCloseItemRaw" data-dismiss="modal">بندول</button>
+                                <button type="submit" id="btnSubmitStock" class="btn btn-outline-primary">ذخیره</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<form data-ajax="true" asp-action="DeleteEmployee" data-ajax-method="post" asp-controller="Employee" data-ajax-success="deleted(data)">
+    <input hidden id="deleteId" asp-for="employee.EmployeeId" />
+    <input hidden id="deleteEmail" asp-for="employee.Email" />
+    <button type="submit" class="d-none" id="btnDelete"></button>
+</form>
+
+<form data-ajax="true" asp-action="LoadEmployeeAllPayments" data-ajax-method="post" asp-controller="Employee" data-ajax-success="EmployeeAllPayments(data)">
+    <input hidden id="employeeId" asp-for="employee.EmployeeId" />
+    <button type="submit" class="d-none" id="btnPayments"></button>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <!-- Document ready -->
+    <script>
+        var show = true;
+        $(document).ready(function () {
+            loadEmployee();
+            $("#divAlert").delay(6000).fadeOut();
+            $("#frmEmployee")[0].reset();
+            $("#browseImg").attr("src", "/images/StaticImages/browse.png");
+
+            var url = location.href;
+
+            if (url.search("Salary") != -1) {
+
+                $("#btnEmployeeSalaryShow").trigger("click");
+            }
+
+            $("#btnr").click(function () {
+
+                $("#divDetails").printThis({
+                    debug: false,
+                    importStyle: true,
+                    printContainer: true,
+                    loadCSS: "",
+                    pageTitle: "",
+                    removeInline: false,
+                    removeInlineSelector: "*",
+                    base: false,
+                    formValues: true,
+                    canvas: false,
+                    doctypeString: '...',
+                    removeScripts: false,
+                    copyTagClasses: true,
+                    beforePrintEvent: null,
+                    beforePrint: null,
+                    afterPrint: null
+                });
+
+            })
+        })
+       
+    </script>
+
+    <!-- Image Code -->
+    <script>
+        $("#browseBtn").click(function () {
+            $("#browseInput").trigger("click");
+        })
+        $("#browseImg").click(function () {
+            $("#browseInput").trigger("click");
+        })
+        $("#browseInput").change(function () {
+            if (this.files && this.files[0]) {
+                var fileReader = new FileReader();
+                fileReader.readAsDataURL(this.files[0]);
+                fileReader.onload = function (x) {
+                    if (x != null)
+                        $("#browseImg").attr("src", x.target.result);
+                    $("#employee_defalut").val("0");
+                }
+            }
+        })
+    </script>
+
+    <!-- employee script functions -->
+    <script>
+
+        var list = true;
+
+        function loadEmployee() {
+            $.ajax({
+                url: "/Employee/LoadEmployee/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    console.log(result)
+                    $.each(result, function (i, col) {
+                        var date = new Date(col.hireDate);
+
+                        var curr = "";
+
+                        col.currencyId == 1 ?curr = "افغانۍ" : col.currencyId == 2 ? curr=  "کلدارې" :curr = "ډالر"
+
+                        tr += '<tr  role="row">' +
+                            '<td >' + (i + 1) + '</td>' +
+                            '<td >' + col.name + '</td>' +
+                            '<td >' + col.fatherName + '</td>' +
+                            '<td >' + col.address + '</td>' +
+                            '<td >' + col.tazkiraNo + '</td>' +
+                            '<td >' + col.job + '</td>' +
+                            '<td>' + col.phone + '</td>' +
+                            '<td>' + col.email + '</td>' +
+                            '<td>' + curr + '</td>' +
+                            ' <td>' + col.salary.toFixed(2) + '</td>' +
+                            ' <td>' + date.toLocaleDateString() + '</td>' +
+                            ' <td><img src=' + col.image + ' height="100" width="100"></td>' +
+                            ' <td  class="@ViewBag.Edit"><button type="button" onclick="fnAddEmployeeOverTime(' + col.employeeId + ')" class="btn btn-primary"><i class="ft-clock"></i></button></td>' +
+                            ' <td  class="@ViewBag.Edit"><button type="button" onclick="fnEditEmployee(' + col.employeeId + ',\'' + col.category + '\',\'' + col.currencyId + '\',\'' + col.name + '\',\'' + col.fatherName + '\',\'' + col.address + '\',\'' + col.district + '\',\'' + col.vilage + '\',\'' + col.tazkiraNo + '\',\'' + col.job + '\',\'' + col.phone + '\',\'' + col.email + '\',\'' + col.address + '\',\'' + col.salary + '\',\'' + col.hireDate + '\',\'' + col.image + '\')" class="btn btn-primary"><i class="fa fa-edit"></i></button></td>' +
+                            ' <td  class="@ViewBag.Delete"><button type="button" onclick="fnDeleteEmployee(' + col.employeeId + ',\'' + col.email + '\')" class="btn btn-danger"><i class="fa fa-trash"></i></button></td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#tblEmployee").dataTable();
+                    table.fnDestroy();
+
+                    $("#tblEmployee>tbody").html("").html(tr);
+
+                        $("#tblEmployee").DataTable({
+
+                            stateSave: true,
+
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه."
+                                ,
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+                            });
+
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+                complete: function () {
+
+                }
+
+            })
+        }
+
+        function fnAddEmployeeOverTime(empid) {
+            $("#overTime_EmployeeId").val(empid);
+            $("#OverTimeModal").modal("show");
+        }
+
+        function fnSuccessPaid(data) {
+
+            $("#frmRawItem")[0].reset();
+
+            toast(data, 'primary')
+
+            $("#OverTimeModal").modal("hide");
+        }
+
+        function funSuccessEmployee(data) {
+
+            loadEmployee();
+
+            $("#frmEmployee")[0].reset();
+
+            toast(data, 'primary')
+
+            $("#btnSubmitEmployee").text("ذخیره ");
+        }
+
+        function fnEditEmployee(id,category,currency, name, fatherName, province, district, vilage, tazkiraNo, job, phone, email, address, salary, hireDate, pic) {
+
+            $("#employee_EmployeeId").val(id);
+            $("#employee_Name").val(name);
+            $("#employee_FatherName").val(fatherName);
+            $("#employee_Province").val(province);
+            $("#employee_District").val(district);
+            $("#employee_Vilage").val(vilage);
+            $("#employee_TazkiraNo").val(tazkiraNo);
+            $("#employee_Job").val(job);
+            $("#employee_Phone").val(phone);
+            $("#employee_Email").val(email);
+            $("#employee_Address").val(address);
+            $("#employee_CurrencyId").val(currency);
+            $("#employee_Salary").val(salary);
+            $("#employee_HireDate").val(hireDate);
+            $("#browseImg").attr("src", pic);
+            $("#employee_defalut").val(pic);
+            $("#employee_oldEmail").val(email);
+            $("#btnSubmitEmployee").text("تغیرول");
+
+            $("#divInput").animate({
+                left: '250px',
+                opacity: '0.9',
+
+            }).show(400);
+
+
+            $("#divTable").animate({
+
+            }).hide(400);
+
+            $("#btnList").text("د کارمندانو لیست ")
+            list = true;
+
+        }
+
+        function fnDeleteEmployee(comId, email) {
+
+            $("#deleteId").val(comId);
+            $("#deleteEmail").val(email);
+
+            swal({
+                title: "آیا غواړی چې نوموړی ریکارډ حذف شې؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    $("#btnDelete").trigger("click");
+                }
+            });
+
+        }
+
+        function deleted(data) {
+            toast(data, 'success')
+            loadEmployee();
+        }
+
+    </script>
+
+    <!-- employee salary script functions -->
+    <script>
+        function LoadEmployeeSalary() {
+            $.ajax({
+                url: "/Employee/LoadEmployeeSalary/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    console.log(result)
+
+                    $.each(result, function (i, col) {
+
+                        col.salaryId == null ? 0 : col.salaryId;
+
+                        var paidDate = new Date(col.paidDate);
+
+                        var currentDate = new Date();
+
+                        var empty = "";
+                        var showBtnPay = "";
+                        var showPayMoney = parseFloat(col.lastPaid);
+                        var showPayDate = "";
+                        if (paidDate.getFullYear() == currentDate.getFullYear() && paidDate.getMonth() == currentDate.getMonth()) {
+                            showBtnPay = "";
+                            showPayMoney = parseFloat(col.lastPaid);
+                            showPayDate = paidDate.toLocaleDateString();
+
+                        } else {
+                            showBtnPay = "";
+                            showPayMoney = 0.00;
+                            showPayDate = "";
+                        }
+                        var clr = "";
+                        if ((col.totalSalary + parseFloat(col.totalOvertimeAmount)) - (col.totalPaid + col.totalAbsentAmount) < 0) {
+                            clr = "#f99ea9";
+                        }
+                        if ((col.totalSalary + parseFloat(col.totalOvertimeAmount)) - (col.totalPaid + col.totalAbsentAmount) > 0) {
+                            clr = "#9ec8ed";
+                        }
+                        var remain = 0;
+                        if ((col.totalSalary - col.totalPaid) == null) {
+                            remain = 0;
+                        } else {
+                            remain = (col.totalSalary + parseFloat(col.totalOvertimeAmount)) - (col.totalPaid + col.totalAbsentAmount);
+                        }
+                        var tpaid = 0;
+                        if (col.totalPaid == null) {
+                            tpaid = 0;
+                        } else {
+                            tpaid = parseFloat( col.totalPaid);
+                        }
+                        var tremain
+                        if (col.totalRemain == null) {
+
+                            tremain = 0;
+                        } else {
+                            tremain = parseFloat( col.totalRemain)
+                        }
+
+                        var curr = "";
+
+                        col.currencyId == 1 ? curr = "افغانۍ" : col.currencyId == 2 ? curr = "کلدارې" : curr = "ډالر"
+                        tr += '<tr class="odd" role="row">' +
+
+                            '<td>' + (i + 1) + '</td>' +
+                            ' <td>' + col.name + '</td>' +
+                            ' <td>' + col.phone + '</td>' +
+                            ' <td>' + col.email + '</td>' +
+                            ' <td>' + curr + '</td>' +
+                            ' <td>' + col.salary.toFixed(2) + '</td>' +
+                            ' <td>' + col.absentAmount.toFixed(2) + '</td>' +
+                            ' <td>' + col.overtime.toFixed(2) + '</td>' +
+                            ' <td dir="ltr" style="background-color: ' + clr + '">' + remain.toFixed(2) + '</td>' +
+                            ' <td class=' + showPayMoney + '>' + showPayMoney.toFixed(2) + '</td>' +
+                            ' <td>' + showPayDate + '</td>' +
+                            ' <td class="' + showBtnPay + '    @ViewBag.Insert"><button type="button" onclick="AddSalary(' + col.id + ',\'' + col.salary + '\',\'' + remain + '\',\'' + col.currencyId + '\',\'' + col.category + '\')" class="btn btn-primary"><i class=""></i>  تادیه  </button></td>' +
+                            ' <td class="@ViewBag.Edit"><button type="button" onclick="EditEmployeeSalary(' + col.id + ',\'' + col.salaryId + '\',\'' + showPayMoney + '\')" class="btn btn-info"><i class="fa fa-edit"></i></button></td>' +
+                            ' <td ><button type="button" onclick="EmployeeSalaryDetails(' + col.id + ',\'' + col.totalAbsentAmount + '\',\'' + col.absentCount + '\',\'' + col.totalOvertimeAmount + '\',\'' + col.imagePath + '\',\'' + col.name + '\',\'' + col.hireDate + '\',\'' + col.email + '\',\'' + col.phone + '\',\'' + col.address + '\',\'' + col.salary + '\',\'' + col.totalMonths + '\',\'' + tpaid + '\',\'' + col.totalSalary + '\',\'' + tremain + '\')" class="btn btn-success"><i class="fa fa-info"></i></button></td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#tblEmployeeSalary").dataTable();
+                    table.fnDestroy();
+                    $("#tblEmployeeSalary>tbody").html("").html(tr);
+                        $("#tblEmployeeSalary").DataTable({
+                            stateSave: true,
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+                               });
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+            })
+        }
+
+        function funSuccessEmployeeSalary(data) {
+            LoadEmployeeSalary();
+            $("#btnResetSalary").trigger("click");
+            $("#addEmployeeSalaryModal").modal("hide");
+            toast(data, 'info')
+            $("#btnSubmitEmployeeSalary").text("ذخیره ");
+        }
+
+        function EmployeeAllPayments(data) {
+            console.log(date)
+            var divPaid = "";
+            var divDate = "";
+            var amount = "";
+            var date = "";
+            if (data == "") {
+                divDate = 0;
+                divPaid = 0;
+            }
+            $.each(data, function (i, col) {
+                amount = parseFloat(col.paidAmount);
+                divPaid += '<h3>' + amount.toFixed(2) + '</h3>';
+                divDate += '<h3>' + col.paidDate + '</h3>';
+            })
+            $("#divPaid").html(divPaid);
+            $("#divDate").html(divDate);
+        }
+
+        function EmployeeSalaryDetails(id, absentamount, absentdays, overtime, imagePath, name, hireDate, email, phone, province, salary, duration, totalPaid, totalSalary, totalRemain) {
+
+            $("#employeeId").val(id);
+            $("#employeeImage").attr("src", imagePath);
+            $("#btnPayments").trigger("click");
+            $("#name").text(name);
+            $("#hireDate").text(hireDate);
+            $("#email").text(email);
+            $("#phone").text(phone);
+            $("#address").text(province);
+            var s = parseFloat(salary);
+            $("#salary").text(s.toFixed(2));
+            var o = parseFloat(overtime);
+            $("#overtime").text(o.toFixed(2));
+            $("#absent").text(absentdays);
+            $("#duration").text(duration);
+            if (totalPaid != 0) {
+                $("#totalPaid").text(parseFloat(totalPaid).toFixed(2));
+            } else {
+                $("#totalPaid").text(0);
+            }
+            if (totalRemain != 0) {
+
+                $("#totalRemain").text((parseFloat(totalSalary) + parseFloat(overtime) - (parseFloat(totalPaid) + parseFloat(absentamount))).toFixed(2));
+
+            } else {
+                $("#totalRemain").text(0);
+            }
+            $("#totalSalary").text((parseFloat(totalSalary)).toFixed(2));
+            $("#totalOvertime").text((parseFloat(overtime)).toFixed(2));
+            $("#totalAbsent").text((parseFloat(absentamount)).toFixed(2));
+            $("#btnr").show();
+            $("#divInput").hide();
+            $("#divTable").hide();
+            $("#divTableSalary").hide();
+            $("#divDetails").show();
+        }
+
+        function EditEmployeeSalary(empId, salaryId, amount) {
+            $("#btnResetSalary").trigger("click");
+            if (isNaN(salaryId) || salaryId == 0) {
+                toast("نوموړی کارمند په دې میاشت کې پیسې نه دې اخیستې", 'warning')
+            } else {
+                $("#salary_SalaryId").val(salaryId)
+                $("#salary_PaidAmount").val(parseFloat(amount).toFixed(2));
+                $("#btnSubmitEmployeeSalary").text("تغیرول");
+                $("#addEmployeeSalaryModal").modal("show");
+            }
+        }
+
+        function AddSalary(empId, salary, remain , currency,category) {
+            var s = parseFloat(salary);
+            var r = parseFloat(remain);
+            $("#btnResetSalary").trigger("click");
+            $("#salary_EmployeeId").val(empId)
+            $("#salary_CurrencyId").val(currency)
+            $("#empSalary").val(s.toFixed(2));
+            $("#lastRemain").val(r.toFixed(2));
+            $("#currency").val(currency);
+            $("#btnSubmitEmployeeSalary").text("ذخیره");
+
+            $("#addEmployeeSalaryModal").modal("show");
+
+            var curr = "";
+
+            currency == 1 ? curr = "افغانۍ" : currency == 2 ? curr = "کلدارې" : curr = "ډالر"
+
+            $("#currencyLabel").text("  پیسو اندازه په " + curr);
+        }
+
+        $("#salary_PaidAmount").keyup(function () {
+
+            var total = parseFloat($("#lastRemain").val()) - parseFloat($("#salary_PaidAmount").val());
+            $("#newRemain").val(total.toFixed(2));
+        })
+    </script>
+
+    <!-- show and hide tables code -->
+    <script>
+
+        $("#browseCancel").click(function () {
+            $("#browseImg").attr("src", "/images/StaticImages/browse.png");
+            $("#browseInput").val("");
+            $("#employee_defalut").val("/images/StaticImages/browse.png");
+        })
+
+        $("#btnReset").click(function () {
+            $("#browseImg").attr("src", "/images/StaticImages/browse.png");
+            $("#browseInput").val("");
+            $("#btnSubmitEmployee").text("ذخیره")
+            $("#frmEmployee")[0].reset();
+        })
+
+        $("#btnEmployeeSalaryShow").click(function () {
+            $("#divInput").hide();
+            $("#divTable").hide();
+            $("#divTableSalary").show(300);
+            $("#divDetails").hide();
+            $("#btnr").hide();
+            LoadEmployeeSalary();
+
+        })
+
+        $("#btnCloseSalaryPayment").click(function () {
+            $("#btnResetSalary").trigger("click");
+
+        })
+
+        $("#btnList").click(function () {
+            if (list) {
+
+                $("#divInput").animate({
+                    left: '250px',
+                    opacity: '0.9',
+
+                }).hide(400);
+
+
+                $("#divTable").animate({
+
+                }).show(400);
+                $("#divTable").removeClass("d-none")
+
+                $("#btnList").text("د کارمند راجستر کول")
+                list = false;
+
+                $("#divTableSalary").hide();
+                $("#divDetails").hide();
+                $("#btnr").hide();
+
+            } else {
+                $("#divInput").animate({
+                    left: '250px',
+                    opacity: '0.9',
+
+                }).show(400);
+
+
+                $("#divTable").animate({
+
+                }).hide(400);
+
+                $("#btnList").text("د کارمندانو لیست ")
+                list = true;
+                $("#divTableSalary").hide();
+                $("#divDetails").hide();
+                $("#btnr").hide();
+            }
+
+        });
+
+    </script>
+
+}

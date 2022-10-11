@@ -1,0 +1,249 @@
+﻿@model ManulReprotViewModel
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>$("#generalReport").addClass("active");</script>
+    <script src="~/js/highcharts.js"></script>
+
+    <div class="col-md-12 container-fluid card">
+        <form asp-controller="Home" data-ajax="true" data-ajax-method="post" data-ajax-success="fnManul(data)" asp-action="ManualGeneralReprot">
+            <div class="row card-body   box-shadow-1 border-purple border-accent-1">
+
+                <div class="col-md-6 p-0 m-0">
+                    <button type="button" onclick="fnDaily()" class="btn btn-info">نن ورځې راپور</button>
+                    <button type="button" onclick="fnWeekly()" class="btn btn-success">تیرې میاشتې راپور</button>
+                    <button type="button" onclick="fnYear()" class="btn btn-info">تیر کال راپور</button>
+                    <button id="btnManualReport" type="button" style="height:45px;" class="btn btn-warning">معلوم وخت راپور</button>
+
+
+                </div>
+                <div id="specific" class="col-md-6 row m-0 p-0" style="display:none">
+
+                    <div class="row col-md-5 p-0 m-0">
+                        <h3 class="col-md-push-4 p-0 m-0 mt-1">
+                            د نیټې څخه
+                        </h3>
+                        &nbsp;
+                        <div class="col-md-8 p-0 m-0">
+                            <input class="form-control " style="height:45px;" asp-for="FromDate">
+                        </div>
+
+                    </div>
+
+
+                    <div class="row col-md-5 p-0 m-0">
+                        <h3 class=" col-md-5 p-0 m-0 mt-1"> تر نیټې پورې</h3>
+
+                        <div class="col-md-7 p-0 m-0">
+                            <input class="form-control " style="height:45px;" asp-for="ToDate">
+                        </div>
+                    </div>
+                    &nbsp;
+                    <div class=" col-md-1 p-0 m-0">
+                        <button type="submit" class="btn btn-default  btn-info">راپور ښودل</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <br />
+    <br />
+    <div id="container" class="border-purple border-accent-2" style="min-width: 400px; height: 580px; margin: 0 auto;margin-top:-60px;">
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+
+        <script>
+
+            $(document).ready(function () {
+                fnDaily();
+                $("#generalReport").addClass("active");
+            })
+
+            function fnWeekly() {
+                $("#specific").hide();
+                var titleMessage = "د تیرې میاشتې عمومې راپور ";
+
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/GetWeeklyGeneral",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (result) {
+                        var keys = Object.keys(result);
+                        var weeklydata = new Array();
+                        var totalspent = 0.00;
+                        for (var i = 0; i < keys.length; i++) {
+                            var arrL = new Array();
+                            arrL.push(keys[i]);
+                            arrL.push(result[keys[i]]);
+                            totalspent += result[keys[i]];
+                            weeklydata.push(arrL);
+                        }
+                        createCharts(weeklydata, titleMessage, totalspent.toFixed(2));
+                    }
+                })
+            }
+
+            function fnDaily() {
+                $("#specific").hide();
+                var titleMessage = "د نن ورځې عمومې راپور";
+
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/GetDailyGeneral",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (result) {
+                        var keys = Object.keys(result);
+                        var monthlydata = new Array();
+                        var totalspent = 0.00;
+                        for (var i = 0; i < keys.length; i++) {
+                            var arrL = new Array();
+                            arrL.push(keys[i]);
+                            arrL.push(result[keys[i]]);
+                            totalspent += result[keys[i]];
+                            monthlydata.push(arrL);
+                        }
+                        createCharts(monthlydata, titleMessage, totalspent.toFixed(2));
+                    }
+                })
+            }
+
+            function fnYear() {
+                $("#specific").hide();
+                var titleMessage = "د تیر کال عمومې راپور ";
+
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/GetYearGeneral",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (result) {
+                        var keys = Object.keys(result);
+                        var weeklydata = new Array();
+                        var totalspent = 0.0;
+                        for (var i = 0; i < keys.length; i++) {
+                            var arrL = new Array();
+                            arrL.push(keys[i]);
+                            arrL.push(result[keys[i]]);
+                            totalspent += result[keys[i]];
+                            weeklydata.push(arrL);
+                        }
+                        createCharts(weeklydata, titleMessage, totalspent.toFixed(2));
+                    }
+                })
+            }
+
+            function fnManul(result) {
+                var titleMessage = "<p> د " + $("#FromDate").val() + " </p>" + "<p> څخه تر " + $("#ToDate").val() + "</p>" + " عمومې راپور ";
+
+                var keys = Object.keys(result);
+
+                var monthlydata = new Array();
+                var totalspent = 0.0;
+                for (var i = 0; i < keys.length; i++) {
+                    var arrL = new Array();
+                    arrL.push(keys[i]);
+                    arrL.push(result[keys[i]]);
+                    totalspent += result[keys[i]];
+                    monthlydata.push(arrL);
+                }
+                createCharts(monthlydata, titleMessage, totalspent.toFixed(2));
+            }
+
+            function createCharts(sum, titleText, totalspent) {
+                Highcharts.getOptions().plotOptions.pie.colors = ['#2f7ed8', '#1aadce', '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a', '#047CF9', '#910000', '#8bbc21'];
+                Highcharts.chart('container', {
+                    chart: {
+                        type: 'column',
+                        polar: true,
+                        options3d: {
+                            enabled: true,
+                            alpha: 45,
+                            beta: 0,
+                            depth: 50,
+                        }
+                    },
+                    title: {
+
+                        text: titleText,
+                        style: {
+                            fontSize: '23px',
+
+                        },
+                    },
+                    xAxis: {
+                        type: 'category',
+
+                        labels: {
+                            rotation: -15,
+
+                            style: {
+                                fontSize: '20px',
+                                fontFamily: 'Verdana, sans-serif'
+                            }
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+
+                            text: ' عمومې راپور ',
+                            style: {
+                                fontSize: '20px',
+
+                            }
+                        },
+                        labels: {
+                            style: {
+                                fontSize: '17px'
+
+                            },
+                            formatter: function () {
+                                return this.value;
+                            },
+
+                        }
+                    },
+                    legend: {
+                        enabled: false,
+
+
+                    },
+                    tooltip: {
+                        headerFormat: '<span style="font-size:17px">{point.key}</span><table>',
+                        pointFormat: '<tr><td style="color:{series.color};padding:0">{point.key} </td>' +
+                            '<td style="padding:0;font-size:15px;"><b>{point.y:.1f} </b></td></tr>',
+                        footerFormat: '</table>',
+                        shared: true,
+                        useHTML: true
+                    },
+                    plotOptions: {
+                        column: {
+                            pointPadding: 0.2,
+                            borderWidth: 0,
+                            dataLabels: {
+                                fontSize: '30px',
+                                enabled: true,
+                                format: '{point.y}',
+                                depth: 25
+                            },
+                            showInLegend: true,
+                        },
+                    },
+
+                    series: [{
+                        // name: 'ملاقات',
+                        colorByPoint: true,
+                        type: 'column',
+                        data: sum,
+                    }]
+                });
+            }
+            $("#btnManualReport").click(function () {
+                $("#specific").show();
+
+            })
+        </script>
+    }

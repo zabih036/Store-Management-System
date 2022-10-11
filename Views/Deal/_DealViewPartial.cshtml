@@ -1,0 +1,469 @@
+﻿
+@model DealViewModel
+
+
+<link href="~/css/style.css" rel="stylesheet" />
+<style>
+   
+    @@media(min-width: 576px) {
+        .col-md-2 {
+            -webkit-box-flex: 0;
+            -webkit-flex: 0 0 16.666667%;
+            -moz-box-flex: 0;
+            -ms-flex: 0 0 16.666667%;
+            flex: 0 0 14.666667% !important;
+            max-width: 14.666667% !important;
+        }
+    }
+   
+</style>
+<div class="modal-content ">
+    <div class="modal-header bg-primary white" style=" justify-content: flex-start; display: flex; align-items: center;">
+        <button type="button" id="btnDealer" class="btn btn-warning btn-icon-sm">کهاتدار </button>&nbsp;&nbsp;
+        <button type="button" id="btnCustomer" class="btn btn-success btn-icon-sm">مشتریان </button>
+    </div>
+    <div class="modal-body">
+       
+        <form  data-ajax="true" asp-action="AddDealInfo" asp-controller="Deal" data-ajax-success="fnSuccessDealing(data)" data-ajax-method="post" id="frmDealerDeal">
+
+            <div class="row ">
+
+                <div class="form-group col-md-2">
+                    <label class="">بیل / رسید نمبر:</label>
+                    <input asp-for="BillNo"  class="form-control " />
+                    <span asp-validation-for="BillNo" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-3" id="divDealer">
+                    <label class="">کهاتدار:</label>
+                    <select asp-for="DealerId" asp-items="@ViewBag.dealers" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                        <option value="">انتخاب کړئ</option>
+                    </select>
+                    <span asp-validation-for="DealerId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-3" id="divCustomer" style="display:none">
+                    <label class="">مشتریان:</label>
+                    <select asp-for="CustomerId" asp-items="@ViewBag.customers" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                        <option value="">انتخاب کړئ</option>
+                    </select>
+                    <span asp-validation-for="CustomerId" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group col-md-2">
+                    <label class="">جمع / بنام:</label>
+                    <select asp-for="Type" class="form-control">
+                        <option value="">انتخاب کړئ</option>
+                        <option value="Credit">جمع</option>
+                        <option value="Debit">بنام</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">سیف پولې واحد:</label>
+                    <select asp-for="Currency2Id" onchange="exchangeCurrency()" class="form-control">
+                        <option value="">انتخاب کړئ</option>
+                        <option value="1">افعانۍ</option>
+                        <option value="2">کلدارې</option>
+                        <option value="3">ډالر</option>
+                    </select>
+                    <span asp-validation-for="Currency2Id" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group col-md-2">
+                    <label class="">پیسو اندازه:</label>
+                    <input asp-for="Amount2" onchange="exchangeCurrency()" class="form-control " />
+                    <span asp-validation-for="Amount2" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">کهاتې پولې واحد:</label>
+                    <select asp-for="CurrencyId" onchange="exchangeCurrency()" class="form-control">
+                        <option value="">انتخاب کړئ</option>
+                        <option value="1">افعانۍ</option>
+                        <option value="2">کلدارې</option>
+                        <option value="3">ډالر</option>
+                    </select>
+                    <span asp-validation-for="CurrencyId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">کهاتې پیسو اندازه:</label>
+                    <input asp-for="Amount" class="form-control " />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">تفصیل:</label>
+                    <input asp-for="Detail" class="form-control " />
+                </div>
+
+
+                <div class="form-group col-md-2" style="display: flex; align-items: flex-end;justify-content: space-around;">
+                    <button type="submit" id="btn" class="btn btn-primary btn-icon-sm">ذخیره </button>
+                   @* <button type="button" id="btnr" class="btn btn-info btn-icon-sm"><span class="fa fa-print"></span> </button>*@
+                </div>
+
+            </div>
+        </form>
+
+        <hr class="mt-3" />
+
+        <div id="tblDealerDiv">
+            <table class="table table-striped  table-responsive table-condensed table-bordered " id="dealTable">
+                <thead class="scrollable-container ps--scrolling-x ">
+                    <tr role="row">
+                        <th class="col-md-2">#</th>
+                        <th class="col-md-2">بیل / رسید نمبر</th>
+                        <th class="col-md-2">نیټه</th>
+                        <th class="col-md-2">تفصیل</th>
+                        <th class="col-md-2">کهاتدار</th>
+                        <th class="col-md-2">پلار نوم</th>
+                        <th class="col-md-1">موبایل</th>
+                        <th class="col-md-2">کارمند</th>
+                        <th class="col-md-2">پولې واحد</th>
+                        <th class="col-md-1">بنام</th>
+                        <th class="col-md-1">جمع</th>
+                        <th dir="ltr" class="col-md-1">باقې</th>
+                        @*<th dir="ltr" class="col-md-1">چاپ</th>*@
+                        <th dir="ltr" class="col-md-1 " >حذف</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="tblCustomerDiv" style="display:none">
+            <table class="table table-striped  table-responsive table-condensed table-bordered " id="CustomerTable">
+                <thead class="scrollable-container ps--scrolling-x ">
+                    <tr role="row">
+                        <th class="col-md-2">#</th>
+                        <th class="col-md-2">بیل / رسید نمبر</th>
+                        <th class="col-md-2">نیټه</th>
+                        <th class="col-md-2">تفصیل</th>
+                        <th class="col-md-2">مشترې</th>
+                        <th class="col-md-2">پلار نوم</th>
+                        <th class="col-md-1">موبایل</th>
+                        <th class="col-md-2">کارمند</th>
+                        <th class="col-md-2">پولې واحد</th>
+                        <th class="col-md-1">بنام</th>
+                        <th class="col-md-1">جمع</th>
+                        <th dir="ltr" class="col-md-1">باقې</th>
+                        @*<th dir="ltr" class="col-md-1">چاپ</th>*@
+                        <th dir="ltr" class="col-md-1 ">حذف</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<input type="hidden" id="DealerOrCustomer" value="" />
+
+<input type="hidden" id="serialNumber" value="" />
+
+<script>
+
+    $(function () {
+        $("#DealerId").select2();
+        $("#CustomerId").select2();
+        $("#CustomerId").val(-1)
+        $("#DealerOrCustomer").val("Dealer")
+        DealerDeal()
+        CustomerDeal()
+        //FetchSerialNumber()
+    })
+
+    function fnSuccessDealing(data) {
+        toast(data, 'success')
+        $("#btnReset").trigger("click");
+        $("#frmDealerDeal")[0].reset();
+
+        if ($("#DealerOrCustomer").val() == "Dealer") {
+            DealerDeal()
+            $("#DealerId").val('').trigger('change')
+            $("#CustomerId").val(-1)
+        } else {
+            CustomerDeal()
+            $("#CustomerId").val('').trigger('change')
+            $("#DealerId").val(-1)
+        }
+    }
+
+    function exchangeCurrency() {
+
+        var  fromCurrency= $("#Currency2Id").val();
+
+        var toCurrency = $("#CurrencyId").val();
+
+        var price = $("#Amount2").val();
+
+
+        var aftous = parseFloat(localStorage.getItem("aftous"));
+        var aftopk = parseFloat(localStorage.getItem("aftopk"));
+        var ustopk = parseFloat(localStorage.getItem("ustopk"));
+
+
+
+
+        if (fromCurrency == 1) {
+
+            if (toCurrency == 1) {
+                var total = parseFloat(price).toFixed(2);
+                $("#Amount").val(total)
+            }
+
+            if (toCurrency == 2) {
+                var total = parseFloat(price * aftopk).toFixed(2);
+                $("#Amount").val(total)
+            }
+
+
+            if (toCurrency == 3) {
+                var total = parseFloat(price / aftous).toFixed(3);
+                $("#Amount").val(total)
+            }
+
+
+        } else if (fromCurrency == 2) {
+
+
+            if (toCurrency == 1) {
+                var total = parseFloat(price / aftopk).toFixed(2);
+                $("#Amount").val(total)
+            }
+
+            if (toCurrency == 2) {
+                var total = parseFloat(price).toFixed(2);
+                $("#Amount").val(total)
+            }
+
+
+            if (toCurrency == 3) {
+                var total = parseFloat(price / ustopk).toFixed(3);
+                $("#Amount").val(total)
+            }
+
+        } else if (fromCurrency == 3) {
+
+            if (toCurrency == 1) {
+                var total = parseFloat(price * aftous ).toFixed(3);
+                $("#Amount").val(total)
+            }
+
+            if (toCurrency == 2) {
+                var total = parseFloat(price * ustopk ).toFixed(3);
+                $("#Amount").val(total)
+            }
+
+
+            if (toCurrency == 3) {
+                var total = parseFloat(price).toFixed(2);
+                $("#Amount").val(total)
+            }
+
+        }
+    }
+
+    function DealerDeal() {
+        $.ajax({
+            url: '/Deal/DealersDealInfo/',
+            type: 'POST',
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+                var deal = "";
+
+                $.each(result, function (i, col) {
+
+                    var disp = "";
+                    if (col.inWord == null) {
+                        disp = "d-none";
+                    }
+
+                        deal += " <tr >";
+                        deal += "      <td> " + (i + 1) + " </td>";
+                        deal += "     <td>  " + col.billNo + " </td>";
+                        deal += "     <td>  " + col.date + " </td>";
+                        deal += "      <td> " + col.details + "  </td>";
+                        deal += "      <td> " + col.name + " </td>";
+                        deal += "      <td> " + col.fname + " </td>";
+                        deal += "      <td> " + col.phone + " </td>";
+                        deal += "      <td> " + col.employee + "  </td>";
+                        deal += "      <td> " + col.currency + "</td>";
+                        deal += "      <td dir='ltr'> " + parseFloat(col.debit).toFixed(3) + " </td>";
+                        deal += "      <td dir='ltr'> " + parseFloat(col.credit).toFixed(3) + " </td>";
+                        deal += "      <td dir='ltr' > " + parseFloat(col.balance).toFixed(3) + " </td>";
+                        //deal += "      <td class=''><button class='btn btn-outline-success " + disp +"' onclick='fnPrintReceipt(\"" + col.serial + "\",\"" + col.currency + "\",\"" + col.image + "\",\"" + col.employee + "\",\"" + col.emPhone + "\",\"" + col.inWord + "\",\"" + col.details + "\",\"" + col.date + "\",\"" + col.credit + "\",\"" + col.debit + "\",\"" + col.name + "\")'><i class='fa fa-print'></i></button></td> ";
+                    deal += "      <td ><button class='btn btn-outline-danger ' onclick='DeleteRecord(\"" + col.dealid + "\",\"" + col.dealerid + "\",\"" + col.currencyid + "\",\"" + 1 + "\")'><i class='fa fa-trash'></i></button></td> ";
+                        deal += "      </tr>";
+                });
+
+                var table = $("#dealTable").dataTable();
+                table.fnDestroy();
+
+                $("#dealTable>tbody").html("").html(deal);
+                $("#dealTable").DataTable({
+                    stateSave:true,
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+
+                });
+            }
+        })
+    }
+
+    function DeleteRecord(id,dealerid,currencyid, type) {
+
+        swal({
+            title: "آیا غواړی چې  ریکارډ حذف شې؟",
+            text: "",
+            icon: "warning",
+            buttons: {
+                cancel: {
+                    text: "نه",
+                    value: null,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "هو",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+
+        }).then((isConfirm) => {
+            if (isConfirm) {
+
+                $.ajax({
+                    url: '/Deal/DeleteRecord/?dealId=' + id + '&record=' + type + '&dealerId=' + dealerid + '&currencyId=' + currencyid + '',
+                    type: 'POST',
+                    contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (result) {
+                        toast(result, 'success');
+                        if (type == "1") {
+                            DealerDeal();
+                        } else {
+                            CustomerDeal();
+                        }
+                    }
+                })
+            }
+        });
+    }
+
+    function CustomerDeal() {
+        $.ajax({
+            url: '/Deal/CustomersDealInfo/',
+            type: 'POST',
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+                var Cus = "";
+
+                $.each(result, function (i, col) {
+
+                    var disp = "";
+                    if (col.inWord == null) {
+                        disp = "d-none";
+                    }
+
+                    Cus += " <tr >";
+                    Cus += "      <td> " + (i + 1) + " </td>";
+                    Cus += "     <td>  " + col.billNo + " </td>";
+                    Cus += "     <td>  " + col.date + " </td>";
+                    Cus += "      <td> " + col.details + "  </td>";
+                    Cus += "      <td> " + col.name + " </td>";
+                    Cus += "      <td> " + col.fname + " </td>";
+                    Cus += "      <td> " + col.phone + " </td>";
+                    Cus += "      <td> " + col.employee + "  </td>";
+                    Cus += "      <td> " + col.currency + "  </td>";
+                    Cus += "      <td dir='ltr'> " + parseFloat(col.debit).toFixed(3) + " </td>";
+                    Cus += "      <td dir='ltr'> " + parseFloat(col.credit).toFixed(3) + " </td>";
+                    Cus += "      <td dir='ltr'  > " + parseFloat(col.balance).toFixed(3) + " </td>"; 
+                    //Cus += "      <td class=''><button class='btn btn-outline-success " + disp +"' onclick='fnPrintReceipt(\"" + col.serial + "\",\"" + col.currency + "\",\"" + col.image + "\",\"" + col.employee + "\",\"" + col.emPhone + "\",\"" + col.inWord + "\",\"" + col.details + "\",\"" + col.date + "\",\"" + col.credit + "\",\"" + col.debit + "\",\"" + col.name + "\")'><i class='fa fa-print'></i></button></td> ";
+                    Cus += "      <td ><button class='btn btn-outline-danger ' onclick='DeleteRecord(\"" + col.dealid + "\",\"" + col.customerid + "\",\"" + col.currencyid + "\",\"" + 2 + "\")'><i class='fa fa-trash'></i></button></td> ";
+                    Cus += "      </tr>";
+                });
+
+                var table = $("#CustomerTable").dataTable();
+                table.fnDestroy();
+
+                $("#CustomerTable>tbody").html("").html(Cus);
+                $("#CustomerTable").DataTable({
+                    stateSave: true,
+
+                    "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                    "pageLength": 5,
+                    "language": {
+                        "emptyTable": "په جدول کې معلومات شتون نه لري",
+                        "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                        "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                        "infoPostFix": "",
+
+                        "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                        "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                        "searchPlaceholder": "پلټنه",
+                        "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                        "paginate": {
+                            "first": "لومړۍ پاڼه",
+                            "previous": "مخکې",
+                            "next": "وروسته",
+                            "last": "پای"
+                        },
+                    },
+
+                });
+            }
+        })
+    }
+
+    $("#btnDealer").click(function () {
+        $("#CustomerId").val(-1)
+        $("#divDealer").show()
+        $("#divCustomer").hide()
+        $("#tblDealerDiv").show()
+        $("#tblCustomerDiv").hide()
+
+        $("#DealerOrCustomer").val("Dealer")
+    })
+
+    $("#btnCustomer").click(function () {
+        $("#DealerId").val(-1)
+        $("#divDealer").hide();
+        $("#divCustomer").show();
+        $("#tblDealerDiv").hide()
+        $("#tblCustomerDiv").show()
+
+        $("#DealerOrCustomer").val("Customer")
+    })
+
+</script>
+

@@ -1,0 +1,260 @@
+﻿<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#cashRemainList").addClass("active")</script>
+<style>
+    .dt-buttons {
+        float: left;
+    }
+</style>
+<div class="card p-0 m-0" id="purchaseList">
+    <div class="card-header ">
+        <h2 class="text-center alert bg-yellow bg-darken-2 box-shadow-1" style="background-color:#ffffff;">د نغدو پیسو حساب لیست </h2>
+    </div>
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-body">
+                    <ul class="nav nav-tabs nav-top-border no-hover-bg">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="baseIcon-tab11" data-toggle="tab" aria-controls="tabIcon11" href="#tabIcon11" aria-expanded="true"><i class="fa fa-money"></i> افغانۍ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " id="baseIcon-tab12" data-toggle="tab" aria-controls="tabIcon12" href="#tabIcon12" aria-expanded="false"><i class="fa fa-money"></i> کلدارې</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " id="baseIcon-tab13" data-toggle="tab" aria-controls="tabIcon13" href="#tabIcon13" aria-expanded="false"><i class="fa fa-money"></i> ډالر</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content  pt-1">
+                        <div role="tabpanel" class="tab-pane active" id="tabIcon11" aria-expanded="true" aria-labelledby="baseIcon-tab11">
+                            <div class="text-center">
+                                <h2>افغانۍ حساب لیست</h2>
+                                <table class="table table-responsive-md table-bordered dataex-fixh-basic dataTable" id="tblaf">
+                                    <thead>
+                                        <tr role="row">
+                                            <th>#</th>
+                                            <th>نیټه</th>
+                                            <th>تفصیل</th>
+                                            <th>پیسو ډول</th>
+                                            <th>جمع شوی</th>
+                                            <th>اخستل شوی</th>
+                                            <th>موجود حساب</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane " id="tabIcon12" aria-labelledby="baseIcon-tab12">
+                            <div class="text-center">
+                                <h2>کلدارو حساب لیست</h2>
+                                <table class="table  table-responsive-md table-bordered dataex-fixh-basic dataTable" id="tblpk">
+                                    <thead>
+                                        <tr role="row">
+                                            <th>#</th>
+                                            <th>نیټه</th>
+                                            <th>تفصیل</th>
+                                            <th>پیسو ډول</th>
+                                            <th>جمع شوی</th>
+                                            <th>اخستل شوی</th>
+                                            <th>موجود حساب</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane " id="tabIcon13" aria-labelledby="baseIcon-tab3">
+                            <div class="text-center">
+                                <h2>ډالرو حساب لیست</h2>
+                                <table class="table table-responsive-md  table-bordered dataex-fixh-basic dataTable" id="tblus">
+                                    <thead>
+                                        <tr role="row">
+                                            <th>#</th>
+                                            <th>نیټه</th>
+                                            <th>تفصیل</th>
+                                            <th>پیسو ډول</th>
+                                            <th>جمع شوی</th>
+                                            <th>اخستل شوی</th>
+                                            <th>موجود حساب</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        $(document).ready(function () {
+            dealers();
+        })
+        function dealers() {
+            $.ajax({
+                url: '/Deal/LoadCashInHand/',
+                type: 'GET',
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (data) {
+                    var af = "";
+                    var pk = "";
+                    var us = "";
+                    var afRemain = 0;
+                    var pkRemain = 0;
+                    var usRemain = 0;
+                   
+                    $.each(data.af, function (i, col) {
+                        afRemain = afRemain + (col.credit - col.debit);
+                        af += ' <tr class="td">';
+                        af += '     <td  class="col-md-1">' + (i+1) + '  </td>';
+                        af += '     <td  class="col-md-1">' + col.date + '  </td>';
+                        af += '     <td  class="col-md-3">' + col.desc + '  </td>';
+                        af += '     <td  class="col-md-3">' + col.currency + '  </td>';
+                        af += '     <td  class="col-md-2"> ' + parseFloat(col.credit).toFixed(2) + '</td>';
+                        af += '     <td  class="col-md-2">' + parseFloat(col.debit).toFixed(2) + '  </td>';
+                        af += '      <td class="col-md-2"> ' + parseFloat(afRemain).toFixed(2) + ' </td>';
+                        af += ' </tr>'
+                    });
+
+                    $.each(data.pk, function (i, col) {
+                        pkRemain = pkRemain + (col.credit - col.debit);
+                        pk += ' <tr class="td">';
+                        pk += '     <td  class="col-md-1">' + (i + 1) + '  </td>';
+                        pk += '     <td  class="col-md-1">' + col.date + '  </td>';
+                        pk += '     <td  class="col-md-3">' + col.desc + '  </td>';
+                        pk += '     <td  class="col-md-3">' + col.currency + '  </td>';
+                        pk += '     <td  class="col-md-2"> ' + parseFloat(col.credit).toFixed(2) + '</td>';
+                        pk += '     <td  class="col-md-2">' + parseFloat(col.debit).toFixed(2) + '  </td>';
+                        pk += '      <td class="col-md-2"> ' + parseFloat(pkRemain).toFixed(2) + ' </td>';
+                        pk += ' </tr>';
+                    });
+
+                    $.each(data.us, function (i, col) {
+                        usRemain = usRemain + (col.credit - col.debit);
+                        us += ' <tr class="td">';
+                        us += '     <td  class="col-md-1">' + (i + 1) + '  </td>';
+                        us += '     <td  class="col-md-1">' + col.date + '  </td>';
+                        us += '     <td  class="col-md-3">' + col.desc + '  </td>';
+                        us += '     <td  class="col-md-3">' + col.currency + '  </td>';
+                        us += '     <td  class="col-md-2"> ' + parseFloat(col.credit).toFixed(2) + '</td>';
+                        us += '     <td  class="col-md-2">' + parseFloat(col.debit).toFixed(2) + '  </td>';
+                        us += '      <td class="col-md-2"> ' + parseFloat(usRemain).toFixed(2) + ' </td>';
+                        us += ' </tr>';
+                    });
+
+                    var table = $("#tblaf").dataTable();
+                    table.fnDestroy();
+                    var table = $("#tblpk").dataTable();
+                    table.fnDestroy();
+                    var table = $("#tblus").dataTable();
+                    table.fnDestroy();
+                   
+                    $("#tblaf>tbody").html("").html(af);
+                    $("#tblaf").DataTable({
+                        dom: 'Blfrtip', buttons: [
+                            { extend: 'print', footer: true },
+                            { extend: 'excel', footer: true },
+                            { extend: 'copy', footer: true },
+                        ],
+                        stateSave: true,
+                        responsive: true,
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+                    });
+
+                    $("#tblpk>tbody").html("").html(pk);
+                    $("#tblpk").DataTable({
+                        dom: 'Blfrtip', buttons: [
+                            { extend: 'print', footer: true },
+                            { extend: 'excel', footer: true },
+                            { extend: 'copy', footer: true },
+                        ],
+                        stateSave: true,
+                        responsive: true,
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+                    });
+
+                    $("#tblus>tbody").html("").html(us);
+                    $("#tblus").DataTable({
+                        dom: 'Blfrtip', buttons: [
+                            { extend: 'print', footer: true },
+                            { extend: 'excel', footer: true },
+                            { extend: 'copy', footer: true },
+                        ],
+                        stateSave: true,
+                        responsive: true,
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+                    });
+
+                    $(".buttons-print").text("").html("<i class='ft-printer'></i>");
+                    $(".buttons-copy").text("").html("<i class='ft-copy'></i>");
+                    $(".buttons-excel").text("").html("<i class='fa fa-file-excel-o'></i>");
+                    $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+                }
+            })
+        }
+    </script>
+}

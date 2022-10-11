@@ -1,0 +1,166 @@
+﻿@model AllViewModel
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#benefitActivePage").addClass("active")</script>
+
+
+@using Microsoft.Extensions.Options
+@inject IOptions<SettingOptions> op
+
+<section id="custom-listgroup">
+
+    <div class="col-md-12">
+        <h2 class="text-center alert bg-yellow bg-darken-2 box-shadow-1" style="background-color:#ffffff;">د خرڅ شوې مال ګټه</h2>
+        <div class="card" style="min-height:100%">
+            <div class="card-header box-shadow-2">
+
+
+                <div class="col-md-12" id="reportbtns" style="text-align:center">
+
+                    <div class="col-md-12 container-fluid card box-shadow-2" style="text-align:center">
+
+                        <div class="col-md-12 container-fluid card box-shadow-2" style="text-align:center">
+                            <form asp-controller="Home" data-ajax="true" data-ajax-method="post" data-ajax-success="loadReport(data)" asp-action="ManualReprot">
+                                <button type="button" class="btn btn-info btn-md" onclick="todaysreport()">د نن ورځې</button>
+                                <button type="button" class="btn btn-success btn-md" onclick="currentMonth()">روان میاشت</button>
+                                <button type="button" class="btn btn-warning btn-md" onclick="lastMonth()">تېر میاشت</button>
+                                <button type="button" class="btn btn-info btn-md" onclick="currentYear()">روان کال </button>
+                                <button type="button" class="btn btn-success btn-md" onclick="lastYear()">تېر کال</button>
+                                <button type="button" class="btn btn-info btn-md" id="btnManualReport">معلوم وخت</button>
+
+                                <div id="specific" class="col-md-10 row  offset-md-1" style="display:none;margin-top:10px;">
+                                    <div class="row col-md-5 p-0 m-0">
+                                        <h3 class="col-md-push-4 p-0 m-0 mt-1">
+                                            د نیټې څخه
+                                        </h3>
+                                        &nbsp;
+                                        <div class="col-md-8 p-0 m-0">
+                                            <input class="form-control" style="height:45px;" asp-for="manulReport.FromDate">
+                                        </div>
+                                    </div>
+                                    <div class="row col-md-5 p-0 m-0">
+                                        <h3 class=" col-md-5 p-0 m-0 mt-1"> تر نیټې پورې</h3>
+                                        <div class="col-md-7 p-0 m-0">
+                                            <input class="form-control" style="height:45px;" asp-for="manulReport.ToDate">
+                                        </div>
+                                    </div>
+                                    &nbsp;
+                                  
+                                </div>
+
+                                <select id="CurrencyId" onchange="fnCurrentMonth()" class="form-control col-md-4">
+                                    <option value="1"> افغانۍ </option>
+                                    <option value="2"> کلدارې </option>
+                                    <option value="3"> ډالر</option>
+                                </select>
+
+                                <div class="form-group" style="margin-top:20px;">
+                                    <input type="text" placeholder="د بیل نمبر ولیکئ" name="BillNo" class="form-control col-md-4 offset-md-4" id="BillNo" />
+                                </div>
+
+                                <div class=" col-md-1 p-0 m-0 col-md-12">
+                                    <button type="submit" class="btn btn-default  btn-primary">راپور ښودل</button>
+                                </div>
+                            </form>
+
+                        </div>
+
+
+                        <div class="alert alert-primary col-md-6 offset-md-3 box-shadow-2">
+                            <h1 style="font-size:30px">مجموعه ګټه</h1>
+                            <h1 style="font-size:30px;" id="totalPrice"></h1>
+                        </div>
+
+                        <div class="d-none">
+                            <form data-ajax="true"  asp-controller="Home" asp-action="FetchFinanceReport" data-ajax-success="loadReport(data)" data-ajax-method="post">
+                                <input type="hidden" class="" value="1" name="reportType" id="reportType" />
+                                <button type="submit" id="btnsubmitReport">submit</button>
+                            </form>
+                        </div>
+                    </div>
+                  
+                </div>
+                <div class="card-content collapse show">
+                    <div class="card-body" id="printable">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+<script>
+    $(document).ready(function () {
+        todaysreport();
+    })
+
+    function todaysReport() {
+        $.ajax({
+            url: '/Home/FetchFinanceReport/',
+            type: 'POST',
+            contentType: "application/json",
+            data: '{}',
+            datatype: "JSON",
+            success: function (result) {
+
+                loadReport(result);
+
+            }
+        })
+    }
+
+    function loadReport(result) {
+
+        var sale = 0.0;
+        var pur = 0.0;
+        var discount = 0.0;
+        var total = 0.0;
+        $.each(result, function (i, col) {
+            discount += col.discount;
+            sale += col.salePrice * col.quantity ;
+            pur += col.purchasePrice * col.quantity ;
+        })
+
+        total = sale - pur - discount;
+        $("#totalPrice").text(total.toFixed(3));
+
+    }
+    ////////////////////// Assigning report type  //////
+    function todaysreport() {
+        $("#specific").hide();
+        $("#reportType").val(1);
+        $("#btnsubmitReport").trigger("click");
+    }
+
+    function currentMonth() {
+        $("#specific").hide();
+        $("#reportType").val(2);
+        $("#btnsubmitReport").trigger("click");
+    }
+
+    function lastMonth() {
+        $("#specific").hide();
+        $("#reportType").val(3);
+        $("#btnsubmitReport").trigger("click");
+    }
+
+    function currentYear() {
+        $("#specific").hide();
+        $("#reportType").val(4);
+        $("#btnsubmitReport").trigger("click");
+    }
+
+    function lastYear() {
+        $("#specific").hide();
+        $("#reportType").val(5);
+        $("#btnsubmitReport").trigger("click");
+    }
+
+    /////////////   Manual report  ////////////////
+    $("#btnManualReport").click(function () {
+        $("#specific").show();
+    })
+</script>}

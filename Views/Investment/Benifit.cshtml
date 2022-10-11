@@ -1,0 +1,388 @@
+﻿@model AllViewModel
+
+
+
+<section id="custom-listgroup">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-center card-body bg-info box-shadow-1" > د ګټې عمومې راپور </h2>
+            <div class="card">
+                <div class="card-header">
+
+
+                    <div class="col-md-12" id="reportbtns">
+
+
+                        @* //////////////////////  د نن ورځې راپور///////////////// *@
+
+
+                        @* //////////////////////  د معلوم وخت راپور///////////////// *@
+                        <div class="col-md-12 container-fluid card">
+                            <form asp-controller="Investment" data-ajax="true" data-ajax-method="post" data-ajax-success="loadReport(data)" asp-action="ManualReprot">
+                                <button class="btn btn-info btn-md" onclick="todaysreport()">د نن ورځې</button>
+                                <button class="btn btn-success btn-md" onclick="currentMonth()">روان میاشت</button>
+                                <button class="btn btn-warning btn-md" onclick="lastMonth()">تېر میاشت</button>
+                                <button class="btn btn-info btn-md" onclick="currentYear()">روان کال </button>
+                                <button class="btn btn-success btn-md" onclick="lastYear()">تېر کال</button>
+                                <button class="btn btn-info btn-md" id="btnManualReport">معلوم وخت</button>
+
+                                <div id="specific" class="col-md-6 row m-0 p-0" style="display:none">
+                                    <div class="row col-md-5 p-0 m-0">
+                                        <h3 class="col-md-push-4 p-0 m-0 mt-1">
+                                            د نیټې څخه
+                                        </h3>
+                                        &nbsp;
+                                        <div class="col-md-8 p-0 m-0">
+                                            <input class="form-control" style="height:45px;" asp-for="manulReport.FromDate">
+                                        </div>
+                                    </div>
+                                    <div class="row col-md-5 p-0 m-0">
+                                        <h3 class=" col-md-5 p-0 m-0 mt-1"> تر نیټې پورې</h3>
+                                        <div class="col-md-7 p-0 m-0">
+                                            <input class="form-control" style="height:45px;" asp-for="manulReport.ToDate">
+                                        </div>
+                                    </div>
+                                    &nbsp;
+                                    <div class=" col-md-1 p-0 m-0">
+                                        <button type="submit" class="btn btn-default  btn-info">راپور ښودل</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+
+                        @* /////////////////////////////////////////////////// *@
+                        <div class="d-none">
+                            <form data-ajax="true" data-ajax-url="/Investment/FetchFinanceReport" data-ajax-success="loadReport(data)" data-ajax-method="post">
+                                <input type="hidden" class="" value="1" name="reportType" id="reportType" />
+                                <button type="submit" id="btnsubmitReport">submit</button>
+                            </form>
+                        </div>
+                    </div>
+                   
+                    <div class="heading-elements">
+                        <ul class="list-inline mb-0">
+                          
+                            <li><a class="btn btn-primary" onclick="printReport()"><i class="ft-printer"></i>&nbsp;&nbsp; چاپ</a></li>
+
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<div class="card collapse show">
+    <div class="card-body" id="printable">
+        <div class="col-md-12 text-center d-none" id="corporation">
+            <p style="font-style:oblique">
+                <label style="font-size:x-large">فابریکه تولیدی مواد شوینده میربت زاده</label><br />
+                @*<label style="font-size:larger">@op.Value.CorporationNameEnglish</label>*@<br />
+                <label style="font-size:x-large">پانګونې راپور</label><br />
+                <label class="float-right" style="font-size:x-large" id="date"></label>
+            </p>
+            <br /><br /><br />
+        </div>
+        <div class="card-body">
+            <div class="card-content collapse show">
+                <div class="card-body">
+                    <div class="list-group">
+                        <div class="row">
+                            <div class="col-md-4 float-right">
+                                <a href="#" class=" list-group-item list-group-item-action list-group-item-success" style="height:130%"><strong class="float-left">افغانۍ ګټه:</strong> <strong class="float-right" id="afghani">0</strong></a>
+                            </div>
+                            <div class="col-md-4 float-left">
+                                <a href="#" class=" list-group-item list-group-item-action list-group-item-info" style="height:130%"><strong class="float-left">کلدارې ګټه:</strong> <strong class="float-right" id="rupe">0</strong></a>
+                            </div>
+                            <div class="col-md-4 float-left">
+                                <a href="#" class=" list-group-item list-group-item-action list-group-item-warning" style="height:130%"><strong class="float-left">ډالر ګټه:</strong> <strong class="float-right" id="doller">0</strong></a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="profileinv">
+        </div>
+    </div>
+</div>
+@* modal for adding benifit *@
+<div class="col-lg-4 col-md-6 col-sm-12">
+    <div class="form-group">
+
+        <div class="modal fade text-left" id="BPaymentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel10"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary white">
+                        <h4 class="modal-title" id="myModalLabel100">د شراکتې ګټه</h4>
+                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    </div>
+                    <div class="modal-body">
+                        <form data-ajax="true" asp-controller="Investment" asp-action="AddBenifit" data-ajax-success="fnSuccessPaid(data)" data-ajax-method="post" id="frmRawItem">
+                            <hr />
+                            <input hidden asp-for="Benifit.InvestorId" value="0" />
+                            <input hidden asp-for="Benifit.BenifitId" value="0" />
+                            <input hidden asp-for="Benifit.CurrencyId" value="0" />
+                            <input hidden asp-for="Benifit.year" value="0" />
+                            <input hidden asp-for="Benifit.month" value="0" />
+                            <input hidden asp-for="Benifit.day" value="0" />
+                            @*<div asp-validation-summary="All" class="text-danger"></div>*@
+                            <div class="form-group">
+                                <label  asp-for="Benifit.TotalAmount" class=""></label>
+                                <input asp-for="Benifit.TotalAmount" disabled  value="0" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Benifit.Amount" class=""></label>
+                                <input asp-for="Benifit.Amount" placeholder=" د پیسو اندازه ولیکئ" class="form-control" />
+                                <span asp-validation-for="Benifit.Amount" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label asp-for="Benifit.Description" class=""></label>
+                                <textarea asp-for="Benifit.Description"  placeholder=" تفصیلات" class="form-control" ></textarea>
+                                @*<span asp-validation-for="purchase.ExpireDate" class="text-danger"></span>*@
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn grey btn-outline-secondary" id="btnCloseItemRaw" data-dismiss="modal">بندول</button>
+                                <button type="submit" id="btnSubmitStock" class="btn btn-outline-primary">ذخیره</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="name" id="invId" value="" />
+<input type="hidden" name="name" id="amount" value="" />
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        //todaysReport();
+        todaysreport();
+        //LoadCashInHand();
+    })
+
+    function printReport() {
+
+        $("#corporation").removeClass("d-none");
+        $("#btnSubmit").addClass("d-none");
+
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        today = yyyy + "-" + mm + "-" + dd;
+        $("#date").text(today);
+
+        let mainLayout = document.getElementById('printable').innerHTML;
+        var originalContent = document.body.innerHTML;
+        document.body.innerHTML = mainLayout;
+        $(document.body).css({ "background-color": "white" });
+        window.print();
+        document.body.innerHTML = originalContent;
+
+        $("#corporation").addClass("d-none");
+        $("#btnSubmit").removeClass("d-none");
+
+    }
+    function todaysReport() {
+        $.ajax({
+            url: '/Investment/fetchFinanceReport/',
+            type: 'POST',
+            contentType: "application/json",
+            data: '{}',
+            datatype: "JSON",
+            success: function (result) {
+
+                loadReport(result);
+
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+    //function fetchLastMonthReport() {
+    //    var titleMessage = "د تیرې میاشتې مصارف: ";
+    //    $.ajax({
+    //        type: "GET",
+    //        url: "/Item/lastMontFinancialReport",
+    //        contentType: "application/json",
+    //        dataType: "json",
+    //        success: function (result) {
+    //            LoadReport(result);
+    //        }
+    //    })
+    //}
+    //function fetchLastYearReport() {
+    //    var titleMessage = "د تیرې میاشتې مصارف: ";
+    //    $.ajax({
+    //        type: "GET",
+    //        url: "/Item/lastYearFinancialReport",
+    //        contentType: "application/json",
+    //        dataType: "json",
+    //        success: function (result) {
+    //            LoadReport(result);
+    //        }
+    //    })
+    //}
+    function loadReport(result) {
+        console.log(result)
+        var afcr = 0.0;
+        var afcrt = 0.0;
+        var afde = 0.0;
+        var afdet = 0.0;
+        var pkcr = 0.0;
+        var pkcrt = 0.0;
+        var pkde = 0.0;
+        var pkdet = 0.0;
+        var uscr = 0.0;
+        var uscrt = 0.0;
+        var usde = 0.0;
+        var usdet = 0.0;
+        var tr = "";
+        $("#afghani").text(parseFloat( result.afb).toFixed(3));
+        $("#rupe").text(parseFloat( result.pkb).toFixed(3));
+        $("#doller").text(parseFloat( result.usb).toFixed(3));
+        $.each(result.investor, function (i, col) {
+            afcr = 0.0; afde = 0.0; pkcr = 0.0; pkde = 0.0; uscr = 0.0; usde = 0.0;
+            $.each(result.investment, function (i, rol) {
+
+                if (col.investorId == rol.investorId) {
+
+                    if (rol.currencyId == 1) {
+                        afcr += rol.credit;
+                        afde += rol.debit;
+
+                    }
+                    if (rol.currencyId == 2) {
+                        pkcr += rol.credit;
+                        pkde += rol.debit;
+                    }
+                    if (rol.currencyId == 3) {
+                        uscr += rol.credit;
+                        usde += rol.debit;
+                    }
+                }
+            })
+          var  afpaid = 0.0;
+          var  pkpaid = 0.0;
+          var  uspaid = 0.0;
+
+            $.each(result.paid, function (i, rol) {
+
+                if (col.investorId == rol.investorId) {
+
+                    if (rol.currencyId == 1) {
+                        afpaid += rol.amount;
+
+                    }
+                    if (rol.currencyId == 2) {
+                        pkpaid +=rol.amount;
+                    }
+                    if (rol.currencyId == 3) {
+                        uspaid += rol.amount;
+                       
+                    }
+                }
+            })
+            afcrt = afcr - afde /*>= 0 ? afcr - afde : 0;*/
+            //afdet = afde - afcr >= 0 ? afde - afcr : 0;
+            //alert(afcrt)
+            var partaf = (afcrt * result.afb) / result.afinvest;
+            pkcrt = pkcr - pkde /*>= 0 ? pkcr - pkde : 0;*/
+            //pkdet = pkde - pkcr >= 0 ? pkde - pkcr : 0;
+            var partpk = (pkcrt * result.pkb) / result.pkinvest;
+            uscrt = uscr - usde /*>= 0 ? uscr - usde : 0;*/
+            var partus = (uscrt * result.usb) / result.usinvest;
+            //usdet = usde - uscr >= 0 ? usde - uscr : 0;
+            tr += '<div class="col-md-4"style="margin-top:20px;" id="">                                                                                                                                                                         ' +
+                '<div class="media d-flex" style="align-content:center;align-items:center">                                                                                                                                    ' +
+                '  <div class="media-body text-left">                                                                                                                                                                          ' +
+                '      <span class="alert" style="font-size:21px;font-weight:bold;"> د <strong style="font-size:30px"> ' + col.name + ' </strong>د پانګونې تفصیل </span>                                                                 ' +
+                '  </div>                                                                                                                                                                                                      ' +
+                '  <div class="align-self-center">                                                                                                                                                                             ' +
+                '      <div class="card-profile-image">                                                                                                                                                                        ' +
+                '          <img src=' + col.image + ' style="height:70px;width:70px;" class="rounded-circle img-border box-shadow-1" alt="Card image">                                                            ' +
+                '       </div>                                                                                                                                                                      ' +
+                '      </div>                                                                                                                                                                                                  ' +
+                '  </div>                                                                                                                                                                                                      ' +
+                '  <div class="list-group" style="height:90%;">                                                                                                                                                                ' +
+                '      <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه افغانۍ:</strong> <strong class="float-right" id="">' + afcrt.toFixed(2) + '</strong></a>      ' +
+                '      <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه کلدارې:</strong> <strong class="float-right" id="">' + pkcrt.toFixed(2) + '</strong></a>          ' +
+                '      <a href="#" class="list-group-item list-group-item-action " style="height:16%"><strong class="float-left">مجموعه ډالر:</strong> <strong class="float-right" id="">' + uscrt.toFixed(2) + '</strong></a>           ' +
+                '      <button onclick="fnPayBenifit(\'' + col.investorId + '\',\'' + parseFloat( partaf).toFixed(2) + '\',\'' + 1 + '\',\'' + result.year + '\',\'' + result.month + '\',\'' + result.day + '\')"  class="list-group-item list-group-item-acti nger" style="height:16% ;text-align:right"><strong class="float-left">افغانۍ ګټه:</strong> <strong class="float-right" id="">' + partaf.toFixed(2) + '</strong></button>       ' +
+                '      <button onclick="fnPayBenifit(\'' + col.investorId + '\',\'' + parseFloat( partaf).toFixed(2) + '\',\'' + 2 + '\',\'' + result.year + '\',\'' + result.month + '\',\'' + result.day + '\')"  class="list-group-item list-group-item-acti nger" style="height:16%;text-align:right"><strong class="float-left">کلدارې ګټه:</strong> <strong class="float-right" id="">' + partpk.toFixed(2) + '</strong></button>       ' +
+                '      <button onclick="fnPayBenifit(\'' + col.investorId + '\',\'' + parseFloat( partaf).toFixed(2) + '\',\'' + 3 + '\',\'' + result.year + '\',\'' + result.month + '\',\'' + result.day + '\')"  class="list-group-item list-group-item-acti nger" style="height:16%;text-align:right"><strong class="float-left">ډالر ګټه:</strong> <strong class="float-right" id="">' + partus.toFixed(2) + '</strong></button>         ' +
+                '      <a href="#" class="list-group-item list-group-item-acti nger" style="height:16%"><strong class="float-left">افغانۍ اخستل شوې:</strong> <strong class="float-right row" id="' + 1+ '_' + col.investorId + '">' + afpaid.toFixed(2) + '</strong></a>       ' +
+                '      <a href="#" class="list-group-item list-group-item-acti nger" style="height:16%"><strong class="float-left">کلدارې اخستل شوې:</strong> <strong class="float-right row" id="' + 2 + '_' + col.investorId + '">' + pkpaid.toFixed(2) + '</strong></a>       ' +
+                '      <a href="#" class="list-group-item list-group-item-acti nger" style="height:16%"><strong class="float-left">ډالر اخستل سوې:</strong> <strong class="float-right row" id="' + 3 + '_' + col.investorId + '">' +uspaid.toFixed(2) + '</strong></a>         ' +
+
+                '  </div>                                                                                                                                                                                                      ' +
+                ' </div>                                                                                                                                                                                                      ';
+            afcrt = 0;
+            pkcrt = 0;
+            uscrt = 0;
+        })
+        $("#profileinv").html('').html(tr);
+    }
+    function fnPayBenifit(invid, benifit, currency, year, month, day) {
+        $("#Benifit_InvestorId").val(invid);
+        $("#Benifit_CurrencyId").val(currency);
+        $("#Benifit_TotalAmount").val(benifit);
+        $("#Benifit_year").val(year);
+        $("#Benifit_month").val(month);
+        $("#Benifit_day").val(day);
+        $("#invId").val(currency + "_"+invid);
+        $("#amount").val(benifit);
+        $("#BPaymentModal").modal("show");
+
+    }
+    function fnSuccessPaid(data) {
+       
+       // $("#frmRawItem")[0].reset();
+        $("#btnCloseItemRaw").trigger("click"); 
+        var amot = parseFloat($(".row #" + $("#invId").val()).text())
+        $(".row #" + $("#invId").val()).text(parseFloat( $("#Benifit_Amount").val())+amot)
+        toast(data, 'success');
+    }
+    ////////////////////// Assigning report type  //////
+    function todaysreport() {
+        $("#specific").hide();
+        $("#reportType").val(1);
+        $("#btnsubmitReport").trigger("click");
+    }
+    function currentMonth() {
+        $("#specific").hide();
+        $("#reportType").val(2);
+        $("#btnsubmitReport").trigger("click");
+    }
+    function lastMonth() {
+        $("#specific").hide();
+        $("#reportType").val(3);
+        $("#btnsubmitReport").trigger("click");
+    }
+    function currentYear() {
+        $("#specific").hide();
+        $("#reportType").val(4);
+        $("#btnsubmitReport").trigger("click");
+    }
+    function lastYear() {
+        $("#specific").hide();
+        $("#reportType").val(5);
+        $("#btnsubmitReport").trigger("click");
+    }
+    /////////////   Manual report  ////////////////
+    $("#btnManualReport").click(function () {
+        $("#specific").show();
+    })
+</script>

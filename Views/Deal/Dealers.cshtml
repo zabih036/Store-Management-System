@@ -1,0 +1,307 @@
+﻿
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#dealerActive").addClass("active")</script>
+
+
+<div class="card" id="purchaseList">
+    <div class="card-header ">
+        <h2 class="text-center  alert bg-primary box-shadow-1">د کهاتدارو د کهاتو تفصیل </h2>
+    </div>
+    <div id="divDealers">
+        <table class="table table-responsive-md table-bordered dataex-fixh-basic dataTable" id="tblList">
+            <thead>
+                <tr role="row">
+                    <th>کهاتدار نوم</th>
+                    <th>د پلار نوم</th>
+                    <th>موبایل</th>
+                    <th>آدرس </th>
+                    <th>انتخاب کړئ</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+
+        </table>
+    </div>
+
+    <div id="divDealerDeal" class="col-md-12" style="display:none">
+        <form data-ajax="true" asp-action="FetchDealerDealInfoByDate" asp-controller="Deal" data-ajax-success="DataFetchedByDate(data)" data-ajax-method="post" id="frmDealerDeal">
+            <div class="row" style="align-items: center; justify-content: center;">
+
+                <input type="hidden" name="dealerId" id="dealerId" />
+
+                <div class="col-md-3 mx-0 px-0" style="display: flex; align-items: center;margin-bottom:10px">
+                    <label class="col-md-4"> پولې واحد:</label>
+                    <select onchange="FetchDealerDeal()" name="currencyId" id="currencyId" class="form-control">
+                        <option selected value="1">افعانۍ</option>
+                        <option value="2">کلدارې</option>
+                        <option value="3">ډالر</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3  m-0 p-0" style="display: flex; align-items: center;">
+                    <label class="col-md-4">د نیټې څخه</label>
+                    <input class="form-control" required name="fromDate" id="fromDate" type="date" style="height:45px;">
+                </div>
+                <div class="col-md-3  m-0 p-0" style="display: flex; align-items: center;">
+                    <label class="col-md-4">تر نیټې پورې</label>
+                    <input class="form-control" required name="toDate" id="toDate" type="date" style="height:45px;">
+                </div>
+                &nbsp;  &nbsp;
+                <div class="col-md-1  m-0 p-0" style="display: flex; align-items: center;">
+                    <button type="submit" class="btn btn-default  btn-info"> ښودل</button>
+                    &nbsp;
+                    <button type="button" id="btnLoadCurrentMonth" onclick="resetForm()" class="btn btn-default  btn-warning">پاکول</button>
+
+                </div>
+                <button type="button" id="btnBack" onclick="backToList()" class="btn btn-success mx-1 btn-icon-sm">کهاتدارو لیست <i class="fa fa-list"></i></button>
+            </div>
+        </form>
+        <table class="table table-striped  table-condensed table-bordered " id="DealerTable">
+            <thead class="scrollable-container ps--scrolling-x ">
+                <tr role="row">
+                    <th class="col-md-2">#</th>
+                    <th class="col-md-2">بیل / رسید نمبر</th>
+                    <th class="col-md-2">نیټه</th>
+                    <th class="col-md-2">تفصیل</th>
+                    <th class="col-md-2">کهاتدار</th>
+                    <th class="col-md-2">پلار نوم</th>
+                    <th class="col-md-1">موبایل</th>
+                    <th class="col-md-2">کارمند</th>
+                    <th class="col-md-2">پولې واحد</th>
+                    <th class="col-md-1">بنام</th>
+                    <th class="col-md-1">جمع</th>
+                    <th class="col-md-1">باقې</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<!--Image modal -->
+<div class="modal fade text-left" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel35"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg p-4" role="document">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="position: absolute; padding: 10px;  ">
+            <span aria-hidden="true" style="color: #f9f9f9; font-size: larger; cursor: pointer ">&times;</span>
+        </button>
+        <img src="" class="round" style="height:100%;width:100%;" id="imageZoom" />
+    </div>
+</div>
+
+
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+
+        $(document).ready(function () {
+            FetchDealers();
+        })
+
+        function FetchDealers() {
+
+            $.ajax({
+                url: '/Deal/FetchDealers/',
+                type: 'POST',
+                contentType: "application/json",
+                data: '{}',
+                datatype: "JSON",
+                success: function (result) {
+
+                    var tr = "";
+                    $.each(result, function (i, col) {
+                        tr += "  <tr> ";
+                        tr += "      <td>" + col.name + "</td> ";
+                        tr += "      <td>" + col.fname + "</td> ";
+                        tr += "      <td>" + col.phone + "</td> ";
+                        tr += "      <td>" + col.address + "</td> ";
+                        tr += '      <td><button type="submit" class="btn btn-primary" onclick="FetchDealerDealId(' + col.dealerId + ')" ><i" class="ft-info" ></i></button></td>';
+                        tr += "  </tr>";
+                    });
+                    $("#tblList>tbody").html("").html(tr);
+
+                    $("#tblList").DataTable({
+                        stateSave: true,
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+                    });
+                }
+            })
+
+        }
+
+        function DataFetchedByDate(data) {
+            PassDataToTable(data);
+        }
+
+        function FetchDealerDealId(dealerId) {
+            $("#dealerId").val(dealerId)
+            FetchDealerDeal()
+        }
+
+        function FetchDealerDeal() {
+
+            $("#divDealers").hide(600);
+
+
+            if ($("#fromDate").val() == "" && $("#toDate").val() == "") {
+
+                $.ajax({
+                    url: '/Deal/FetchDealerDealInfo/?dealerId=' + $("#dealerId").val() + '&currencyId=' + $("#currencyId :selected").val() + '',
+                    type: 'POST',
+                    contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (result) {
+
+                        PassDataToTable(result);
+                    }
+                })
+            }
+
+        }
+
+        function PassDataToTable(data) {
+
+            var Cus = "";
+
+            $("#divDealerDeal").show(400);
+
+            $.each(data, function (i, col) {
+
+                Cus += " <tr >";
+                Cus += "      <td> " + (i + 1) + " </td>";
+                Cus += "     <td>  " + col.billNo + " </td>";
+                Cus += "     <td>  " + col.date + " </td>";
+                Cus += "      <td> " + col.details + "  </td>";
+                Cus += "      <td> " + col.name + " </td>";
+                Cus += "      <td> " + col.fname + " </td>";
+                Cus += "      <td> " + col.phone + " </td>";
+                Cus += "      <td> " + col.employee + "  </td>";
+                Cus += "      <td> " + col.currency + "  </td>";
+                Cus += "      <td dir='ltr'> " + parseFloat(col.debit).toFixed(3) + " </td>";
+                Cus += "      <td dir='ltr'> " + parseFloat(col.credit).toFixed(3) + " </td>";
+                Cus += "      <td dir='ltr'> " + parseFloat(col.balance).toFixed(3) + " </td>";
+                Cus += "      </tr>";
+            });
+
+            var table = $("#DealerTable").dataTable();
+            table.fnDestroy();
+
+            $("#DealerTable>tbody").html("").html(Cus);
+            $("#DealerTable").DataTable({
+                stateSave: true,
+                dom: 'Blfrtip',
+
+                buttons: [
+                    'colvis',
+                    {
+                        extend: 'print',
+                        //customize: function (win) {
+                        //    $(win.document.body).attr('padding', '30px');
+                        //},
+                        footer: true,
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+
+                    },
+                    {
+                        extend: 'excel', footer: true, exportOptions: {
+                            columns: ':visible'
+                        },
+                    },
+                    {
+                        extend: 'copy', footer: true, exportOptions: {
+                            columns: ':visible'
+                        },
+                    },
+                    //{
+                    //    extend: 'pdf',
+                    //    footer: true,
+                    //    charset: 'UTF-8',
+                    //    bom: true,
+                    //    //customize: function (doc) {
+                    //    //    doc.defaultStyle.font = 'Roboto-Regular';
+                    //    //},
+                    //    exportOptions: {
+                    //        columns: ':visible'
+                    //    },
+                    //},
+                ],
+
+                responsive: true,
+
+                colReorder: true,
+                "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                "pageLength": 5,
+                "language": {
+                    "emptyTable": "په جدول کې معلومات شتون نه لري",
+                    "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                    "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                    "infoPostFix": "",
+
+                    "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                    "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                    "searchPlaceholder": "پلټنه",
+                    "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                    "paginate": {
+                        "first": "لومړۍ پاڼه",
+                        "previous": "مخکې",
+                        "next": "وروسته",
+                        "last": "پای"
+                    },
+                },
+
+            });
+
+            $(".buttons-print").text("").html("<i class='ft-printer'></i>");
+            $(".buttons-copy").text("").html("<i class='ft-copy'></i>");
+            $(".buttons-excel").text("").html("<i class='fa fa-file-excel-o'></i>");
+            $(".buttons-colvis").text("").html("<i class='ft-eye-off'></i>");
+            $('.buttons-copy, .buttons-print, .buttons-excel,.buttons-colvis').addClass('btn btn-primary ');
+
+        }
+
+        function backToList() {
+            $("#divDealers").show(400);
+            $("#divDealerDeal").hide(650);
+        }
+
+        function resetForm() {
+
+            $("#fromDate").val("");
+
+            $("#toDate").val("");
+
+            FetchDealerDeal()
+        }
+
+        function fnZoomImageCustomer(path) {
+
+            $("#imageZoom").attr("src", path);
+            $("#imageModal").modal("show")
+        }
+    </script>
+
+}

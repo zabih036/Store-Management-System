@@ -1,0 +1,412 @@
+﻿
+
+@model ReturnItemsViewModel
+
+<div class="col-md-7 offset-md-3">
+    <form asp-controller="Purchase" data-ajax="true" class="form-inline" data-ajax-method="post" data-ajax-success="StockloadReport(data)" asp-action="FetchPurchasedItems">
+
+        <div id="specific" class="col-md-12 row m-0 p-0">
+            <div class="col-md-4  m-0" style="display: flex; align-items: center;">
+                <label>د نیټې څخه</label>
+                <input class="form-control" required name="fromDate" type="date" style="height:45px;">
+            </div>
+            <div class="col-md-4  m-0" style="display: flex; align-items: center;">
+                <label>تر نیټې پورې</label>
+                <input class="form-control" required name="toDate" type="date" style="height:45px;">
+            </div>
+            <div class="col-md-4  m-0" style="display: flex; align-items: center;">
+                <button type="submit" class="btn btn-default  btn-info"> ښودل</button>
+                &nbsp;
+                <button type="reset" id="btnLoadCurrentMonth" class="btn btn-default  btn-warning">پاکول</button>
+                &nbsp;
+                <button type="button" id="btnDeleteBill" onclick="DeleteBill()" class="btn btn-default  btn-danger">حذف</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<table class="table dtr-inline table-striped table-bordered dataTable" id="tblPurchased">
+    <thead>
+        <tr role="row">
+            <th>بیل نمبر</th>
+            <th>کهاتدار</th>
+            <th>جنس</th>
+            <th>واحد</th>
+            <th>واحد ظرفیت</th>
+            <th>عمده تعداد</th>
+            <th>پرچون تعداد</th>
+            <th>قیمت</th>
+            <th>مصرف</th>
+            <th>ګودام</th>
+            <th>پولې واحد</th>
+            <th>نیټه</th>
+            <th>کارمند</th>
+            <th>واپس کول</th>
+            <th>مجموعه</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+            <th rowspan="1" colspan="1"></th>
+
+        </tr>
+    </tfoot>
+    <tbody></tbody>
+</table>
+
+<!--return modal-->
+
+<div class="modal fade text-left" id="ItemReturnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel10"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary white">
+                <h4 class="modal-title" id="myModalLabel10">د جنس واپس کول </h4>
+                <button type="button" id="" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-2">
+                <form data-ajax="true" asp-action="ReturnItems" asp-controller="Purchase" data-ajax-success="funSuccessReturny(data)" data-ajax-method="post" id="frm">
+                    <input hidden id="purId" name="purId" />
+                    <input hidden id="dealerIdd" name="dealerIdd" />
+                    <input hidden id="inUnitt" name="inUnitt" />
+
+                    <div class="form-group">
+                        <label class="">اخستل شوی :</label>
+                        <input id="purchasedQty" disabled class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="">واحد:</label>
+                        <input id="unitt" disabled class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="">قیمت:</label>
+                        <input id="itempricee" disabled class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="">واپسی تعداد:</label>
+                        <input asp-for="ReturnQty" class="form-control " />
+                        <span asp-validation-for="ReturnQty" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="">تفصیل:</label>
+                        <input asp-for="Details" class="form-control " />
+                    </div>
+
+                    <div class="modal-footer" id="btnSubmits">
+                        <button type="button" class="btn grey btn-outline-secondary" id="btnClosee" data-dismiss="modal">بندول</button>
+                        <button type="submit" id="btnSubmit" class="btn btn-outline-primary">واپس کول</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--return modal-->
+
+<div class="modal fade text-left" id="DeleteModal" role="dialog" aria-labelledby="myModalLabel10"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary white">
+                <h4 class="modal-title" id="myModalLabel10">د بیل حذف کولو فارم </h4>
+                <button type="button" id="" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-2">
+                <form data-ajax="true" asp-action="DeleteBill" asp-controller="Purchase" data-ajax-success="fnSuccessDelete(data)" data-ajax-method="post">
+
+                    <div class="form-group ">
+                        <label class="">کهاتدار:</label><br />
+                        <select name="dealerId" id="dlrId" asp-items="@ViewBag.dealers" required class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                            <option value="">انتخاب کړئ</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="">بیل نمبر :</label>
+                        <input type="text" id="billNumber" name="billNumber" required class="form-control " />
+                    </div>
+
+                    <div class="modal-footer" id="btnSubmits">
+                        <button type="button" class="btn grey btn-outline-secondary" id="btnClose" data-dismiss="modal">بندول</button>
+                        <button type="submit" id="btnSubmit" class="btn btn-outline-danger"><i class="fa fa-trash-o"></i> حذف</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+
+    $(function () {
+        AllPurchasedItems()
+
+    })
+
+    function StockloadReport(data) {
+        TableDataShow(data);
+    }
+
+    function AllPurchasedItems() {
+        $.ajax({
+            url: '/Purchase/FetchPurchasedItems/',
+            type: 'POST',
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+
+                TableDataShow(result);
+            }
+        })
+    }
+
+    function TableDataShow(data) {
+
+        var tr = "";
+        $.each(data, function (i, col) {
+
+            var qty = col.qty + (col.qty2 / col.inunit);
+
+            tr += "  <tr> ";
+            tr += "      <td> " + col.billno + "</td> ";
+            tr += "      <td>" + col.dealer + "</td> ";
+            tr += "      <td>" + col.item + "</td> ";
+            tr += "      <td>" + col.unit + "</td> ";
+            tr += "      <td>" + col.inunit + "</td> ";
+            tr += "      <td>" + col.qty + "</td> ";
+            tr += "      <td>" + col.qty2 + "</td> ";
+            tr += "      <td>" + parseFloat(col.price).toFixed(2) + "</td> ";
+            tr += "      <td>" + parseFloat(col.expense).toFixed(3) + "</td> ";
+            tr += "      <td>" + col.stock + "</td> ";
+            tr += "      <td>" + col.currency + "</td> ";
+            tr += "      <td>" + col.date + "</td> ";
+            tr += "      <td>" + col.employee + "</td> ";
+            tr += "      <td><button class='btn btn-outline-info'onclick='ReturnItems(\"" + col.purchaseid + "\",\"" + col.dealerid + "\",\"" + col.price + "\",\"" + qty + "\",\"" + col.unit + "\",\"" + col.inunit + "\")'><i class='ft-refresh-cw'></i>&nbsp; <strong> واپس</strong></button></td> ";
+            tr += "      <td>" + parseFloat(qty * (col.price + col.expense)).toFixed(2) + "</td> ";
+            tr += "  </tr>";
+        });
+
+        var table = $("#tblPurchased").dataTable();
+        table.fnDestroy();
+
+        $("#tblPurchased>tbody").html("").html(tr);
+        table = $("#tblPurchased").DataTable({
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(),
+                    data;
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0
+                };
+
+                first = api
+                    .column(14, {
+                        page: 'current'
+                    })
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                $(api.column(14).footer()).html(
+                    'ټوټل' + parseFloat(first).toFixed(2)
+                );
+            },
+
+            dom: 'Blfrtip',
+
+            buttons: [
+                'colvis',
+                {
+                    extend: 'print',
+                    //customize: function (win) {
+                    //    $(win.document.body).attr('padding', '30px');
+                    //},
+                    footer: true,
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+
+                },
+                { extend: 'excel', footer: true },
+                { extend: 'copy', footer: true },
+            ],
+
+            responsive: true,
+
+            colReorder: true,
+
+            stateSave: true,
+            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+            "pageLength": 5,
+            "language": {
+                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه."
+                ,
+                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                "search": "پلټنه<span class='fa fa-search'></span> ",
+                "searchPlaceholder": "پلټنه",
+                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                "paginate": {
+                    "first": "لومړۍ پاڼه",
+                    "previous": "مخکې",
+                    "next": "وروسته",
+                    "last": "پای"
+                },
+            },
+
+        });
+
+        $('#tblPurchased tfoot th').each(function () {
+
+            var title = $(this).text();
+
+            if (title != '') return false;
+
+            $(this).html('<input type="text" style="height:35px !important;" class="form-control" placeholder="پلټنه ' + title + '" />');
+        });
+
+        // Apply the search
+        table.columns().every(function () {
+            var that = this;
+
+            $('input', this.footer()).on('keyup change', function () {
+                if (that.search() !== this.value) {
+                    that
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+
+        $(".buttons-print").text("").html("<i class='ft-printer'></i>");
+        $(".buttons-copy").text("").html("<i class='ft-copy'></i>");
+        $(".buttons-excel").text("").html("<i class='fa fa-file-excel-o'></i>");
+        $(".buttons-colvis").text("").html("<i class='ft-eye-off'></i>");
+        $('.buttons-copy, .buttons-print, .buttons-excel,.buttons-colvis').addClass('btn btn-primary ');
+    }
+
+    function ReturnItems(purchaseid, dealerid, price, purchasedQty, unit, inunit) {
+
+        $("#purId").val(purchaseid)
+        $("#dealerIdd").val(dealerid)
+        $("#itempricee").val(price)
+        $("#purchasedQty").val(purchasedQty)
+        $("#unitt").val(unit)
+        $("#inUnitt").val(inunit)
+
+        $("#ItemReturnModal").modal("show")
+    }
+
+    function funSuccessReturny(data) {
+        $("#ItemReturnModal").modal("hide")
+
+        toast(data, 'success');
+        AllPurchasedItems();
+    }
+
+    function fnSuccessDelete(data) {
+        $("#DeleteModal").modal("hide")
+
+        toast(data, 'success');
+        AllPurchasedItems();
+
+        $("#btnDeleteBill").removeClass("d-none");
+    }
+
+    function DeleteBill() {
+
+        swal({
+            title: "آیا غواړی چې  ریکارډ حذف شې؟",
+            text: "",
+            icon: "warning",
+            buttons: {
+                cancel: {
+                    text: "نه",
+                    value: null,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "هو",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+        }).then((isConfirm) => {
+            if (isConfirm) {
+
+                $("#dlrId").select2();
+
+                $("#btnDeleteBill").addClass("d-none");
+
+                $("#DeleteModal").modal("show");
+
+                //$.ajax({
+                //    url: '/RawItem/DeleteLastPurchased/',
+                //    type: 'POST',
+                //    contentType: "application/json",
+                //    datatype: "JSON",
+                //    success: function (result) {
+
+                //        toast(result, 'success');
+
+                //        $("#btnDeletePurchase").removeClass("d-none");
+                //        AllPurchasedItems();
+                //    }
+                //})
+            }
+        });
+
+    }
+
+    $("#btnClose").click(function () {
+        $("#btnDeleteBill").removeClass("d-none");
+    })
+
+    $("#btnLoadCurrentMonth").click(function () {
+        AllPurchasedItems();
+    })
+
+    $("#ReturnQty").keyup(function () {
+        if (parseFloat($("#purchasedQty").val()) < parseFloat($("#ReturnQty").val())) {
+            $("#btnSubmits").addClass('d-none')
+            toast("واپسی وزن زیات ده", 'success');
+        } else {
+            $("#btnSubmits").removeClass('d-none')
+        }
+    })
+
+</script>

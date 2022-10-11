@@ -1,0 +1,1010 @@
+﻿
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#generalReport").addClass("active")</script>
+
+<style>
+    h2 {
+        font-size: 23px !important;
+    }
+    h3{
+        direction:ltr;
+    }
+    .card-header {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .amountDiv {
+        justify-content: space-evenly;
+    }
+
+    .desc {
+        font-size: 19px !important;
+    }
+
+    .card {
+        border: 1px solid #22c2dc82;
+        box-shadow: 0 16px 28px 0 rgb(255 255 255), 0 25px 55px 0 #2dcee32b !important;
+    }
+</style>
+
+<section id="card-heading-color-options" class="">
+
+    <div class="col-md-12 col-sm-12 p-0">
+        <div class="card box-shadow-0 border-info">
+            <div class="card-header card-head-inverse bg-info">
+                <h2 class="text-center ">د سیستم عمومې تفصیلې راپور</h2>
+                <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+                <div class="heading-elements">
+                    <ul class="list-inline mb-0">
+                        <li><a data-action="collapse"><i class="ft-plus"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-content collapse">
+                <dsiv class="card-body">
+
+                    <form data-ajax="true" asp-action="FetchGeneralReportData" asp-controller="Report" data-ajax-success="DataFetchedByDate(data)" data-ajax-method="post" id="frmDealerDeal">
+
+                        <div class="row" style="align-items: center; justify-content: center;">
+
+                            <div class="col-md-3  m-0 p-0" style="display: flex; align-items: center;">
+                                <label class="col-md-4">د نیټې څخه</label>
+                                <input class="form-control" required name="fromDate" id="fromDate" type="date" style="height:45px;">
+                            </div>
+                            <div class="col-md-3  m-0 p-0" style="display: flex; align-items: center;">
+                                <label class="col-md-4">تر نیټې پورې</label>
+                                <input class="form-control" required name="toDate" id="toDate" type="date" style="height:45px;">
+                            </div>
+                            &nbsp; &nbsp;
+                            <div class="col-md-1  m-0 p-0" style="display: flex; align-items: center;">
+                                <button type="submit" class="btn btn-default  btn-info"> ښودل</button>
+                                &nbsp;
+                                <button type="reset" id="btnLoadCurrentMonth" onclick=" FetchGeneralReportData()" class="btn btn-default  btn-warning">پاکول</button>
+
+                            </div>
+                        </div>
+                    </form>
+                </dsiv>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Purchase Sale Expense Benifit  -->
+    <div class="row">
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-primary">
+                    <h2 class="card-title">ټوټل خرید</h2>
+                </div>
+                <div class="card-content bg-primary bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afPurchase">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkPurchase">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usPurchase">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-primary">
+                    <a class="white" asp-controller="Report" asp-action="PurchaseReportDetails"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-success">
+                    <h2 class="card-title">ټوټل فروشات</h2>
+                </div>
+                <div class="card-content bg-success bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afSale">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkSale">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usSale">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-success">
+                    <a class="white" asp-controller="Report" asp-action="SaleReportDetails"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-info">
+                    <h2 class="card-title">ټوټل مصارف</h2>
+                </div>
+                <div class="card-content bg-info bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afExpense">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkExpense">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usExpense">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-info">
+                    <a class="white" asp-controller="Report" asp-action="Expense"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-warning">
+                    <h2 class="card-title">ټوټل ګټه</h2>
+                </div>
+                <div class="card-content bg-warning bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afBenifit">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkBenifit">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usBenifit">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-warning">
+                    <a class="white" asp-controller="Report" asp-action="SaleReportDetails"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- CustomerLoan DealerLoan BanksLoan  CashInHand  -->
+    <div class="row">
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-danger">
+                    <h2 class="card-title">صرافې او بانک حساب</h2>
+                </div>
+                <div class="card-content bg-danger bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afBank">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkBank">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usBank">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-danger">
+                    <a class="white" asp-controller="Deal" asp-action="BankRemainList"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-blue">
+                    <h2 class="card-title">پر مشتریانو قرضونه</h2>
+                </div>
+                <div class="card-content bg-blue bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afCus">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkCus">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usCus">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-blue">
+                    <a class="white" asp-controller="Deal" asp-action="CustomerRemainList"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-blue-grey">
+                    <h2 class="card-title">پر مونږ قرضونه</h2>
+                </div>
+                <div class="card-content bg-blue-grey bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afDeal">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkDeal">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usDeal">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-blue-grey">
+                    <a class="white" asp-controller="Deal" asp-action="DealersRemainList"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-purple">
+                    <h2 class="card-title">دخل حساب</h2>
+                </div>
+                <div class="card-content bg-purple bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afCash">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkCash">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usCash">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-purple">
+                    <a class="white" asp-controller="Deal" asp-action="CashRemainList"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- RawStock HalfRawStock SickGulStock GeneralStock  -->
+    <div class="row">
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-cyan">
+                    <h2 class="card-title">ګودام اجناس</h2>
+                </div>
+                <div class="card-content bg-cyan bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afRaw">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkRaw">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usRaw">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-cyan">
+                    <a class="white" asp-controller="Purchase" asp-action="Stock" > <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        @*<div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-teal">
+                    <h2 class="card-title">نیمه خام اجناسو ګودام</h2>
+                </div>
+                <div class="card-content bg-teal bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                                <h3 class="card-text">
+                                    افغانۍ
+                                </h3>
+                                <h3 class="card-text" id="afHalf">
+                                </h3>
+                            </div>
+                            <div class="row amountDiv">
+                                <h3 class="card-text">
+                                    کلدارې
+                                </h3>
+                                <h3 class="card-text" id="pkHalf">
+                                </h3>
+                            </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usHalf">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-teal">
+                    <a class="white" asp-controller="HalfRawItem" asp-action="Stock" asp-route-id="Report"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-pink">
+                    <h2 class="card-title">سیخ ګول ګودام</h2>
+                </div>
+                <div class="card-content bg-pink bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                                <h3 class="card-text">
+                                    افغانۍ
+                                </h3>
+                                <h3 class="card-text" id="afPro">
+                                </h3>
+                            </div>
+                            <div class="row amountDiv">
+                                <h3 class="card-text">
+                                    کلدارې
+                                </h3>
+                                <h3 class="card-text" id="pkPro">
+                                </h3>
+                            </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usPro">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-pink">
+                    <a class="white" asp-controller="Purchase" asp-action="Stock"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-blue">
+                    <h2 class="card-title">عمومې ګودام</h2>
+                </div>
+                <div class="card-content bg-blue bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                                <h3 class="card-text">
+                                    افغانۍ
+                                </h3>
+                                <h3 class="card-text" id="afStock">
+                                </h3>
+                            </div>
+                            <div class="row amountDiv">
+                                <h3 class="card-text">
+                                    کلدارې
+                                </h3>
+                                <h3 class="card-text" id="pkStock">
+                                </h3>
+                            </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usStock">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-blue">
+                    <a class="white" asp-controller="Purchase" asp-action="Stock" asp-route-id="Report"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>*@
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-primary">
+                    <h2 class="card-title"> اضافه شوې سرمایه</h2>
+                </div>
+                <div class="card-content bg-primary bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afInv">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkInv">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usInv">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-primary">
+                    <a class="white" asp-controller="Investment" asp-action="AddInvestment"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-teal">
+                    <h2 class="card-title">ټوټل  سرمایه</h2>
+                </div>
+                <div class="card-content bg-teal bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afAsset">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkAsset">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usAsset">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-teal">
+                    <a class="white" asp-controller="Report" asp-action="Index"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-blue">
+                    <h2 class="card-title">تیر کال سرمایه</h2>
+                </div>
+                <div class="card-content bg-blue bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afLast">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkLast">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usLast">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-blue">
+                    <a class="white" asp-controller="Investment" asp-action="LastYearAssets"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Assets totalAsset  -->
+    <div class="row justify-content-center">
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-blue-grey">
+                    <h2 class="card-title">ټوټل ناخالص ګټه</h2>
+                </div>
+                <div class="card-content bg-blue-grey bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afGross">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkGross">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usGross">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-blue-grey">
+                    <a class="white" asp-controller="Deal" asp-action="DealersRemainList"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-purple">
+                    <h2 class="card-title">عمومې ګټه / تاوان</h2>
+                </div>
+                <div class="card-content bg-purple bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afGain">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkGain">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usGain">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header card-head-inverse bg-purple">
+                    <a class="white" asp-controller="Report" asp-action="Index"> <h3 class="card-title desc">پوره تفصیل</h3></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $(document).ready(function () {
+
+            FetchGeneralReportData();
+
+            LoadAllDealsInfo();
+
+            LoadAllStocksInfo();
+
+            LoadAllAssetsInfo();
+
+        })
+
+        localStorage.setItem("afAsset", 0.0);
+        localStorage.setItem("pkAsset", 0.0);
+        localStorage.setItem("usAsset", 0.0);
+
+
+
+        function FetchGeneralReportData() {
+
+            $.ajax({
+                url: '/Report/FetchGeneralReportData/',
+                type: 'POST',
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (data) {
+                    ShowDataInFields(data)
+                }
+            })
+
+        }
+
+        function DataFetchedByDate(data) {
+            ShowDataInFields(data);
+        }
+
+        function ShowDataInFields(data) {
+
+            var afPurchase = 0.0;
+            var pkPurchase = 0.0;
+            var usPurchase = 0.0;
+
+            var afSale = 0.0;
+            var pkSale = 0.0;
+            var usSale = 0.0;
+
+            var afExpense = 0.0;
+            var pkExpense = 0.0;
+            var usExpense = 0.0;
+
+            var afBenifit = 0.0;
+            var pkBenifit = 0.0;
+            var usBenifit = 0.0;
+
+
+
+            ///// stock Item Purchase //////
+            $.each(data.stockPurchase, function (i, col) {
+                if (col.currency == 1) {
+                    afPurchase += col.price
+                } else if (col.currency == 2) {
+                    pkPurchase += col.price
+                } else if (col.currency == 3) {
+                    usPurchase += col.price
+                }
+            })
+
+            ///// Sale Item //////
+            $.each(data.sale, function (i, col) {
+                if (col.currency == 1) {
+
+                    afSale += col.price
+                    afBenifit += col.benifit
+
+                } else if (col.currency == 2) {
+
+                    pkSale += col.price
+                    pkBenifit += col.benifit
+
+                } else if (col.currency == 3) {
+
+                    usSale += col.price
+                    usBenifit += col.benifit
+                }
+            })
+
+            ///// Expense Item //////
+            $.each(data.expense, function (i, col) {
+                if (col.currency == 1) {
+                    afExpense += col.price
+                } else if (col.currency == 2) {
+                    pkExpense += col.price
+                } else if (col.currency == 3) {
+                    usExpense += col.price
+                }
+            })
+
+
+            $("#afPurchase").text(parseFloat(afPurchase).toFixed(2))
+            $("#pkPurchase").text(parseFloat(pkPurchase).toFixed(2))
+            $("#usPurchase").text(parseFloat(usPurchase).toFixed(2))
+
+            $("#afSale").text(parseFloat(afSale).toFixed(2))
+            $("#pkSale").text(parseFloat(pkSale).toFixed(2))
+            $("#usSale").text(parseFloat(usSale).toFixed(2))
+
+            $("#afExpense").text(parseFloat(afExpense).toFixed(2))
+            $("#pkExpense").text(parseFloat(pkExpense).toFixed(2))
+            $("#usExpense").text(parseFloat(usExpense).toFixed(2))
+
+            $("#afBenifit").text(parseFloat(afBenifit - afExpense).toFixed(2))
+            $("#pkBenifit").text(parseFloat(pkBenifit - pkExpense).toFixed(2))
+            $("#usBenifit").text(parseFloat(usBenifit - usExpense).toFixed(2))
+        }
+
+        function LoadAllDealsInfo() {
+
+            $.ajax({
+                url: '/Report/FetchDealsInfo/',
+                type: 'POST',
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (data) {
+
+                    var afAsset = parseFloat(localStorage.getItem("afAsset"));
+                    var pkAsset = parseFloat(localStorage.getItem("pkAsset"));
+                    var usAsset = parseFloat(localStorage.getItem("usAsset"));
+
+                    afAsset += data.afBank;
+                    pkAsset += data.pkBank;
+                    usAsset += data.usBank;
+
+                    afAsset += data.afCus;
+                    pkAsset += data.pkCus;
+                    usAsset += data.usCus;
+
+                    afAsset -= data.afDeal;
+                    pkAsset -= data.pkDeal;
+                    usAsset -= data.usDeal;
+
+                    afAsset += data.afCash;
+                    pkAsset += data.pkCash;
+                    usAsset += data.usCash;
+
+                    localStorage.setItem("afAsset", afAsset);
+                    localStorage.setItem("pkAsset", pkAsset);
+                    localStorage.setItem("usAsset", usAsset);
+
+                    $("#afBank").text(parseFloat(data.afBank).toFixed(2))
+                    $("#pkBank").text(parseFloat(data.pkBank).toFixed(2))
+                    $("#usBank").text(parseFloat(data.usBank).toFixed(2))
+
+                    $("#afCus").text(parseFloat(data.afCus).toFixed(2))
+                    $("#pkCus").text(parseFloat(data.pkCus).toFixed(2))
+                    $("#usCus").text(parseFloat(data.usCus).toFixed(2))
+
+                    $("#afDeal").text(parseFloat(data.afDeal).toFixed(2))
+                    $("#pkDeal").text(parseFloat(data.pkDeal).toFixed(2))
+                    $("#usDeal").text(parseFloat(data.usDeal).toFixed(2))
+
+                    $("#afCash").text(parseFloat(data.afCash).toFixed(2))
+                    $("#pkCash").text(parseFloat(data.pkCash).toFixed(2))
+                    $("#usCash").text(parseFloat(data.usCash).toFixed(2))
+
+                    var afBenifit = 0.0;
+                    var pkBenifit = 0.0;
+                    var usBenifit = 0.0;
+
+                    ///// Sale Item //////
+                    $.each(data.sale, function (i, col) {
+                        if (col.currency == 1) {
+
+                            afBenifit += col.benifit
+
+                        } else if (col.currency == 2) {
+
+                            pkBenifit += col.benifit
+
+                        } else if (col.currency == 3) {
+
+                            usBenifit += col.benifit
+                        }
+                    })
+
+                    $("#afGross").text(parseFloat(afBenifit).toFixed(2))
+                    $("#pkGross").text(parseFloat(pkBenifit).toFixed(2))
+                    $("#usGross").text(parseFloat(usBenifit).toFixed(2))
+
+                    AllTotal();
+                }
+            })
+
+        }
+
+        function LoadAllStocksInfo() {
+
+            $.ajax({
+                url: '/Report/FetchStocksInfo/',
+                type: 'POST',
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (data) {
+
+
+                    var afAsset = parseFloat(localStorage.getItem("afAsset"));
+                    var pkAsset = parseFloat(localStorage.getItem("pkAsset"));
+                    var usAsset = parseFloat(localStorage.getItem("usAsset"));
+
+                    afAsset += data.afStock;
+                    pkAsset += data.pkStock;
+                    usAsset += data.usStock;
+
+                    $("#afRaw").text(parseFloat(data.afStock).toFixed(2))
+                    $("#pkRaw").text(parseFloat(data.pkStock).toFixed(2))
+                    $("#usRaw").text(parseFloat(data.usStock).toFixed(2))
+
+
+                    localStorage.setItem("afAsset", afAsset);
+                    localStorage.setItem("pkAsset", pkAsset);
+                    localStorage.setItem("usAsset", usAsset);
+
+                    AllTotal();
+                }
+            })
+
+        }
+
+        function LoadAllAssetsInfo() {
+
+            $.ajax({
+                url: '/Report/FetchAssetsInfo/',
+                type: 'POST',
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (data) {
+
+                    var afAsset = parseFloat(localStorage.getItem("afAsset"));
+                    var pkAsset = parseFloat(localStorage.getItem("pkAsset"));
+                    var usAsset = parseFloat(localStorage.getItem("usAsset"));
+
+                    afAsset += data.afInv;
+                    pkAsset += data.pkInv;
+                    usAsset += data.usInv;
+
+                    localStorage.setItem("afAsset", afAsset);
+                    localStorage.setItem("pkAsset", pkAsset);
+                    localStorage.setItem("usAsset", usAsset);
+
+                    $("#afInv").text(parseFloat(data.afInv).toFixed(2))
+
+                    $("#pkInv").text(parseFloat(data.pkInv).toFixed(2))
+
+                    $("#usInv").text(parseFloat(data.usInv).toFixed(2))
+
+
+                    localStorage.setItem("afLast", data.afLast);
+                    localStorage.setItem("pkLast", data.pkLast);
+                    localStorage.setItem("usLast", data.usLast);
+
+                    $("#afLast").text(parseFloat(data.afLast).toFixed(2))
+
+                    $("#pkLast").text(parseFloat(data.pkLast).toFixed(2))
+
+                    $("#usLast").text(parseFloat(data.usLast).toFixed(2))
+
+                    AllTotal();
+                }
+            })
+
+        }
+
+        function AllTotal() {
+            var afAsset = parseFloat(localStorage.getItem("afAsset"));
+            var pkAsset = parseFloat(localStorage.getItem("pkAsset"));
+            var usAsset = parseFloat(localStorage.getItem("usAsset"));
+
+            var afLast = parseFloat(localStorage.getItem("afLast"));
+            var pkLast = parseFloat(localStorage.getItem("pkLast"));
+            var usLast = parseFloat(localStorage.getItem("usLast"));
+
+            $("#afAsset").text(parseFloat(afAsset).toFixed(2))
+
+            $("#pkAsset").text(parseFloat(pkAsset).toFixed(2))
+
+            $("#usAsset").text(parseFloat(usAsset).toFixed(2))
+
+
+            $("#afGain").text(parseFloat(afAsset - afLast).toFixed(2))
+
+            $("#pkGain").text(parseFloat(pkAsset - pkLast).toFixed(2))
+
+            $("#usGain").text(parseFloat(usAsset - usLast).toFixed(2))
+        }
+
+    </script>
+}

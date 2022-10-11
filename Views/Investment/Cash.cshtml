@@ -1,0 +1,233 @@
+﻿
+@model CashViewModel
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#addCash").addClass("active")</script>
+
+<div class="row">
+    <div class="col-md-12 ">
+        <h2 class="text-center alert bg-info box-shadow-1">د  نغدو پیسو اضافه کولو فارم</h2>
+
+        <hr />
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body card-dashboard">
+                <section>
+                    @Html.AntiForgeryToken()
+
+                    <br />  <br />  <br />
+                    <br />  <br />
+                    <form data-ajax="true" asp-controller="Investment" asp-action="AddCash" data-ajax-success="frmSuccess(data)" data-ajax-method="post" id="frmnotes">
+                        <hr />
+                        <input hidden asp-for="CashId" value="0" />
+
+                        <div class="form-group">
+                            <label asp-for="Amount" class=""></label>
+                            <input asp-for="Amount" dir="rtl" class="form-control" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group ">
+                            <label class="">جمع / اخستل:</label>
+                            <select asp-for="Type" class="form-control">
+                                <option value="">انتخاب کړئ</option>
+                                <option value="Credit">جمع</option>
+                                <option value="Debit">اخستل</option>
+                            </select>
+                            <span asp-validation-for="Type" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group ">
+                            <label class="">کهاتې پولې واحد:</label>
+                            <select asp-for="CurrencyId" class="form-control">
+                                <option value="">انتخاب کړئ</option>
+                                <option value="1">افعانۍ</option>
+                                <option value="2">کلدارې</option>
+                                <option value="3">ډالر</option>
+                            </select>
+                            <span asp-validation-for="CurrencyId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="">تفصیل</label>
+                            <input asp-for="Desc" dir="rtl" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <button type="reset" id="btnreset" class="btn btn-warning btn-icon-md">پاکول</button>
+                            <button type="submit" id="btnsubmit" class="btn btn-primary btn-icon-md">ذخیره</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 " style="margin:0px;">
+        <div class="card">
+            <div class="card-header ">
+                <h4 class="card-title "><strong>د نغدو پیسو لیست</strong></h4>
+            </div>
+            <div class="card-content  collapse show">
+                <div class="card-body dt-ext table-responsive">
+                    <table class="table   table-bordered dataex-fixh-basic dataTable" id="tbl">
+                        <thead class="">
+                            <tr role="row">
+                                <th class="col-md-3">#</th>
+                                <th class="col-md-3"> اضافه شوې</th>
+                                <th class="col-md-3"> اخستل شوې</th>
+                                <th class="col-md-3"> پولې واحد</th>
+                                <th class="col-md-3">   نیټه</th>
+                                <th class="col-md-2">  کارمند</th>
+                                <th class="col-md-2">  تفصیل</th>
+                                <th class="col-md-3">  تغیرول</th>
+                                @*<th class="col-md-3">  حذف </th>*@
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        $(document).ready(function () {
+            LoadAssets();
+        })
+
+        function LoadAssets() {
+            $.ajax({
+                url: '/Investment/FetchCash/',
+                type: 'GET',
+                contentType: "application/json",
+                data: '{}',
+                datatype: "JSON",
+                success: function (customers) {
+                    var Cus = "";
+                    $.each(customers, function (i, col) {
+                        Cus += ' <tr>';
+                        Cus += '      <td class="col-md-3"> ' + (i + 1) + ' </td>';
+                        Cus += '      <td class="col-md-3"> ' + parseFloat(col.credit).toFixed(2) + ' </td>';
+                        Cus += '      <td class="col-md-3"> ' + parseFloat(col.debit).toFixed(2) + ' </td>';
+                        Cus += '      <td  class="col-md-3"> ' + col.currency + '</td>';
+                        Cus += '      <td  class="col-md-3"> ' + col.date + '</td>';
+                        Cus += '      <td  class="col-md-2">' + col.employee + '  </td>';
+                        Cus += '      <td  class="col-md-2">' + col.desc + '  </td>';
+                        Cus += '      <td  class="col-md-2"> <button class="btn btn-primary" onclick="passValue(' + col.id + ',\'' + col.credit + '\',\'' + col.debit + '\',\'' + col.currencyId + '\',\'' + col.desc + '\')"><i class="ft-edit"></i></button></td>';
+                        //Cus += "      <td><button type='button' onclick='fnDelete(" + col.id + ")' class='btn btn-danger'><i class='ft-trash'></i></button></form></td> ";
+                        Cus += '      </tr>';
+                    });
+
+                    var table = $("#tbl").dataTable();
+                    table.fnDestroy();
+
+                    $("#tbl>tbody").html("").html(Cus);
+
+                    $("#tbl").DataTable({
+                        stateSave: true,
+                        responsive:true,
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+                    });
+                }
+            })
+        }
+
+        function passValue(id, credit, debit, currency, desc) {
+
+            $("#CashId").val(id);
+            if (credit != 0) {
+                $("#Amount").val(credit);
+                $("#Type").val("Credit");
+
+            } else {
+                $("#Amount").val(debit);
+                $("#Type").val("Debit");
+            }
+            $("#CurrencyId").val(currency);
+            $("#Desc").val(desc);
+
+            $("#btnsubmit").text("تغیرول");
+        }
+
+        function frmSuccess(data) {
+
+            $("#btnsubmit").text("ذخیره");
+
+            toast(data, 'success');
+
+            $("#frmnotes")[0].reset();
+
+            LoadAssets();
+        }
+
+        function fnDelete(id) {
+
+            swal({
+                title: "آیا غواړی چې  ریکارډ حذف شې؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+
+            }).then((isConfirm) => {
+                if (isConfirm) {
+
+                    $.ajax({
+                        url: '/Investment/DeleteAsset/?assetId=' + id + '',
+                        type: 'POST',
+                        contentType: "application/json",
+                        datatype: "JSON",
+                        success: function (result) {
+                            toast(result, 'success');
+                            LoadAssets();
+                        }
+                    })
+                }
+            });
+        }
+
+        $("#btnreset").click(function () {
+
+            $("#btnsubmit").text("ذخیره")
+
+        })
+
+    </script>
+}
+
+

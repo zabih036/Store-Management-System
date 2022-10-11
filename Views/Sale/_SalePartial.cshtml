@@ -1,0 +1,1001 @@
+﻿@model SaleViewModel
+
+<link href="~/css/style.css" rel="stylesheet" />
+
+<style>
+   
+
+    @@media(min-width: 576px) {
+        .col-md-2 {
+            -webkit-box-flex: 0;
+            -webkit-flex: 0 0 16.666667%;
+            -moz-box-flex: 0;
+            -ms-flex: 0 0 16.666667%;
+            flex: 0 0 12.5% !important;
+            max-width: 12.5% !important;
+        }
+    }
+
+    .form-group {
+        padding: 0 3px !important;
+    }
+
+    @@media print {
+        th {
+            font-size: 21px !important;
+            height:45px;
+        }
+
+        td {
+            font-size: 20px !important;
+            height: 45px;
+        }
+        .table th {
+            background: transparent;
+        }
+
+        .dt-print-view > h1 {
+            font-size: 35px !important
+        }
+        .fonts {
+            font-family: 'Segoe UI';
+        }
+        .tblth {
+            width: 125px;
+            height: 35px;
+        }
+    }
+
+
+    .title {
+        font-size: 30px;
+    }
+
+    .h-3 {
+        font-size: 19px;
+    }
+
+    .titleDiv {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #753205;
+    }
+
+    .log {
+        height:150px;
+        width:170px;
+    }
+
+    .col {
+        margin: 0;
+        margin-top: 15px;
+        padding: 0;
+        padding-right: 10px !important;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .tblth {
+        width: 125px;
+        height:30px;
+    }
+   
+</style>
+
+<div class="modal-content">
+    <div class="modal-header bg-primary white">
+        <h4 class="modal-title" id="myModalLabel100">اجناسو خرڅولو فارم </h4>
+    </div>
+    <div class="modal-body">
+
+        <div id="hide1">
+            <form data-ajax="true" asp-action="" asp-controller="Sale" data-ajax-success="GenerateBill()" data-ajax-method="post" id="frmSale">
+                <div class="row">
+
+                    <div class="form-group col-md-2">
+                        <label class="">بیل نمبر:</label>
+                        <input disabled asp-for="BillNo" class="form-control" />
+                    </div>
+
+                    <div class="form-group col-md-3">
+                        <label class="">مشترې:</label><br />
+                        <select asp-for="CustomerId" asp-items="@ViewBag.customers" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                            <option value="">انتخاب کړئ</option>
+                        </select>
+                        <span asp-validation-for="CustomerId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label class="">بارګیرې:</label>
+                        <input asp-for="Loading" value="0" class="form-control " />
+                        <span asp-validation-for="Loading" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label class="">پولې واحد:</label>
+                        <select asp-for="CurrencyId" onchange="exchangeCurrency()" class="form-control">
+                            <option value=""> انتخاب کړئ </option>
+                            <option value="1"> افغانۍ </option>
+                            <option value="2"> کلدارې </option>
+                            <option selected value="3"> ډالر</option>
+                        </select>
+                        <span asp-validation-for="CurrencyId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label class="">ګودام:</label>
+                        <select asp-for="StockId" onchange="FetchItemInfo()" asp-items="@ViewBag.stock" class="form-control">
+                        </select>
+                        <span asp-validation-for="StockId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-3">
+                        <label class="">جنس :</label>
+                        <input hidden asp-for="stockItemId" />
+                        <select asp-for="ItemId" onchange="FetchItemInfo()" asp-items="@ViewBag.items" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                            <option value="">انتخاب کړئ</option>
+                        </select>
+                        <span asp-validation-for="ItemId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label class="">عمده / پرچون:</label>
+                        <select asp-for="Type" onchange="WholeSale()" class="form-control">
+                            <option value="عمده"> عمده </option>
+                            <option value="پرچون"> پرچون</option>
+                        </select>
+                        <span asp-validation-for="Type" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="form-group col-lg-2">
+                        <label class="">  ګودام اندازه :</label>
+                        <input id="itemInStock" disabled class="form-control " />
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label class="">واحد:</label>
+                        <select asp-for="UnitId" asp-items="@ViewBag.unit" class="form-control">
+                            <option value=""> انتخاب کړئ </option>
+                        </select>
+                        <span asp-validation-for="UnitId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label class=""> تمام شد قیمت:</label>
+                        <input asp-for="Price" class="form-control " />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label class=""> خرڅ قیمت:</label>
+                        <input asp-for="SalePrice" class="form-control " />
+                        <span asp-validation-for="SalePrice" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label class=""> خرڅ قیمت افغانۍ:</label>
+                        <input id="sPrice" onkeyup="AfChanges()" class="form-control " />
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label class="">تعداد / مقدار:</label>
+                        <input asp-for="Qty"  class="form-control " />
+                        <span asp-validation-for="Qty" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="form-group col-md-1">
+                        <label class="">تخفیف:</label>
+                        <input asp-for="Discount" value="0" class="form-control " />
+                        <span asp-validation-for="Discount" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-2 " style="display:flex;align-items:flex-end">
+                        <button type="submit" id="btnSubmitItemBill" class="btn btn-primary btn-icon-sm">اضافه کول</button>
+                        &nbsp;
+                        <button type="button" id="btnr" onclick="PrintOptions()" class="btn btn-info btn-icon-sm d-none "><span class="fa fa-print"></span> </button>
+                        &emsp;
+                        <button type="reset" id="btnResetItem" class="btn d-none btn-warning btn-icon-sm"></button>
+                        &nbsp;
+
+                        <button type="button" id="totalAf" class="btn btn-default btn-icon-sm"></button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+        <div id="repeatedItemList" class="d-none">
+            <div class="card-header">
+                <h4 class="card-title"><strong> نوموړی جنس مختلف اقسام لرې یو انتخاب کړئ</strong></h4>
+            </div>
+            <table class="table table-responsive-md table-bordered dataex-fixh-basic dataTable" id="tblItem2">
+                <thead>
+                    <tr role="row">
+                        <th>#</th>
+                        <th>جنس</th>
+                        <th>عمده تعداد</th>
+                        <th>پرچون تعداد</th>
+                        <th>قیمت</th>
+                        <th>پولې واحد</th>
+                        <th>مجموعه</th>
+                    </tr>
+                </thead>
+                <tbody id="selectitem"></tbody>
+            </table>
+        </div>
+
+        <div class="col-md-12 d-none justify-content-center" id="billtable">
+
+            <table class="table  table-active table-bordered" id="tblsaleitems">
+
+                <thead class="col-md-12 tblThead" style="background-color: #2d607852; color: black">
+                    <tr role="row">
+                        <th>شماره </th>
+                        <th>نام جنس  </th>
+                        <th> واحد</th>
+                        <th>تعداد  </th>
+                        <th>مبلغ  </th>
+                        <th>تخفیف </th>
+                        <th>قیمت کل</th>
+                    </tr>
+                </thead>
+                <tbody id="PrintBillBody" style="font-size: small; background: #6c7f880d "></tbody>
+
+            </table>
+
+
+            <hr />
+            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-around;">
+
+                <div class="alert bg-primary alert-dismissible mb-1 col-md-4" role="alert" style="max-width:300px;">
+                    <strong>ټوټل بیل :</strong> <strong class="text-lg-center afghaniTotal" >0</strong>
+                </div>
+
+                <div class="alert bg-primary alert-dismissible mb-1 col-md-4" role="alert" style="max-width:300px;">
+                    <strong>بارګیرې / تخلیه :</strong> <strong class="text-lg-center loading" id="bellowLoading">0</strong>
+                </div>
+
+                <div class="alert bg-primary alert-dismissible mb-1 col-md-4" role="alert" style="max-width:300px;">
+                    <strong>سابقه بقایا :</strong> <strong class="text-lg-center previousBalance">0</strong>
+                </div>
+
+                <div class="alert bg-primary alert-dismissible mb-1 col-md-4" role="alert" style="max-width:300px;">
+                    <strong>ټوټل مجموعه :</strong> <strong class="text-lg-center" id="grandTotalAll">0</strong>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <input id="afghaniPay" onkeyup="GrandTotal()" style="height: 53px !important;" dir="ltr" placeholder="تادیه " class="form-control" />
+
+                </div>
+
+                <div class="form-group col-md-3">
+                    <input id="details" style="height: 53px !important;" dir="auto" placeholder="تفصیل" class="form-control" />
+                </div>
+
+                <div class="alert bg-primary alert-dismissible mb-1 col-md-4" role="alert" style="max-width:300px;">
+                    <strong>باقی :</strong> <strong class="text-lg-center remain" id="">0</strong>
+                </div>
+
+                <div class="form-group col-md-1">
+                    <button id="btnPrints" style="height:52px;" onclick="fnSubmitItems()" class="hidden-print btn btn-primary">ذخیره <i class="ft-save"></i></button>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="printBill" class=" d-none " style="background-image: url('/images/StaticImages/bg.jpg'); background-size: cover; background-repeat: no-repeat; background-position: top; display: grid; justify-items: stretch; padding: 10px; margin-top: -80px;">
+
+            <div  style=" align-items: center; display: flex; justify-content: flex-end; align-items: center; flex-wrap: nowrap; ">
+
+                <div class="titleDiv" style="  ">
+                    <h2 class="title" style="color: #162eb7">شرکت عبدالرحمن امین نواب زاده لمیتد</h2>
+                    <h2 class="" style="font-size: 23px; color: #ff7c0c;">Ab Rahman Amin Nawab Zada Co Ltd</h2>
+                    <h2 class="" style="font-size: 23px; color: darkslategray;">صادرات و واردات</h2>
+                </div>
+                <div>
+                    <img src="~/images/StaticImages/logo.png" class="log" />
+                </div>
+                <div class="titleDiv" >
+                    <h2 class="" style="margin-bottom: 10px; font-size: 22px; color: #162eb7">شماره تماس</h2>
+                    <h2 class="" style="margin-bottom:10px;font-size:19px;"><i class="fa fa-whatsapp"></i> 0775838000 -  0777768747 -  0730005353  <i class="fa fa-phone"></i></h2>
+                    <h2 class="" style="margin-bottom:10px;font-size:19px;"><i class="fa fa-whatsapp"></i> 0744641835  -  0784630166   <i class="fa fa-phone"></i></h2>
+                    <h2 class="" style="margin-bottom:10px;font-size:19px;"> Abdulrahmanamin202@gmail.com <i class="fa fa-envelope-o"></i></h2>
+                </div>
+            </div>
+
+            <div class="fonts" id="fonts" style="font-family: 'Segoe UI';">
+                <h2>بل فروش</h2>
+                <hr style="border-top: 3px solid rgb(0 0 0 / 51%) !important;" />
+            </div>
+
+            <div class="row m-0 fonts">
+                <div>
+                    <div>
+                        <b class="h-3 " style="">شماره بل :  </b>
+                        &emsp; &emsp;
+                        <b class="h-3 serialNo">23242</b>
+                    </div>
+
+                    <div>
+                        <b class="h-3" style="">تاریخ صدور بل: </b>
+                        &emsp;
+                        <b class="h-3 date"> @Convert.ToDateTime(DateTime.Now.Date).ToShortDateString()</b>
+                    </div>
+
+                    <div x>
+                        <b class="h-3" style="">کد ونام ګدام: </b>
+                        &emsp;
+                        <b class="h-3 stockId"> 1001 کابل ګدام</b>
+                    </div>
+                </div>
+                &emsp; &emsp; &emsp; &emsp;
+                &emsp; &emsp; &emsp; &emsp;
+                <div>
+                    <div>
+                        <b class="h-3 " style="">کد شخص :  </b>
+                        &emsp;&emsp;
+                        <b class="h-3 customerNo">23242</b>
+                    </div>
+
+                    <div>
+                        <b class="h-3" style="">نام شخص: </b>
+                        &emsp;&emsp;
+                        <b class="h-3 customerName">حاجی احمد </b>
+                    </div>
+
+                    <div x>
+                        <b class="h-3" style="">ارز بل: </b>
+                        &emsp;&emsp;
+                        <b class="h-3 currencyType"> دالر امریکاېی</b>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <hr style="border-top: 3px solid rgb(0 0 0 / 51%) !important; margin-bottom:0;" />
+            </div>
+
+            <table class="table-bordered table-striped" id="tblPrint" style="margin-top: 10px;">
+                <thead id="tblThead" class="col-md-12 tblThead" style="background-color: #2d607852; color: black">
+                    <tr role="row">
+                        <th>شماره </th>
+                        <th>نام جنس  </th>
+                        <th> واحد</th>
+                        <th>تعداد  </th>
+                        <th>مبلغ  </th>
+                        <th>تخفیف </th>
+                        <th>قیمت کل</th>
+                    </tr>
+                </thead>
+                <tbody class="" style="font-size: small; background: #6c7f880d; color: black"></tbody>
+
+            </table>
+
+            <div style="display: grid; justify-content: end;margin-top:10px" id="tblAmount">
+                <table class="table-bordered">
+                    <tr role="row">
+                        <th class="tblth">جمع بل </th>
+                        <th class="totalPrice tblth" style="width:170px"> </th>
+                    </tr>
+                    <tr>
+                        <th class="tblth">سابقه بقایا </th>
+                        <th class="previousBalance tblth"> </th>
+                    </tr>
+                    <tr role="row">
+                        <th class="tblth">بارګیرې/ تخلیه</th>
+                        <th class="loading tblth"> </th>
+                    </tr>
+                    <tr role="row">
+                        <th class="tblth"> وصول</th>
+                        <th class="paid tblth"> </th>
+                    </tr>
+                    <tr>
+                        <th class="tblth">ټوټل بقایا </th>
+                        <th class="remain tblth"> </th>
+                    </tr>
+                </table>
+
+            </div>
+            <hr style="border-top: 3px solid rgb(0 0 0 / 51%) !important;" />
+
+            <div class="">
+                <div>
+                    <h3 class=""><b>آدرس: </b>کابل مندوی  نواب مارکیټ  منزل اول </h3>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-around; margin-top: 20px; ">
+                <h3>امضاء فروشنده</h3>
+                <h3>امضاء خریدار</h3>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<input type="hidden" name="name" value="" id="previousBalance" />
+
+<input type="hidden" name="name" value="" id="fromCurrency" />
+
+<input type="hidden" name="name" value="" id="purchasepriceforcur" />
+
+<input type="hidden" name="name" value="" id="Price2" />
+
+<input type="hidden" name="name" value="" id="inUnit" />
+
+<input type="hidden" name="name" value="" id="stockItemId" />
+
+<input type="hidden" name="name" value="" id="unit" />
+
+<input type="hidden" name="name" value="" id="ExistQty" />
+
+<script>
+    $(function () {
+        $("#ItemId").select2();
+        $("#CustomerId").select2();
+        FetchSerialNumber();
+    })
+
+    function AfChanges() {
+
+        var aftous = parseFloat(localStorage.getItem("aftous"));
+
+        var price = $("#sPrice").val();
+
+        var total = parseFloat(price / aftous).toFixed(3);
+        $("#SalePrice").val(total)
+
+    }
+
+    function WholeSale() {
+
+        var inunit = parseInt($("#inUnit").val());
+        
+        var price = parseFloat($("#Price").val())
+
+        var price2 = parseFloat($("#Price2").val())
+
+
+        if ($("#Type").val() == "عمده") {
+
+            $("#Price").val(price2);
+
+            $("#UnitId").val($("#unit").val());
+        } else {
+            $("#Price").val(parseFloat(price / inunit).toFixed(3));
+
+            $("#UnitId").val('');
+        }
+    }
+
+    function exchangeCurrency() {
+
+        $("#Type").val("عمده")
+
+        var toCurrency = $("#CurrencyId").val();
+
+        var fromCurrency = $("#fromCurrency").val();
+        
+        var aftous = parseFloat(localStorage.getItem("aftous"));
+        var aftopk = parseFloat(localStorage.getItem("aftopk"));
+        var ustopk = parseFloat(localStorage.getItem("ustopk"));
+
+        var price = parseFloat($("#purchasepriceforcur").val());
+
+        if (fromCurrency == 1) {
+
+            if (toCurrency == 1) {
+                var total = parseFloat(price).toFixed(3);
+                $("#Price").val(total)
+                $("#Price2").val(total)
+            }
+
+            if (toCurrency == 2) {
+                var total = parseFloat(price * aftopk).toFixed(3);
+                $("#Price").val(total)
+                $("#Price2").val(total)
+            }
+
+
+            if (toCurrency == 3) {
+                var total = parseFloat(price / aftous).toFixed(3);
+                $("#Price").val(total)
+                $("#Price2").val(total)
+            }
+
+        }
+        else if (fromCurrency == 2) {
+
+            if (toCurrency == 1) {
+                var total = parseFloat(price / aftopk).toFixed(3);
+                $("#Price").val(total)
+                $("#Price2").val(total)
+            }
+
+            if (toCurrency == 2) {
+                var total = parseFloat(price).toFixed(3);
+                $("#Price").val(total)
+                $("#Price2").val(total)
+            }
+
+
+            if (toCurrency == 3) {
+                var total = parseFloat(price / ustopk).toFixed(3);
+                $("#Price").val(total)
+                $("#Price2").val(total)
+            }
+        }
+
+        else if (fromCurrency == 3) {
+
+            if (toCurrency == 1) {
+                var total = parseFloat(price * aftous).toFixed(3);
+                $("#Price").val(total)
+                $("#Price2").val(total)
+            }
+
+            if (toCurrency == 2) {
+                var total = parseFloat(price * ustopk).toFixed(3);
+                $("#Price").val(total)
+                $("#Price2").val(total)
+            }
+
+
+            if (toCurrency == 3) {
+                var total = parseFloat(price).toFixed(3);
+                $("#Price").val(total)
+                $("#Price2").val(total)
+            }
+        }
+
+
+        FetchLastRemainOnCustomer();
+    }
+
+    function FetchLastRemainOnCustomer() {
+        if ($("#CustomerId").val() != "" && $("#CurrencyId").val() != "") {
+            $.ajax({
+                url: '/Sale/FetchLastRemain/?customerId=' + $("#CustomerId").val() + '&currencyId=' + $("#CurrencyId").val() + '',
+                type: 'POST',
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+
+                    $(".previousBalance").text(parseFloat(result).toFixed(3))
+
+                }
+            })
+        }
+    }
+
+    function PrintOptions() {
+
+        var serial = $("#BillNo").val();
+        var date = "@DateTime.Now.Date.ToShortDateString()";
+        var stock = $("#StockId :selected").text();
+        var stockId = $("#StockId :selected").val();
+        var customerNo = $("#CustomerId :selected").text().split(' - ')[0];
+        var customerName = $("#CustomerId :selected").text().split(' - ')[1];
+        var currency = $("#CurrencyId :selected").text();
+        var total = parseFloat($(".afghaniTotal").text());
+        var prev = parseFloat($(".previousBalance").text());
+        var loading = parseFloat($("#Loading").val());
+        var paid = parseFloat($("#afghaniPay").val());
+
+        print(serial, date,stock,stockId, customerNo,customerName, currency, total,prev, loading, paid)
+    }
+
+    function print(serial, date, stock, stockId, customerNo, customerName, currency, total, prev, loading, paid) {
+
+        if ($("#PrintBillBody").children().length > 0) {
+
+            GrandTotal();
+
+            $(".serialNo").text(serial);
+            $(".date").text(date);
+            $(".stockId").text("[" + stockId +" , "+ stock + "]");
+            $(".customerNo").text(customerNo);
+            $(".customerName").text(customerName);
+            $(".currencyType").text(currency);
+            $(".totalPrice").text(parseFloat(total).toFixed(3));
+            $(".previousBalance").text(parseFloat(prev).toFixed(3));
+            $(".loading").text(parseFloat(loading).toFixed(3));
+            $(".paid").text(paid);
+
+
+            var t = parseFloat(total);
+            var l = parseFloat(loading);
+            var p = parseFloat(prev);
+
+            var remain = parseFloat(t + l + p);
+
+            var re = remain - paid;
+
+            $(".remain").text(parseFloat(re).toFixed(3));
+
+            $("#tblPrint").html($("#tblsaleitems").html())
+
+            $("#printBill").removeClass("d-none");
+
+            $("#printBill").printThis({
+                debug: false,
+                importStyle: true,
+                printContainer: true,
+                loadCSS: "",
+                pageTitle: "",
+                removeInline: false,
+                removeInlineSelector: "*",
+                base: false,
+                formValues: true,
+                canvas: false,
+                doctypeString: '...',
+                removeScripts: false,
+                copyTagClasses: true,
+                beforePrintEvent: null,
+                beforePrint: null,
+                afterPrint: null,
+            });
+
+            setTimeout(function () {
+                $("#printBill").addClass("d-none");
+            }, 2000)
+
+        }
+
+    }
+
+    function FetchSerialNumber() {
+        $.ajax({
+            url: '/Sale/FetchSerialNumber/',
+            type: 'POST',
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+
+                $("#BillNo").val(result.serialNumber)
+
+            }
+        })
+    }
+
+    function FetchItemInfo() {
+        if ($("#ItemId").val() != 0 ) {
+            $.ajax({
+                url: "/Sale/FetchItemInfo/?itemid=" + $("#ItemId :selected").val() + "&stockId=" + $("#StockId :selected").val()+"",
+                type: "GET",
+                datatype: "JSON",
+                success: function (result) {
+
+                    var itemCount = 0;
+                    var repeatedItem = "";
+                    $.each(result, function (i, col) {
+                        itemCount++;
+                    });
+                    if (itemCount == 0) {
+                        toast("جنس ګودام کې نشته", 'warning');
+                        $("#hide1").removeClass("d-none");
+                        $("#repeatedItemList").addClass("d-none");
+
+                        $("#stockItemId").val('');
+                        $("#SalePrice").val('');
+                        $("#Qty").val('');
+                        $("#Price").val('');
+                        $("#PPrice").val('');
+                        $("#ExistQty").val('');
+                        $("#UnitId").val('');
+                    }
+                    else if (itemCount == 1) {
+
+                        $("#btnSubmitItemBill").removeClass("d-none");
+                        $.each(result, function (i, col) {
+
+                            $("#stockItemId").val(col.stockItemId);
+                            $("#Price").val(parseFloat(col.price).toFixed(3));
+                            $("#fromCurrency").val(col.currencyid);
+                            $("#ExistQty").val(col.quantity * col.inunit);
+                            $("#purchasepriceforcur").val(parseFloat(col.price).toFixed(2))
+                            $("#inUnit").val(col.inunit)
+                            $("#unit").val(col.unitid)
+                            $("#UnitId").val(col.unitid)
+
+                            $("#itemInStock").val(Math.floor(col.quantity / col.inunit) + " عمده " + Math.floor(col.quantity % col.inunit) + " پرچون");
+
+                            $("#hide1").removeClass("d-none");
+                            $("#repeatedItemList").addClass("d-none");
+
+                        });
+
+
+                        exchangeCurrency();
+                    }
+                    else {
+                        $.each(result, function (i, col) {
+
+                            repeatedItem += "   <tr>";
+                            repeatedItem += "       <th scope='row'><input type='radio' onclick='selectedItem(" + col.stockItemId + ",\"" + col.quantity + "\",\"" + col.price + "\",\"" + col.currencyid + "\",\"" + col.inunit + "\",\"" + col.unitid + "\")' style='width: 30px; height: 30px; ' name='selectitem' /></th>";
+                            repeatedItem += "       <td>" + col.itemname + "</td>";
+                            repeatedItem += "       <td>" + parseFloat(Math.floor(col.quantity / col.inunit)).toFixed() + "</td>";
+                            repeatedItem += "       <td>" + parseFloat(Math.floor(col.quantity % col.inunit)).toFixed() + "</td>";
+                            repeatedItem += "       <td>" + parseFloat(col.price).toFixed(2) + "</td>";
+                            repeatedItem += "       <td>" + col.currency + "</td>";
+                            repeatedItem += "       <td>" + parseFloat(parseFloat(col.price) * parseFloat(col.quantity)).toFixed(2) + "</td>";
+                            repeatedItem += "   </tr>";
+                        });
+                        $("#selectitem").html('').html(repeatedItem);
+                        $("#hide1").addClass("d-none");
+                        $("#repeatedItemList").removeClass("d-none");
+                    }
+                }
+            })
+        }
+    }
+
+    function selectedItem(stockItemId, qty, price, currencyid,inunit,unitid) {
+        $("#btnSubmitItemBill").removeClass("d-none");
+
+        $("#stockItemId").val(stockItemId);
+        $("#Price").val(parseFloat(price).toFixed(3));
+        $("#fromCurrency").val(currencyid);
+        $("#ExistQty").val(qty * inunit);
+
+        $("#purchasepriceforcur").val(parseFloat(price).toFixed(2))
+        $("#inUnit").val(inunit)
+
+        $("#unit").val(unitid)
+        $("#UnitId").val(unitid)
+
+       
+
+        $("#itemInStock").val(Math.floor(qty / inunit) + " عمده "  + Math.floor(qty % inunit) + " پرچون");
+
+        $("#hide1").removeClass("d-none");
+        $("#repeatedItemList").addClass("d-none");
+
+
+        exchangeCurrency();
+    }
+
+    $("#SalePrice").keyup(function () {
+        $("#PPrice").val($("#SalePrice").val())
+    })
+
+    $("#Qty").keyup(function () {
+
+        if ($("#ExistQty").val() < ($("#Qty").val() * $("#inUnit").val())) {
+            toast("جنس وزن مو زیات لیکئ", 'warning');
+            $("#btnSubmitItemBill").addClass("d-none")
+        } else {
+            $("#btnSubmitItemBill").removeClass("d-none")
+        }
+    })
+
+    var count = 0;
+    var rowId = 0;
+
+    let row = 1;
+    function AddItemsToBill() {
+
+        var currencyId = 0;
+        var itemId = 0;
+
+        if ($("#PrintBillBody").children().length > 0) {
+
+            $("#btnr").removeClass("d-none")
+
+            currencyId = $("#PrintBillBody>tr").find('td').eq(11).text();
+
+            if (currencyId != $("#CurrencyId :selected").val()) {
+                toast("د بیل پولې واحد مختلف دی", 'warning');
+
+            }
+            else {
+                GenerateBill();
+            }
+        } else {
+            GenerateBill();
+        }
+
+    }
+
+    function GenerateBill() {
+
+        $("#billtable").removeClass("d-none");
+        $("#btnr").removeClass("d-none")
+
+        $("#CustomerId").attr({ "disabled": "disabled" });
+        $("#Company").attr({ "disabled": "disabled" });
+        $("#Loading").attr({ "disabled": "disabled" });
+        $("#CurrencyId").attr({ "disabled": "disabled" });
+        $("#StockId").attr({ "disabled": "disabled" });
+
+        var discount = ($("#SalePrice").val() * $("#Qty").val() * $("#Discount").val()) / 100
+
+        var total = ($("#SalePrice").val() * $("#Qty").val()) - discount;
+
+        var afdiscount = ($("#sPrice").val() * $("#Qty").val() * $("#Discount").val()) / 100
+
+        var aftotal = ($("#sPrice").val() * $("#Qty").val()) - afdiscount;
+
+        var saleditem = "";
+
+        saleditem += "  <tr  id='" + row + "'>";
+        saleditem += "     <td >" + row + "</td>";
+        saleditem += "     <td class='item'><label>" + $("#ItemId :selected").text().split(" - ")[0] + "</label></td>";
+        saleditem += "     <td class='item'><label>" + $("#UnitId :selected").text() + "</label></td>";
+        saleditem += "     <td><label>" + parseFloat($("#Qty").val() ).toFixed(2) +" <label</td>";
+        saleditem += "     <td><label>" + parseFloat($("#SalePrice").val()).toFixed(3) + "<label</td>";
+        saleditem += "     <td><label>" + parseFloat(discount).toFixed(3) + "<label</td>";
+        saleditem += "     <td style='cursor: pointer;' title='حذف کول' onclick='removeItemFromList(this)'>" + parseFloat(total).toFixed(3) + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#ItemId").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#Type").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#Price").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#SalePrice").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#Qty").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#UnitId").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + discount + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#stockItemId").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#ItemId :selected").text().split(" - ")[1] + "</td>";
+        saleditem += "     <td style='display:none'>" + aftotal + "</td>";
+        saleditem += " </tr>";
+
+        row++;
+        $("#PrintBillBody").append(saleditem);
+        updateTotalPrice();
+
+        $("#Price").val('');
+        $("#SalePrice").val('');
+        $("#sPrice").val('');
+        $("#ItemId").val('');
+        $("#Qty").val('');
+        $("#Type").val('عمده');
+
+    }
+
+    function fnSubmitItems() {
+
+        let data = []
+        let items = {}
+        let alltotal = 0.0;
+
+        let length = $("#PrintBillBody").children().length;
+
+        let i = 0;
+
+        $("#PrintBillBody>tr").each(function (i, col) {
+
+            items = {
+                itemid: parseInt($(this).find('td').eq(7).text()),
+                type: ($(this).find('td').eq(8).text()),
+                purprice: parseFloat($(this).find('td').eq(9).text()),
+                saleprice: parseFloat($(this).find('td').eq(10).text()),
+                qty: parseFloat($(this).find('td').eq(11).text()),
+                unitid: parseInt($(this).find('td').eq(12).text()),
+                discount: parseFloat($(this).find('td').eq(13).text()),
+                stockItemId: ($(this).find('td').eq(14).text()),
+            };
+            alltotal += parseFloat($(this).find('td').eq(6).text());
+            data.push(items)
+
+            i++;
+            if (i == length) return false;
+
+        })
+
+        var CustomerInfo = {
+            serial: $("#BillNo").val(),
+            customerid : $("#CustomerId").val(),
+            stockid: $("#StockId").val(),
+            loading: parseFloat( $("#Loading").val()),
+            prev: parseFloat($(".previousBalance").text()),
+            paid: parseFloat($("#afghaniPay").val()),
+            currencyid: $("#CurrencyId").val(),
+            total: parseFloat($(".afghaniTotal").text()),
+            desc: $("#details").val(),
+        }
+
+        if (alltotal < 0) {
+            toast("بیل خالی دی", 'warning');
+        } else {
+            $.ajax({
+                url: "/Sale/AddSaledItems/?data=" + JSON.stringify(data) + "&customerInfo=" + JSON.stringify(CustomerInfo) + "",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    fnSuccessSale(result);
+                },
+                error: function (err) {
+                    toast("اشتباه" + err, 'error');
+                }
+            })
+        }
+    }
+
+    function fnSuccessSale(result) {
+        if (result == "success") {
+            $(".afghaniTotal").text("0");
+            $(".remain").text("0");
+            $(".totalPrice").text("0");
+            $("#afghaniPay").val("");
+            $("#sPrice").val("");
+            $("#grandTotalAll").val("");
+            $("#PrintBillBody").empty();
+            $("#billtable").addClass("d-none");
+            $("#ItemId").val("").trigger("change");
+            $("#btnResetItem").trigger("click");
+
+            toast("اجناس خرڅ شول", 'success');
+
+            $("#CustomerId").removeAttr("disabled").val("").trigger("change");
+            $("#CurrencyId").removeAttr("disabled");
+            $("#StockId").removeAttr("disabled");
+            $("#Loading").removeAttr("disabled");
+            $("#btnr").addClass("d-none")
+
+            FetchSerialNumber();
+            allSaledItems();
+            allItems();
+        }
+    }
+
+    function updateTotalPrice() {
+        let subtotal = 0.0;
+        var aftous = parseFloat(localStorage.getItem("aftous"));
+        let loading = parseFloat($("#Loading").val())
+        let afTotal = loading * aftous;
+
+        var length = $("#PrintBillBody").children().length;
+
+        var i = 0;
+        $("#PrintBillBody>tr").each(function (i, col) {
+
+            subtotal += parseFloat($(this).find('td').eq(6).text());
+            afTotal += parseFloat($(this).find('td').eq(16).text());
+            i++;
+            if (i == length) return false;
+        })
+
+        $(".afghaniTotal").text(parseFloat(subtotal).toFixed(3))
+        $("#totalAf").text(parseFloat(afTotal).toFixed(3))
+        GrandTotal();
+    }
+
+    function removeItemFromList(rowNumber) {
+        $(rowNumber).closest('tr').remove();
+        if ($("#PrintBillBody").children().length < 1) {
+
+            $("#billtable").addClass("d-none");
+
+            $("#CustomerId").removeAttr("disabled");
+            $("#CurrencyId").removeAttr("disabled");
+            $("#StockId").removeAttr("disabled");
+            $("#btnr").addClass("d-none")
+            row = 1;
+        }
+        updateTotalPrice();
+        $("#afghaniPay").val('')
+    }
+
+    var rownum = 1;
+    function GrandTotal() {
+
+        var totalBill = parseFloat($(".afghaniTotal").text());
+
+        var loading = parseFloat($("#Loading").val());
+
+        var previuss = parseFloat($(".previousBalance").text());
+
+        var Gtotal =parseFloat(totalBill) + parseFloat(loading) + parseFloat(previuss);
+
+        $("#grandTotalAll").text(parseFloat(Gtotal).toFixed(3));
+        $("#bellowLoading").text(loading);
+
+        var remain = parseFloat(Gtotal) - parseFloat($("#afghaniPay").val());
+        $(".remain").text(parseFloat(remain).toFixed(3));
+    }
+
+</script>
+

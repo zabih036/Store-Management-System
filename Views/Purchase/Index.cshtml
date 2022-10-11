@@ -1,0 +1,34 @@
+﻿
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#purchaseStockItemActive").addClass("active")</script>
+
+<div class="card">
+    <div class="col-md-12 px-2 pt-1">
+        <h2 class="text-center alert bg-yellow bg-darken-2 box-shadow-1" style="background-color:#ffffff;">د اجناسو اخستلو فارم</h2>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <ul class="nav nav-tabs nav-top-border no-hover-bg">
+                <li class="nav-item">
+                    <a class="nav-link active" id="baseIcon-tab11" data-toggle="tab" aria-controls="tabIcon11" href="#tabIcon11" aria-expanded="true"><i class="fa fa-shopping-cart"></i> اجناسو اخستلو فارم </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " id="baseIcon-tab12" data-toggle="tab" aria-controls="tabIcon12" href="#tabIcon12" aria-expanded="false"><i class="fa fa-list"></i> اخستل شوی اجناس</a>
+                </li>
+            </ul>
+            <div class="tab-content pt-1">
+                <div role="tabpanel" class="tab-pane active" id="tabIcon11" aria-expanded="true" aria-labelledby="baseIcon-tab11">
+                    @await Html.PartialAsync("~/views/Purchase/_PurchasePartial.cshtml")
+                </div>
+                <div class="tab-pane" id="tabIcon12" aria-labelledby="baseIcon-tab12">
+                    @await Html.PartialAsync("~/views/Purchase/_StockItemPurchasedPartial.cshtml")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

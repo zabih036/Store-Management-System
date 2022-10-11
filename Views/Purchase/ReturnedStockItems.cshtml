@@ -1,0 +1,112 @@
+﻿
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#StockItemReturned").addClass("active")</script>
+
+
+<div class="card" id="purchaseList">
+    <div class="card-header ">
+        <h2 class="text-center  alert bg-primary box-shadow-1">د اخیستل شویو اجناسو د واپسیو لېست</h2>
+    </div>
+    <table class="table table-responsive-md table-bordered dataex-fixh-basic dataTable" id="tblList">
+        <thead>
+            <tr role="row">
+                <th>بیل نمبر</th>
+                <th>کهاتدار</th>
+                <th>جنس</th>
+                <th>واحد</th>
+                <th>واحد ظرفیت</th>
+                <th>اخستلو قیمت</th>
+                <th>مصرف</th>
+                <th> عمده تعداد</th>
+                <th> پرچون تعداد</th>
+                <th>مجموعه</th>
+                <th>پیسو ډول</th>
+                <th>د واپسی نیټه</th>
+                <th>تفصیل</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+
+    </table>
+</div>
+
+
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        $(document).ready(function () {
+            PurchasedReturned();
+        })
+        function PurchasedReturned() {
+
+            $.ajax({
+                url: '/Purchase/FetchPurchaseReturned/',
+                type: 'POST',
+                contentType: "application/json",
+                data: '{}',
+                datatype: "JSON",
+                success: function (result) {
+
+                    var tr = "";
+                    $.each(result, function (i, col) {
+
+                        var qty = col.quantity + (col.quantity2 / col.inUnit);
+
+                        tr += "  <tr> ";
+                        tr += "      <td>" + col.billno + "</td> ";
+                        tr += "      <td>" + col.dealer + "</td> ";
+                        tr += "      <td>" + col.item + "</td> ";
+                        tr += "      <td>" + col.unit + "</td> ";
+                        tr += "      <td>" + col.inUnit + "</td> ";
+                        tr += "      <td>" + parseFloat(col.price).toFixed(3) + "</td> ";
+                        tr += "      <td>" + parseFloat(col.expense).toFixed(3) + "</td> ";
+                        tr += "      <td>" + parseFloat(col.quantity).toFixed(2) + "</td> ";
+                        tr += "      <td>" + parseFloat(col.quantity2).toFixed(2) + "</td> ";
+                        tr += "      <td>" + parseFloat(qty *  (col.price + col.expense)).toFixed(2) + "</td> ";
+                        tr += "      <td>" + col.currency + "</td> ";
+                        tr += "      <td>" + col.returndate + "</td> ";
+                        tr += "      <td>" + col.desc + "</td> ";
+                        tr += "  </tr>";
+                    });
+                    $("#tblList>tbody").html("").html(tr);
+
+                    $("#tblList").DataTable({
+                        stateSave: true,
+                        dom: 'Blfrtip', buttons: ['print','excel' , 'copy'],
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+                    });
+                    $(".buttons-print").text("").html("<i class='ft-printer'></i>");
+                    $(".buttons-copy").text("").html("<i class='ft-copy'></i>");
+                    $(".buttons-excel").text("").html("<i class='fa fa-file-excel-o'></i>");
+                    $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            })
+        }
+
+    </script>
+
+}
+

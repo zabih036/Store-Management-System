@@ -1,0 +1,290 @@
+﻿
+@model AllViewModel
+
+@{
+    ViewData["Title"] = "Student Registration Form";
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#teacherAttendance").addClass("active")</script>
+
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorize
+
+@if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+
+    @await Html.PartialAsync("AccessDeniedPartial")
+
+
+    ViewBag.view = "d-none";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+
+@if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    //  ViewBag.Delete = "";
+}
+
+<div class=" row">
+
+</div>
+
+<div id="div1" class="container-fluid card  @ViewBag.view">
+
+    <div class="card col-md-12 ">
+        <div class="card-header row ">
+            <div class="col-md-9">
+                <h2 class="text-center alert bg-yellow bg-darken-2 box-shadow-1" style="background-color:#ffffff;">
+                    Teacher's Attendance Form
+                </h2>
+            </div>
+        </div>
+
+        <section id="divInput" style="">
+            @Html.AntiForgeryToken()
+        </section>
+    </div>
+    <div id="div2" class="card col-md-12">
+        <div class="card-header ">
+            <h4 class="card-title "><strong>Show Attendance Record </strong></h4>
+            <hr />
+        </div>
+        <div class="card-body">
+            <div id="divAllAttendance">
+                <div class="col-md-12 row">
+                    <div class="form-group col-md-4">
+                        <label class="">Year</label>
+                        <select id="dropdownYear" style="height:45px;" class="form-control">
+                            <option value="0">Select Year</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                            <option value="2031">2031</option>
+                            <option value="2032">2032</option>
+                            <option value="2033">2033</option>
+                            <option value="2034">2034</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label class="">Month</label>
+                        <select id="dropdownMonth" style="height:45px;" class="form-control">
+                            <option value="0">Select Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">Decenber</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2" style="margin-top:30px;">
+
+                        <input type="submit" class="btn btn-success" onclick="loadAllAttendance()" value="Submit" />
+                    </div>
+
+                </div>
+                <table class="table table-responsive table-striped table-condensed table-bordered dataTables_scrollHead " id="tblAllAttendance">
+                    <thead class="scrollable-container ps--scrolling-x">
+                        <tr role="row">
+                            <th style="max-width:20px;">#</th>
+                            <th class="">Image</th>
+                            <th class="">Student</th>
+                            <th class="">F/Name</th>
+                            <th class="">Total Attendance</th>
+                            <th class="">Attended</th>
+                            <th class="">Absent</th>
+                            <th class="">Leave</th>
+                            <th class="">Attended %</th>
+                            <th class="">Absent %</th>
+                            <th class="">Leave %</th>
+                            <th class="">Detile</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <br /><br />
+            <div class="d-none" id="div3">
+                <div class="text-center alert alert-info">
+                    <p style="font-size:xx-large" id="lblStudent" class="text-capitalize font-italic"></p>
+                </div>
+                <div class="col-md-6 offset-3">
+                    <table class="table table-responsive table-striped table-bordered" id="tblSingleAttendance">
+                        <thead class="">
+                            <tr>
+                                <th>#</th>
+                                <th class="col-md-5">Attendance Date</th>
+                                <th class="col-md-5">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+<input type="hidden" name="name" id="rowValue" value="" />
+
+@* ///////////////////////////// Fetching all teachers Attendance  /////////////// *@
+<form data-ajax="true" asp-action="loadLoginedTeacherAttendance" data-ajax-method="post" asp-controller="TeacherAttendance" data-ajax-success="fnSuccessLoadAllAttendance(data)">
+    <input hidden id="hiddenYearInput" name="Year" />
+    <input hidden id="hiddenMonthInput" name="Month" />
+    <button type="submit" class="d-none" id="btnSubmitYearAndMonth"></button>
+</form>>
+@* /////////////////////////////  Fetching Selected student attendance in detile ////// *@
+<form data-ajax="true" asp-action="attendanceOfSelectedTeacher" data-ajax-method="post" asp-controller="TeacherAttendance" data-ajax-success="fetchDetiledAttendance(data)">
+    <input hidden id="studentIdForAttendance" name="studentIdForAttendance" />
+    <input hidden id="yearForDetaile" name="yearForDetaile" />
+    <input hidden id="monthForDetaile" name="monthForDetaile" />
+    <button type="submit" class="d-none" id="btnFetchDetiledAttendance"></button>
+</form>
+<input hidden id="stdId" />
+<input hidden id="inputAttendance" value="Attendance" />
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+            var show = true;
+            $(document).ready(function () {
+                loadTeacher();
+                //   $("#frmEmployee")[0].reset();
+                //$("#browseImg").attr("src", "/images/StaticImages/browse.png");
+                //$("#divSuccess").delay(6000).fadeOut();
+            })
+    </script>
+    @* ////////////////////  My script //////// *@
+    <script>
+
+     function loadAllAttendance() {
+
+                $("#hiddenYearInput").val($("#dropdownYear").val());
+                $("#hiddenMonthInput").val($("#dropdownMonth").val());
+                $("#btnSubmitYearAndMonth").trigger("click");
+
+    }
+    function fnSuccessLoadAllAttendance(data) {
+            var tr = "";
+            var attendedPercentage = 0.0;
+            var absentPercentage = 0.0;
+            var leavePercentage = 0.0;
+        $.each(data, function (i, col) {
+            if (col.totalAttended != 0) {
+                attendedPercentage = (100 * col.totalAttended) / col.totalCredit;
+                leavePercentage = (100 * col.totalLeave) / col.totalCredit;
+                absentPercentage = (100 * col.totalAbsent) / col.totalCredit;
+            }
+
+                tr += '<tr  role="row">' +
+                    '<td>' + (i + 1) + '</td>' +
+                    ' <td><img src=' + col.image + ' height="100" width="100"></td>' +
+                    '<td>' + col.name + '</td>' +
+                    '<td>' + col.fName + '</td>' +
+                    '<td>' + col.totalCredit + '</td>' +
+                    '<td>' + col.totalAttended + '</td>' +
+                    '<td>' + col.totalAbsent + '</td>' +
+                    '<td>' + col.totalLeave + '</td>' +
+                    '<td>' + attendedPercentage.toFixed(2) + '%</td>' +
+                    '<td>' + absentPercentage.toFixed(2) + '%</td>' +
+                    '<td> ' + leavePercentage.toFixed(2) + '% </td>' +
+                    '<td> <button class="btn btn-info" onClick="fetchSelectedTeacherAttendance(' + col.studentId + ',\'' + col.name + '\',\'' + col.year + '\',\'' + col.month + '\')"><i class="fa fa-info"></i></button> </td>' +
+                    '</tr>';
+            })
+            var table = $("#tblAllAttendance").dataTable();
+            table.fnDestroy();
+            $("#tblAllAttendance>tbody").html("").html(tr);
+            $("#tblAllAttendance").DataTable({
+                "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "All"]],
+                stateSave: true
+            });
+    }
+    function fetchSelectedTeacherAttendance(studentId, name, year, month) {
+
+        $("#studentIdForAttendance").val(studentId);
+        $("#yearForDetaile").val(year);
+        $("#monthForDetaile").val(month);
+        $("#btnFetchDetiledAttendance").trigger("click");
+        $("#lblStudent").text(name + " Attendance Detile" + ", Month_" + month + ",Year_" + year);
+        //alert("fetch");
+
+
+    }
+
+
+     function fetchDetiledAttendance(data) {
+            $("#div3").removeClass("d-none");
+              var row = "";
+         //   console.log(data);
+           $.each(data, function (i, col) {
+               row += '<tr  role="row">' +
+                         '<td class="">' + (i + 1) + '</td>' +
+                         '<td class="col-md-5">' + col.date + '</td>' +
+                         '<td class="col-md-5">' + col.status + '</td>' +
+                       '</tr>';
+           })
+           var table = $("#tblSingleAttendance").dataTable();
+            table.fnDestroy();
+
+            $("#tblSingleAttendance>tbody").html("").html(row);
+
+           $("#tblSingleAttendance").DataTable({
+                     "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "All"]],
+                     stateSave: true
+           });
+       }
+    </script>
+
+}

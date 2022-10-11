@@ -1,0 +1,181 @@
+﻿
+@model NoteViewModel
+
+<div class="row">
+    <div class="col-md-12 ">
+        <h2 class="text-center alert bg-info box-shadow-1">د یاد داښتونو فورم</h2>
+
+        <hr />
+    </div>
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-body card-dashboard">
+                <section>
+                    @Html.AntiForgeryToken()
+
+                    <br />  <br />  <br />
+                    <br />  <br />
+                    <form data-ajax="true" asp-controller="Employee" asp-action="AddNote"  data-ajax-success="frmSuccess(data)" data-ajax-method="post" id="frmnotes">
+                        <hr />
+                        <input hidden asp-for="NoteId" class="form-control" value="0" />
+                        <div class="form-group">
+
+                            <label asp-for="Note" class=""></label>
+                            <textarea asp-for="Note" dir="rtl" placeholder="خپل نوټ ولیکئ!!!" class="form-control"></textarea>
+                            <span asp-validation-for="Note" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="TargetDate" class=""></label>
+                            <input asp-for="TargetDate" asp-format="0:yyyy-MM-dd" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="TargetDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="RemindDate" class=""></label>
+                            <input asp-for="RemindDate" asp-format="0:yyyy-MM-dd" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="RemindDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <button type="reset" id="btnreset" class="btn btn-warning btn-icon-md">پاکول</button>
+                            <button type="submit" id="btnsubmit" class="btn btn-primary btn-icon-md">راجستر</button>
+
+                        </div>
+
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7 " style="margin:0px;">
+        <div class="card">
+            <div class="card-header ">
+                <h4 class="card-title "><strong>د نوټونو لېست</strong></h4>
+            </div>
+            <div class="card-content  collapse show">
+                <div class="card-body dt-ext table-responsive">
+                    <table class="table   table-bordered dataex-fixh-basic dataTable" id="tbl">
+                        <thead class="">
+                            <tr role="row">
+                                <th class="col-md-3">نوټ</th>
+                                <th class="col-md-3"> د نوټ نیټه</th>
+                                <th class="col-md-3">  د یادولو نیټه</th>
+                                @*<th class="col-md-2">  پته</th>*@
+                                <th class="col-md-3">  تغیرول</th>
+                                <th class="col-md-3">  حذف </th>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        LoadNotes();
+    })
+    var show = true;
+    function LoadNotes() {
+        $.ajax({
+            url: '/Employee/FetchNotes/',
+            type: 'GET',
+            contentType: "application/json",
+            data: '{}',
+            datatype: "JSON",
+            success: function (customers) {
+                var Cus = "";
+                $.each(customers, function (i, col) {
+                    Cus += ' <tr>';
+                    Cus += '      <td class="col-md-3"> ' + col.note + ' </td>';
+                    Cus += '     <td  class="col-md-3"> ' + col.targetdateShow + '</td>';
+                    Cus += '     <td  class="col-md-2">' + col.reminddateShow + '  </td>';
+                   // Cus += '     <td  class="col-md-2"> ' + col.address + ' </td>';
+                    Cus += '     <td  class="col-md-2"> <button class="btn btn-primary" onclick="passValue(' + col.noteid + ',\'' + col.note + '\',\'' + col.targetdate + '\',\'' + col.reminddate + '\')"><i class="ft-edit"></i></button></td>';
+                    Cus += "      <td><form data-ajax='true' data-ajax-url='/Employee/DeleteNote' data-ajax-success='RetunedItemSuccess(data)' data-ajax-method='post'> <input hidden name='NoteId' value='" + col.noteid + "' /> <button type='submit' class='btn btn-danger'><i class='ft-trash'></i></button></form></td> ";
+                 //   Cus += '     <td  class="col-md-2"> </td>';
+                    Cus += '      </tr>';
+                });
+
+                var table = $("#tbl").dataTable();
+                table.fnDestroy();
+
+                $("#tbl>tbody").html("").html(Cus);
+
+                    $("#tbl").DataTable({
+                   
+                        stateSave: true,
+                       
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+                    });
+          },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    function passValue(noteid, note, targetdate, reminddate)
+    {
+
+        $("#Note").val(note);
+        $("#NoteId").val(noteid);
+        $("#TargetDate").val(targetdate);
+        $("#RemindDate").val(reminddate);
+       // $("#Address").val(address);
+        $("#btnsubmit").text("تغیرول");
+    }
+    function frmSuccess(data) {
+        //$("#CustmerId").val(0);
+        //$("#Name").val("");
+        //$("#Phone").val("");
+        //$("#Email").val("");
+        //$("#Address").val("");
+        $("#btnsubmit").text("راجستر");
+      
+        toast(data, 'success');
+        //  $("#btnSubmit").text("ذخیره ");
+        $("#frmnotes")[0].reset();
+        LoadNotes();
+    }
+    function RetunedItemSuccess(data) {
+       
+        toast(data, 'warning');
+        $("#frmnotes")[0].reset();
+        LoadNotes();
+    }
+    function DeleteNote(noteid)
+    {
+            
+    }
+    $("#btnreset").click(function () {
+
+       
+        $("#btnsubmit").text("راجستر")
+
+    })
+
+</script>
+
+

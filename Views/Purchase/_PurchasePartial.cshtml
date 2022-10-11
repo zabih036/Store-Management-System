@@ -1,0 +1,416 @@
+﻿
+@model PurchaseViewModel
+
+<link href="~/css/style.css" rel="stylesheet" />
+
+<div class="modal-content">
+    <div class="modal-header bg-primary white">
+        <h4 class="modal-title" id="myModalLabel100">اجناسو ذخیره کول</h4>
+    </div>
+    <div class="modal-body">
+
+        <form data-ajax="true" asp-action="" asp-controller="Purchase" data-ajax-success="AddItemsToBill()" data-ajax-method="post" id="frmStockItem">
+            <div class="row px-2">
+
+                <input hidden asp-for="PurchaseId" value="0" />
+
+
+                <div class="form-group col-md-2">
+                    <label class="">بیل نمبر:</label>
+                    <input asp-for="BillNo" class="form-control" />
+                    <span asp-validation-for="BillNo" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label class="">کهاتدار:</label><br />
+                    <select asp-for="DealerId" asp-items="@ViewBag.dealers" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                        <option value="">انتخاب کړئ</option>
+                    </select>
+                    <span asp-validation-for="DealerId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">پولی واحد:</label>
+                    <select asp-for="CurrencyId" onchange="exchangeCurrency()" class="form-control">
+                        <option value=""> انتخاب کړئ </option>
+                        <option value="1">افغانۍ</option>
+                        <option value="2">کلدارې</option>
+                        <option value="3">ډالر</option>
+                    </select>
+                    <span asp-validation-for="CurrencyId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">بیل مصرف:</label>
+                    <input asp-for="BillExpense" value="0" class="form-control" />
+                    <span asp-validation-for="BillExpense" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label class="">جنس:</label>
+                    <select asp-for="ItemId" onchange="FetchItemInfo()" asp-items="@ViewBag.items" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                        <option value="">انتخاب کړئ</option>
+                    </select>
+                    <span asp-validation-for="ItemId" class="text-danger"></span>
+                </div>
+
+            </div>
+            <div class="row px-2">
+
+                <div class="form-group col-md-2">
+                    <label class="">واحد:</label>
+                    <select asp-for="UnitId" asp-items="@ViewBag.units" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                        <option value="">انتخاب کړئ</option>
+                    </select>
+                    <span asp-validation-for="UnitId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">واحد ظرفیت:</label>
+                    <input asp-for="InUnit" class="form-control " />
+                    <span asp-validation-for="InUnit" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">عمده تعداد:</label>
+                    <input asp-for="Qty" class="form-control " />
+                    <span asp-validation-for="Qty" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">پرچون تعداد:</label>
+                    <input asp-for="Qty2" value="0" class="form-control " />
+                    <span asp-validation-for="Qty2" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">قیمت:</label>
+                    <input asp-for="Price" onchange="exchangeCurrency()" class="form-control " />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">ګودام:</label>
+                    <select asp-for="StockId" asp-items="@ViewBag.stock" class="form-control">
+                    </select>
+                    <span asp-validation-for="StockId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">کمبودی تعداد:</label>
+                    <input asp-for="ShortageQty" class="form-control" value="0" />
+                    <span asp-validation-for="ShortageQty" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-1" style="display:flex;align-items:flex-end">
+                    <button type="submit" id="btnSubmitItem" class="btn btn-primary btn-icon-sm">اضافه کول</button>
+                    &nbsp;&nbsp;
+                    <button type="reset" id="btnResetItem" class="btn btn-warning btn-icon-sm">پاکول</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="col-md-12 d-none justify-content-center" id="billtable">
+            <table class="table  table-active table-bordered" id="tblsaleitems">
+                <thead class="col-md-12 " style="background-color:deepskyblue;">
+                    <tr role="row">
+                        <th>بیل</th>
+                        <th>جنس</th>
+                        <th>واحد</th>
+                        <th>واحد ظرفیت</th>
+                        <th>قیمت</th>
+                        <th>پولې واحد</th>
+                        <th>عمده تعداد  </th>
+                        <th>پرچون تعداد  </th>
+                        <th>مجموعه </th>
+                        <th>حذف</th>
+                    </tr>
+                </thead>
+
+                <tbody id="currentselling"></tbody>
+
+            </table>
+            <hr />
+            <div class="col-md-12 row align-baseline justify-content-center">
+                <div class="form-group col-md-1">
+                    <button id="btnPrints" style="height:52px;" onclick="fnSubmitItems()" class="hidden-print btn btn-primary">ذخیره <i class="ft-save"></i></button>
+                </div>
+
+                <div class="alert bg-primary alert-dismissible mb-1 col-md-2" role="alert" style="max-width:300px;">
+                    <strong>باقې :</strong> <strong class="text-lg-center" id="remain">0</strong>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <input id="details" style="height: 53px !important;" dir="auto" placeholder="کهاتې تفصیل" class="form-control" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <input id="payment" onkeyup="Remain()" style="height: 53px !important;" dir="auto" placeholder="" class="form-control" />
+                </div>
+
+                <div class="alert bg-primary alert-dismissible mb-1 col-md-4" role="alert" style="max-width:300px;">
+                    <strong>ټوټل بیل :</strong> <strong class="text-lg-center" id="afghaniTotal">0</strong>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        $("#ItemId").select2();
+        $("#DealerId").select2();
+        FetchSerialNumber();
+    })
+
+    function FetchItemInfo() {
+        if ($("#ItemId").val() != 0) {
+            $.ajax({
+                url: "/Purchase/FetchItemInfo/?itemid=" + $("#ItemId :selected").val() + "",
+                type: "GET",
+                datatype: "JSON",
+                success: function (result) {
+
+                    if (result.length != 0) {
+
+                        $.each(result, function (i, col) {
+
+                            $("#CurrencyId").val(col.currencyid);
+
+                            $("#UnitId").val(col.unitid);
+
+                            $("#InUnit").val(col.inunit);
+
+                            $("#Price").val(parseFloat(col.price).toFixed(3));
+
+                        });
+
+                    } else {
+                        toast("جنس پخوانی ریکارډ نشته", 'warning');
+
+                        //$("#CurrencyId").val('');
+
+                        $("#UnitId").val('');
+
+                        $("#InUnit").val('');
+
+                        $("#Price").val('');
+                    }
+
+                }
+            })
+        }
+    }
+
+    function Remain() {
+        var total = parseFloat($("#afghaniTotal").text())
+        var paid = parseFloat($("#payment").val())
+
+        if (paid < 0) {
+            $("#btnPrints").addClass("d-none");
+            toast("تادیه باید صفر نه کم نه وی", "warning")
+        } else {
+            $("#btnPrints").removeClass("d-none");
+        }
+
+        $("#remain").text(parseFloat(total - paid).toFixed(2))
+    }
+
+    function FetchSerialNumber() {
+        $.ajax({
+            url: '/Purchase/FetchSerialNumber/',
+            type: 'POST',
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+
+                $("#BillNo").val(result.serialNumber)
+
+            }
+        })
+    }
+
+    function exchangeCurrency() {
+
+        var toCurrency = 3; /*$("#CurrencyId2").val();*/
+
+        var fromCurrency = $("#CurrencyId").val();
+
+        var price = $("#Price").val();
+
+
+        var aftous = parseFloat(localStorage.getItem("aftous"));
+        var aftopk = parseFloat(localStorage.getItem("aftopk"));
+        var ustopk = parseFloat(localStorage.getItem("ustopk"));
+
+
+        if (fromCurrency == 1) {
+
+            var total = parseFloat(price / aftous).toFixed(3);
+            $("#StockPrice").val(total)
+            $("#StockPrice2").val(total)
+
+        } else if (fromCurrency == 2) {
+
+            var total = parseFloat(price / ustopk).toFixed(3);
+            $("#StockPrice").val(total)
+            $("#StockPrice2").val(total)
+
+        } else if (fromCurrency == 3) {
+
+            var total = parseFloat(price).toFixed(3);
+            $("#StockPrice").val(total)
+            $("#StockPrice2").val(total)
+        }
+
+    }
+
+    var count = 0;
+    var rowId = 0;
+    let row = 1;
+
+    function AddItemsToBill() {
+        $("#billtable").removeClass("d-none");
+
+        $("#BillNo").attr({ "disabled": "disabled" });
+        $("#DealerId").attr({ "disabled": "disabled" });
+        $("#CurrencyId").attr({ "disabled": "disabled" });
+        $("#BillExpense").attr({ "disabled": "disabled" });
+
+        var parchon = parseFloat($("#Qty").val()) * parseInt($("#InUnit").val());
+
+        var totalQty = parseFloat($("#Qty2").val()) + parseFloat(parchon);
+
+        var price = parseFloat($("#Price").val()) / parseInt($("#InUnit").val());
+
+        var saleditem = "";
+
+        saleditem += "  <tr  id='" + row + "'>";
+        saleditem += "     <td class='item'><label>" + $("#BillNo").val() + "</label></td>";
+        saleditem += "     <td class='item'><label>" + $("#ItemId :selected").text() + "</label></td>";
+        saleditem += "     <td class='item'><label>" + $("#UnitId :selected").text() + "</label></td>";
+        saleditem += "     <td><label>" + $("#InUnit").val() + "<label</td>";
+        saleditem += "     <td><label>" + parseFloat($("#Price").val()).toFixed(3) + "<label</td>";
+        saleditem += "     <td><label>" + $("#CurrencyId :selected").text() + "<label</td>";
+        saleditem += "     <td><label>" + $("#Qty").val() + "<label</td>";
+        saleditem += "     <td><label>" + $("#Qty2").val() + "<label</td>";
+        saleditem += "     <td><label>" + parseFloat(parseFloat(price) * parseFloat(totalQty)).toFixed(3) + "<label</td>";
+        saleditem += "     <td><button type='button' class='btn btn-danger btnRad' onclick='removeItemFromList(this)' ><i class='fa fa-trash'></i></button></td>";
+        saleditem += "     <td style='display:none'>" + $("#BillNo").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#DealerId").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#CurrencyId").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#ItemId").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#UnitId").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#InUnit").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#Qty").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#Qty2").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#Price").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#ShortageQty").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#StockId").val() + "</td>";
+        saleditem += "     <td style='display:none'>" + $("#BillExpense").val() + "</td>";
+        saleditem += " </tr>";
+
+        row++;
+        $("#currentselling").append(saleditem);
+        updateTotalPrice();
+
+        $("#ItemId").val('').trigger("change");
+        $("#UnitId").val('')
+        $("#InUnit").val('')
+        $("#Qty").val('')
+        $("#Qty2").val(0)
+        $("#Price").val('')
+    }
+
+    function fnSubmitItems() {
+
+        let data = []
+        let items = {}
+        let alltotal = 0.0;
+        $("#currentselling>tr").each(function (i, col) {
+            items = {
+                bill: ($(this).find('td').eq(10).text()),
+                dealerId: parseInt($(this).find('td').eq(11).text()),
+                currencyId: parseInt($(this).find('td').eq(12).text()),
+                itemId: parseInt($(this).find('td').eq(13).text()),
+                unitId: parseInt($(this).find('td').eq(14).text()),
+                inUnit: parseInt($(this).find('td').eq(15).text()),
+                qty: parseFloat($(this).find('td').eq(16).text()),
+                qty2: parseFloat($(this).find('td').eq(17).text()),
+                price: parseFloat($(this).find('td').eq(18).text()),
+                shortage: parseInt($(this).find('td').eq(19).text()),
+                stockId: parseInt($(this).find('td').eq(20).text()),
+                expense: parseInt($(this).find('td').eq(21).text()),
+
+            };
+            alltotal += parseFloat($(this).find('td').eq(8).find('label').text());
+            data.push(items)
+        })
+
+        if (alltotal < 0) {
+            toast("بیل باید خالی نه وي", 'success');
+
+        } else {
+            $.ajax({
+                url: "/Purchase/AddPurchasedItems/?data=" + JSON.stringify(data) + "&credit=" + alltotal + "&details=" + $("#details").val() + "&paid=" + $("#payment").val() + "",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    fnSuccessPurchase(result);
+                }
+            })
+        }
+    }
+
+    function fnSuccessPurchase(result) {
+        if (result == "success") {
+            $("#afghaniTotal").text("0");
+            $("#frmStockItem")[0].reset();
+            $("#currentselling").empty();
+            $("#billtable").addClass("d-none");
+            $("#btnResetItem").trigger("click");
+
+            toast("اجناس ګودام کې ذخیره شول", 'success');
+
+            $("#BillNo").removeAttr("disabled");
+            $("#DealerId").removeAttr("disabled");
+            $("#CurrencyId").removeAttr("disabled");
+            $("#BillExpense").removeAttr("disabled");
+
+            FetchSerialNumber();
+            AllPurchasedItems();
+
+            $("#ItemId").trigger("change");
+
+            $("#DealerId").trigger("change");
+        }
+    }
+
+    function updateTotalPrice() {
+        let subtotal = 0.0;
+        $("#currentselling>tr").each(function (i, col) {
+
+            subtotal += parseFloat($(this).find('td').eq(8).find('label').text());
+        })
+        $("#afghaniTotal").text(subtotal.toFixed(2))
+    }
+
+    function removeItemFromList(row) {
+        $(row).closest('tr').remove();
+        if ($("#currentselling").children().length < 1) {
+            $("#billtable").addClass("d-none");
+
+            $("#BillNo").removeAttr("disabled");
+            $("#DealerId").removeAttr("disabled");
+            $("#CurrencyId").removeAttr("disabled");
+
+        }
+        updateTotalPrice();
+        $("#afghaniPay").val('')
+    }
+
+</script>
+

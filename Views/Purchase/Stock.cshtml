@@ -1,0 +1,278 @@
+﻿@model UseItemsViewModel
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#stockPurchaseActiveMali").addClass("active")</script>
+
+<style>
+    .dt-buttons {
+        float: left;
+        height: 45px;
+    }
+
+    input[type='search'] {
+        height: 45px !important
+    }
+</style>
+<div class="card">
+    <div class="card-header ">
+        <h2 class="text-center alert bg-yellow bg-darken-2 box-shadow-1" style="background-color:#ffffff;">د موجودو اجناسو ګودام</h2>
+    </div>
+    <div class="card-content  collapse show">
+        <div class="card-body">
+
+            <table class="table   table-bordered dataex-fixh-basic dataTable" id="tblStock">
+                <thead>
+                    <tr role="row">
+                        <th>#</th>
+                        <th>انتقال</th>
+                        <th>جنس</th>
+                        <th>واحد</th>
+                        <th>د واحد ظرفیت</th>
+                        <th>عمده تعداد</th>
+                        <th>پرچون تعداد</th>
+                        <th>قیمت</th>
+                        <th>پیسو ډول</th>
+                        <th> ګودام</th>
+                        <th>عمومې مجموعه</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                        <th rowspan="1" colspan="1"></th>
+                    </tr>
+                </tfoot>
+                <tbody id="tblBody">
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<!-- move Item modal-->
+
+
+<div class="modal fade text-left" id="movetoanotherstock" tabindex="-1" role="dialog" aria-labelledby="myModalLabel10"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary white">
+                <h4 class="modal-title" id="myModalLabel100"> د اجناسو انتقال بل ګودام ته </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-ajax="true" asp-action="MoveToAnotherStock" asp-controller="Purchase" data-ajax-success="frmMoveSuccess(data)" data-ajax-method="post" id="frmmove">
+                    <input type="hidden" id="item2idstock" name="item2idstock" value="0" />
+                    <input type="hidden" id="oldstock" name="oldstock" value="0" />
+
+                    <div class="form-group col-md-12 ">
+                        <label class=""> تعداد:</label><br />
+                        <input id="quantitystock" name="quantitystock" required onkeyup="checkQuantity()" dir="rtl" placeholder="د جنس تعداد" class="form-control input-sm quantitystock" />
+                        <span class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-12">
+                        <label class=""> نوی ګودام انتخاب کړئ:</label>
+                        <select asp-items="@ViewBag.stock" id="newstock" onchange="checkStock()" name="newstock" style="height:40px;" class="form-control" dir="rtl">
+                            <option value="">نوی ګودام انتخاب کړئ</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer" style="justify-content:center">
+                        <button type="button" class="btn grey btn-outline-secondary" id="btnCloseReturn" data-dismiss="modal">بندول</button>
+                        <button type="submit" id="btnMove" class="btn btn-outline-primary">انتقال</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="name" class="quantitystock" id="qhidden" value="" />
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        $(document).ready(function () {
+            FetchStockItems();
+
+            var url = location.href;
+
+            if (url.search("Report") != -1) {
+
+                $("#stock").val("ټول").trigger("change");
+            }
+        })
+
+        function FetchStockItems() {
+
+            $.ajax({
+                url: '/Purchase/FetchStockItems/',
+                type: 'POST',
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+
+                    $.each(result, function (i, col) {
+
+                        var amountInAll = col.quantity / col.inUnit;
+                        var amountInParchon = col.quantity % col.inUnit;
+                        var totalPrice = amountInAll * col.price;
+
+                        if (amountInAll < 1) {
+                            amountInAll = 0;
+                            totalPrice = amountInParchon * col.price / col.inUnit;
+                        } else {
+
+                        }
+
+                        tr += "  <tr> ";
+                        tr += "      <td>" + (i + 1) + "</td> ";
+                        tr += "      <td><button type='button' class='btn btn-success' onclick='MoveToStock(" + col.stockitemid + ",\"" + amountInAll + "\",\"" +col.stockid + "\",\"" + col.amountinpackage + "\")' ><i class='ft-log-out'></i></button></td>";
+                        tr += "      <td>" + col.itemname + "</td> ";
+                        tr += "      <td>" + col.unit + "</td> ";
+                        tr += "      <td>" + col.inUnit + "</td> ";
+                        tr += "      <td>" + Math.floor(amountInAll) + "</td> ";
+                        tr += "      <td>" + Math.floor(amountInParchon) + "</td> ";
+                        tr += "      <td>" + parseFloat(col.price).toFixed(3) + "</td> ";
+                        tr += "      <td>" + col.currency + "</td> ";
+                        tr += "      <td>" + col.stock + "</td> ";
+                        tr += "      <td class='success'>" + parseFloat(totalPrice).toFixed(3) + "</td> ";
+                        tr += "  </tr>";
+                    });
+
+                    var table = $("#tblStock").dataTable();
+                    table.fnDestroy();
+
+                    $("#tblStock>tbody").html("").html(tr);
+
+                    $("#tblStock").DataTable({
+                        "footerCallback": function (row, data, start, end, display) {
+                            var api = this.api(),
+                                data;
+                            var intVal = function (i) {
+                                return typeof i === 'string' ?
+                                    i.replace(/[\$,]/g, '') * 1 :
+                                    typeof i === 'number' ?
+                                        i : 0
+                            };
+
+                            first = api
+                                .column(10, {
+                                    page: 'current'
+                                })
+                                .data()
+                                .reduce(function (a, b) {
+                                    return intVal(a) + intVal(b);
+                                }, 0);
+
+                            $(api.column(10).footer()).html(
+                                'ټوټل' + parseFloat(first).toFixed(2)
+                            );
+                        },
+                        stateSave: true,
+                        dom: 'Blfrtip',
+                        responsive: true,
+                        buttons: [
+                            {
+                                extend: 'print',
+                                //customize: function (win) {
+                                //    $(win.document.body).attr('padding', '30px');
+                                //},
+                                footer: true,
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+
+                            },
+                            { extend: 'excel', footer: true },
+                            { extend: 'copy', footer: true },
+                        ],
+                        "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                        "pageLength": 5,
+                        "language": {
+                            "emptyTable": "په جدول کې معلومات شتون نه لري",
+                            "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                            "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                            "infoPostFix": "",
+
+                            "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                            "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                            "searchPlaceholder": "پلټنه",
+                            "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                            "paginate": {
+                                "first": "لومړۍ پاڼه",
+                                "previous": "مخکې",
+                                "next": "وروسته",
+                                "last": "پای"
+                            },
+                        },
+                    });
+                    $(".buttons-print").text("").html("<i class='ft-printer'></i>");
+                    $(".buttons-copy").text("").html("<i class='ft-copy'></i>");
+                    $(".buttons-excel").text("").html("<i class='fa fa-file-excel-o'></i>");
+                    $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+
+                }
+            })
+        }
+
+        $("#Qty").keyup(function () {
+            if (parseFloat($("#stockQty").val()) < parseFloat($("#Qty").val())) {
+                $("#btnSubmits").addClass('d-none')
+                toast(" استعمال وزن / تعداد مو زیات رسولی", 'success');
+            } else {
+                $("#btnSubmits").removeClass('d-none')
+            }
+        })
+
+        function MoveToStock(item2id, quantity, oldstock, inpackage) {
+
+            $("#item2idstock").val(item2id);
+            $(".quantitystock").val(quantity);
+            $("#oldstock").val(oldstock);
+            $("#movetoanotherstock").modal("show");
+        }
+
+        $("#btnSubmitReturn").click(function () {
+            $("#btnSubmitReturn").attr("type", "submit");
+        })
+
+        function checkQuantity() {
+            var newq = parseFloat($("#quantitystock").val());
+            var old = parseFloat($("#qhidden").val());
+            if (newq > old) {
+                $("#btnMove").addClass("d-none");
+            } else {
+                $("#btnMove").removeClass("d-none");
+            }
+        }
+
+        function checkStock() {
+            if ($("#newstock").val() == $("#oldstock").val()) {
+                $("#btnMove").addClass("d-none");
+            } else {
+                $("#btnMove").removeClass("d-none");
+            }
+        }
+
+        function frmMoveSuccess(data) {
+            toastr.success(data, '', { "progressBar": true, positionClass: 'toast-top-left', containerId: 'toast-top-left' });
+            $("#movetoanotherstock").modal("hide");
+            $("#frmmove")[0].reset();
+            FetchStockItems();
+        }
+    </script>
+}

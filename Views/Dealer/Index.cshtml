@@ -1,0 +1,43 @@
+﻿
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#dealerRegisterActive").addClass("active")</script>
+
+<div class="card">
+    <div class="row">
+        <div class="col-md-12 pt-1">
+            <h2 class="text-center alert bg-yellow bg-darken-2 box-shadow-1" style="background-color:#ffffff;"> کهاتدار , مشتري , بانک یا صراف راجستر کولو فارم</h2>
+        </div>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <ul class="nav nav-tabs nav-top-border no-hover-bg">
+                <li class="nav-item">
+                    <a class="nav-link active" id="baseIcon-tab11" data-toggle="tab" aria-controls="tabIcon11" href="#tabIcon11" aria-expanded="true"><i class="fa fa-user"></i> کهاتدار</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " id="baseIcon-tab12" data-toggle="tab" aria-controls="tabIcon12" href="#tabIcon12" aria-expanded="false"><i class="fa fa-user"></i>مشترې</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " id="baseIcon-tab13" data-toggle="tab" aria-controls="tabIcon13" href="#tabIcon13" aria-expanded="false"><i class="fa fa-home"></i>بانک / صراف</a>
+                </li>
+            </ul>
+            <div class="tab-content pt-1">
+                <div role="tabpanel" class="tab-pane active" id="tabIcon11" aria-expanded="true" aria-labelledby="baseIcon-tab11">
+                    @await Html.PartialAsync("~/views/Dealer/_DealerPartial.cshtml")
+                </div>
+                <div class="tab-pane " id="tabIcon12" aria-labelledby="baseIcon-tab12">
+                    @await Html.PartialAsync("~/views/Dealer/_CustomerPartial.cshtml")
+                </div>
+                <div class="tab-pane " id="tabIcon13" aria-labelledby="baseIcon-tab13">
+                    @await Html.PartialAsync("~/views/Dealer/_BankPartial.cshtml")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

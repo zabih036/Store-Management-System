@@ -1,0 +1,244 @@
+﻿@model AllViewModel
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>$("#unitActive").addClass("active")</script>
+
+    @using Microsoft.AspNetCore.Authorization
+    @inject IAuthorizationService authorize
+
+    @if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+    {
+
+        @await Html.PartialAsync("AccessDeniedPartial")
+
+
+        ViewBag.View = "d-none";
+        ViewBag.Insert = "d-none";
+        ViewBag.Delete = "d-none";
+        ViewBag.Edit = "d-none";
+    }
+
+
+    @if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+    {
+        ViewBag.View = "";
+        ViewBag.Insert = "d-none";
+        ViewBag.Delete = "d-none";
+        ViewBag.Edit = "d-none";
+    }
+
+    @if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+    {
+        ViewBag.View = "";
+        ViewBag.Insert = "";
+        ViewBag.Delete = "d-none";
+        ViewBag.Edit = "d-none";
+
+    }
+
+    @if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+    {
+        ViewBag.View = "";
+        ViewBag.Insert = "";
+        ViewBag.Edit = "";
+        ViewBag.Delete = "d-none";
+    }
+
+    @if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+    {
+        ViewBag.View = "";
+        ViewBag.Insert = "";
+        ViewBag.Edit = "";
+        ViewBag.Delete = "";
+    }
+    <div class="card  col-md-6 offset-md-3 @ViewBag.View p-0 border-primary">
+        <h2 class="text-center alert bg-info box-shadow-1">د واحد اضافه کولو فارم</h2>
+        <div class="card-header ">
+            <h4 class="card-title "><strong>د واحداتو لیست</strong></h4>
+            <button type="button" id="btnAddunit" class="btn  btn-primary @ViewBag.Insert" data-toggle="modal"
+                    data-target="#success">
+                د نوې واحد اضافه کول
+            </button>
+        </div>
+        <table class="table table-responsive-md table-striped table-condensed table-bordered dataTables_scrollHead" id="tblunit">
+            <thead class="scrollable-container ps--scrolling-x">
+                <tr role="row">
+                    <th class="col-md-0.5">#</th>
+                    <th class="col-md-3">واحد</th>
+                    <th class="col-md-1 @ViewBag.Edit"> تغیرول </th>
+                    <th class="col-md-1 @ViewBag.Delete">  حذف</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    @* modal for adding unit *@
+    <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="form-group">
+            <div class="modal fade text-left" id="success" tabindex="-1" role="dialog" aria-labelledby="myModalLabel10"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info white">
+                            <h4 class="modal-title" id="myModalLabel10">د واحد اضافه کول</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="p-1">
+                            <form data-ajax="true" asp-action="SaveUnit" asp-controller="ManageSmallTables" data-ajax-success="funSuccess(data)" data-ajax-method="post" id="frm">
+                                <input hidden asp-for="unit.UnitId" value="0" />
+                                <div class="form-group">
+                                    <label asp-for="unit.Unit" class=""></label>
+                                    <input asp-for="unit.Unit" placeholder="واحد نوم" class="form-control" />
+                                    <span asp-validation-for="unit.Unit" class="text-danger"></span>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn grey btn-outline-secondary" id="btnClose" data-dismiss="modal">بندول</button>
+                                    <button type="submit" id="btnSubmit" class="btn btn-outline-primary">ذخیره</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form data-ajax="true" asp-action="DeleteUnit" data-ajax-method="post" asp-controller="ManageSmallTables" data-ajax-success="unitdeleted(data)">
+        <input hidden id="deleteId1" asp-for="unit.UnitId" />
+        <button type="submit" class="d-none" id="btnDelete1"></button>
+    </form>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+        <script>
+            $(document).ready(function () {
+                loadunit();
+
+            })
+        </script>
+        @* unit script functions *@
+        <script>
+        var show = true;
+        function loadunit() {
+
+            $.ajax({
+                url: "/ManageSmallTables/LoadUnit/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    console.log(result)
+                    $.each(result, function (i, col) {
+
+                        tr += '<tr class="odd" role="row">' +
+
+                            '<td>' + (i + 1) + '</td>' +
+                            ' <td>' + col.unit1 + '</td>' +
+                            ' <td class="@ViewBag.Edit"><button type="button" onclick="Editunit(' + col.unitId + ',\'' + col.unit1 + '\')" class="btn btn-primary"><i class="fa fa-edit"></i></button></td>' +
+                            ' <td class="@ViewBag.Delete"><button type="button" onclick="fnDeleteunit(' + col.unitId + ')" class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#tblunit").dataTable();
+                    table.fnDestroy();
+
+                    $("#tblunit>tbody").html("").html(tr);
+
+                        $("#tblunit").DataTable({
+                            stateSave: true,
+
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+                      });
+
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+                complete: function () {
+
+                }
+
+            })
+        }
+        function funSuccess(data) {
+
+            loadunit();
+
+            $("#frm")[0].reset();
+            $("#btnClose").trigger("click");
+
+            toast(data,'primary')
+            $("#btnSubmit").text("ذخیره ");
+        }
+
+        function Editunit(id, name) {
+            $("#unit_Unit").val(name);
+            $("#unit_UnitId").val(id);
+            $("#btnAddunit").trigger("click");
+            $("#btnSubmit").text("تغیرول");
+        }
+
+        function fnDeleteunit(comId) {
+            $("#deleteId1").val(comId);
+            swal({
+                title: "آیا غواړی چې نوموړی ریکارډ حذف شې؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    $("#btnDelete1").trigger("click");
+                }
+            });
+
+        }
+
+        function unitdeleted(data) {
+            loadunit();
+            toast(data, 'success')
+
+        }
+        $("#btnClose").click(function () {
+
+            $("#frm")[0].reset();
+            $("#btnSubmit").text("ذخیره")
+
+        })
+        </script>
+
+    }

@@ -1,0 +1,629 @@
+﻿@model InvestDealViewModel
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>$("#investmentActive").addClass("active")</script>
+
+    <link href="~/metronic/components-rounded-rtl.min.css" rel="stylesheet" />
+
+    <div class="card" id="customercard">
+        <h2 class="text-center  card-body bg-info white box-shadow-1 mt-5" style="padding: 13px;">د شراکتیانو پانګونې فورم</h2>
+
+        <table class="table table-responsive-md table-striped table-condensed  table-bordered dataTables_scrollHead" id="tbl">
+            <thead class="scrollable-container ps--scrolling-x ">
+                <tr role="row">
+                    <th class="col-md-3">د شراکتې نوم</th>
+                    <th class="col-md-1"> مبائیل</th>
+                    <th class="col-md-3">  پرېښنالیک</th>
+                    <th class="col-md-1">  انتخابول</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="card d-none" id="dealcard">
+        <div class="card-header">
+            <h3 class="card-title" style="text-align:center"><label class="font-medium-4" style="font-size:x-large">د پانګونې تفصیل</label></h3>
+            <button type="button" id="btnlist" onclick="backToList()" class="btn btn-outline-info"><i class="ft-user-plus"></i>&nbsp; شراکتیانو لېست</button>
+
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs nav-justified nav-top-border no-hover-bg nav-justified">
+                <li class="nav-item">
+                    <a class="nav-link   " id="active-tab1" data-toggle="tab" href="#active1" aria-controls="active1" aria-expanded="true"><label style="font-size:large">افغانۍ</label></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " id="link-tab1" data-toggle="tab" href="#link1" aria-controls="link1" aria-expanded="false"><label style="font-size:large"> کلدارې</label></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " id="linkOpt-tab1" data-toggle="tab" href="#linkOpt1" aria-controls="linkOpt1"><label style="font-size:large">  ډالر </label></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active " id="linkOpt-tab2" data-toggle="tab" href="#linkOpt2" aria-controls="linkOpt1"><label style="font-size:large"> مجموعه  </label></a>
+                </li>
+            </ul>
+            <div class="tab-content pt-1">
+                <div role="tabpanel" class="tab-pane" id="active1" aria-labelledby="active-tab1" aria-expanded="true">
+                    <div class="col-md-2" style="float:left">
+                        <button type="button" onclick="afghaniDeal()" class="btn btn-info   mr-1" data-toggle="modal" data-target="#bootstrap"><i class="ft-plus-circle "></i>&nbsp; د پیسو اضافه کول یا اخستل</button>
+                    </div>
+                    <table class="table table-responsive-md table-striped table-condensed table-bordered dataTables_scrollHead " id="afghaniTable">
+                        <thead class="scrollable-container ps--scrolling-x">
+                            <tr role="row">
+                                <th class="col-md-2">شراکتې</th>
+                                <th class="col-md-2">تیلفون شماره</th>
+                                <th class="col-md-1">ذخیره شوې</th>
+                                <th class="col-md-1">اخستل شوې</th>
+                                <th class="col-md-1">ډول</th>
+                                <th class="col-md-2">تفصیل</th>
+                                <th class="col-md-2">اجراء کوونکی</th>
+                                <th class="col-md-2">نیټه</th>
+                                <th class="col-md-2">تغیرول</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <div class="portlet-body">
+                        <div class="mt-element-step">
+                            <div class="row step-default">
+                                <div class="col-md-4 bg-grey mt-step-col active">
+                                    <div class="mt-step-number bg-white font-grey"><strong> ذخیره شوې</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="afghaniCredit">1000</strong></div>
+                                </div>
+                                <div class="col-md-4 bg-grey mt-step-col ">
+                                    <div class="mt-step-number bg-white kt-font-dark"><strong> اخستل شوې</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="afghaniDebit">1000</strong></div>
+                                </div>
+                                <div class="col-md-4 bg-grey mt-step-col active">
+                                    <div class="mt-step-number bg-white font-grey"><strong>موجوده حساب</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="afghaniRemain">1000</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="link1" role="tabpanel" aria-labelledby="link-tab1" aria-expanded="true">
+
+                    <div class="col-md-2" style="float:left">
+                        <button type="button" onclick="rupeDeal()" class="btn btn-info " data-toggle="modal" data-target="#bootstrap"><i class="ft-plus-circle"></i>&nbsp;  د پیسو اضافه کول یا اخستل</button>
+                    </div>
+
+                    <table class="table table-responsive-md table-striped table-condensed table-bordered dataTables_scrollHead" id="rupeTable">
+                        <thead class="scrollable-container ps--scrolling-x">
+                            <tr role="row">
+                                <th class="col-md-2">شراکتې</th>
+                                <th class="col-md-2">تیلفون شماره</th>
+                                <th class="col-md-1">ذخیره شوې</th>
+                                <th class="col-md-1">اخستل شوې</th>
+                                <th class="col-md-1">ډول</th>
+                                <th class="col-md-2">تفصیل</th>
+                                <th class="col-md-2">اجراء کوونکی</th>
+                                <th class="col-md-2">نیټه</th>
+                                <th class="col-md-2">تغیرول</th>
+                            </tr>
+                        </thead>
+
+                        <tbody></tbody>
+
+                    </table>
+
+                    <div class="portlet-body">
+                        <div class="mt-element-step">
+                            <div class="row step-default">
+                                <div class="col-md-4 bg-grey mt-step-col active">
+                                    <div class="mt-step-number bg-white font-grey"><strong>ذخیره شوې</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="rupeCredit">1000</strong></div>
+                                </div>
+                                <div class="col-md-4 bg-grey mt-step-col ">
+                                    <div class="mt-step-number bg-white kt-font-dark "><strong>اخستل شوې</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="rupeDebit">1000</strong></div>
+                                </div>
+                                <div class="col-md-4 bg-grey mt-step-col active">
+                                    <div class="mt-step-number bg-white font-grey"><strong>موجوده حساب</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="rupeRemain">1000</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="linkOpt1" role="tabpanel" aria-labelledby="linkOpt-tab1" aria-expanded="false">
+                    <div class="col-md-2" style="float:left">
+                        <button type="button" onclick="dollerDeal()" class="btn btn-info   mr-1" data-toggle="modal" data-target="#bootstrap"><i class="ft-plus-circle"></i>&nbsp; د پیسو اضافه کول یا اخستل</button>
+                    </div>
+
+                    <table class="table table-responsive-md table-striped table-condensed table-bordered dataTables_scrollHead" id="dollerTable">
+                        <thead class="scrollable-container ps--scrolling-x">
+                            <tr role="row">
+                                <th class="col-md-2">شراکتې</th>
+                                <th class="col-md-2">تیلفون شماره</th>
+                                <th class="col-md-1">ذخیره شوې</th>
+                                <th class="col-md-1">اخستل شوې</th>
+                                <th class="col-md-1">ډول</th>
+                                <th class="col-md-2">تفصیل</th>
+                                <th class="col-md-2">اجراء کوونکی</th>
+                                <th class="col-md-2">نیټه</th>
+                                <th class="col-md-2">تغیرول</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <div class="portlet-body">
+                        <div class="mt-element-step">
+                            <div class="row step-default">
+                                <div class="col-md-4 bg-grey mt-step-col active">
+                                    <div class="mt-step-number bg-white font-grey"><strong> ذخیره شوې</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="dollerCredit">1000</strong></div>
+                                </div>
+                                <div class="col-md-4 bg-grey mt-step-col ">
+                                    <div class="mt-step-number bg-white kt-font-dark "><strong> اخستل شوې</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="dollerDebit">1000</strong></div>
+                                </div>
+                                <div class="col-md-4 bg-grey mt-step-col active">
+                                    <div class="mt-step-number bg-white font-grey"><strong>موجوده حساب</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="dollerRemain">1000</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane in active" id="linkOpt2" role="tabpanel" aria-labelledby="linkOpt-tab1" aria-expanded="false">
+                    <div class="portlet-body">
+                        <div class="mt-element-step">
+                            <div class="row step-default">
+                                <div class="col-md-4 bg-grey mt-step-col active">
+                                    <div class="mt-step-number bg-white font-grey"><strong> افغانۍ</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="totalAfghani">5000</strong></div>
+                                </div>
+                                <div class="col-md-4 bg-grey mt-step-col ">
+                                    <div class="mt-step-number bg-white kt-font-dark "><strong> کلدارې </strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="totalRupe">6000</strong></div>
+                                </div>
+                                <div class="col-md-4 bg-grey mt-step-col active">
+                                    <div class="mt-step-number bg-white font-grey"><strong> ډالر</strong></div>
+                                    <div class="mt-step-title uppercase font-grey-cascade" dir="ltr"><strong id="totalDoller">10000</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade text-left" id="bootstrap" tabindex="-1" role="dialog" aria-labelledby="myModalLabel35"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-info white">
+                    <h3 class="modal-title">حساب ته د پیسو اضافه کول  یا اخستل</h3>
+                </div>
+                <form data-ajax="true" asp-controller="Investment" asp-action="NewDeal" data-ajax-success="frmSuccess(data)" data-ajax-method="post" id="frmDeal">
+                    <input type="hidden" name="CustomerID" id="customeridfordeal" />
+
+                    <input hidden asp-for="DealId" value="0"/>
+                    <input hidden asp-for="CurrencyID" />
+                    <input hidden asp-for="DealerID" />
+
+                    <div class="modal-body">
+                        <fieldset class="form-group floating-label-form-group">
+                            <label for="total">موجوده حساب </label>
+                            <input type="text" disabled class="form-control" id="txtTotalDebit" placeholder="مجموعه قرضه">
+                        </fieldset>
+
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class="">اضافه کول</label>
+                                <input asp-for="Credit" onkeyup="creditMode()" dir="rtl" placeholder="حساب ته د پیسو اضافه کول" class="form-control" />
+                                <span asp-validation-for="Credit" class="text-danger"></span>
+                            </div>
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <div class="form-group">
+                                <label class=""> اخستل </label>
+                                <input asp-for="Debit" onkeyup="debitMode()" dir="rtl" placeholder="حساب نه د پیسو اخستل!" class="form-control" />
+                                <span asp-validation-for="Debit" class="text-danger"></span>
+                            </div>
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <label asp-for="Type" class=""></label>
+                            <select asp-for="Type" class="form-control" >
+                                <option value="نغدي پیسې">نغدي پیسې</option>
+                                <option value="وسایل"> وسایل  </option>
+                            </select>
+                            <span asp-validation-for="Type" class="text-danger"></span>
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <label for="total">ټوټل حساب:</label>
+                            <input type="text" disabled class="form-control" id="txtRemainCredit" placeholder="ټوټل حساب">
+                        </fieldset>
+                        <fieldset class="form-group floating-label-form-group">
+                            <label for="total">د حساب تفصیل:</label>
+                            <input asp-for="Detail" dir="rtl" placeholder="تفصیلات" class="form-control" />
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="reset" class="btn btn-outline-secondary btn-lg" data-dismiss="modal" value="بندول">
+                        <input type="submit" class="btn btn-outline-primary btn-lg" value="ذخیره">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-none">
+        <form data-ajax="true" asp-controller="Investment" asp-action="GetAllDeals" data-ajax-success="loadSingleDealerDeal(data)" data-ajax-method="post" id="">
+            <input type="hidden" name="DealerID" id="idForReload" value="" />
+            <button type="submit" class="btn btn-primary" id="btnReloadDeals"></button>
+        </form>
+    </div>
+
+
+    @section Scripts{
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+        <script>
+            $(document).ready(function () {
+                LoadCustomers();
+
+            })
+
+            function LoadCustomers() {
+                $.ajax({
+                    url: '/Investment/FetchDealers/',
+                    type: 'GET',
+                    contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (customers) {
+                        var tr = "";
+                        $.each(customers, function (i, col) {
+
+                            tr += ' <tr>';
+                            tr += '      <td class="col-md-3"> ' + col.name + ' </td>';
+                            tr += '     <td  class="col-md-2"> ' + col.phone + '</td>';
+                            tr += '     <td  class="col-md-3">' + col.email + '  </td>';
+                            tr += ' <td  class="col-md-2">  <form data-ajax="true" data-ajax-url="/Investment/GetAllDeals" data-ajax-success="loadSingleDealerDeal(data)" data-ajax-method="post" ><input type="hidden" name="DealerID" value="' + col.dealerid + '" /><button type="submit" class="btn btn-primary" onclick="passValue(' + col.dealerid + ',\'' + col.name + '\',\'' + col.phone + '\',\'' + col.email + '\')" ><i" class="ft-info" ></i></button> </form> </td>';
+                            tr += ' </tr>';
+                        });
+
+                        $("#tbl>tbody").html("").html(tr);
+                        $("#tbl").DataTable({
+
+                            stateSave: true,
+
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+
+                        });
+                    }
+                })
+            }
+
+            function passValue(dealerid, name, phone, email) {
+
+                $("#idForReload").val(dealerid);
+                $("#DealerID").val(dealerid);
+
+                $("#userinput1").val(name);
+                $("#userinput3").val(phone);
+                $("#userinput4").val(email);
+
+                $("#customercard").addClass("d-none");
+                $("#dealcard").removeClass("d-none");
+            }
+
+            function backToList() {
+                $("#customercard").removeClass("d-none");
+                $("#dealcard").addClass("d-none");
+
+            }
+
+            function afghaniDeal() {
+                $("#CurrencyID").val(1);
+
+                $("#txtTotalDebit").val(totalAfghaniDebit);
+                $("#txtRemainCredit").val(totalAfghaniDebit);
+
+            }
+
+            function rupeDeal() {
+                $("#CurrencyID").val(2);
+
+                $("#txtTotalDebit").val(totalRupeDebit);
+            }
+
+            function dollerDeal() {
+                $("#CurrencyID").val(3);
+
+                $("#txtTotalDebit").val(totalDollerDebit);
+                $("#txtRemainCredit").val(totalDollerDebit)
+            }
+
+            function creditMode() {
+                $("#Debit").val(0);
+                $("#txtRemainCredit").val(parseInt($("#txtTotalDebit").val()) + parseInt($("#Credit").val()));
+            }
+
+            function debitMode() {
+                $("#Credit").val(0);
+                var total = parseInt($("#txtTotalDebit").val());
+                var debit = parseInt($("#Debit").val());
+                var remain = total - debit;
+                $("#txtRemainCredit").val(remain);
+            }
+
+            function frmSuccess(data) {
+                $("#Debit").val("");
+                $("#Credit").val("");
+                $("#Detail").val("");
+               
+                toast(data, 'success');
+
+                $("#txtTotalDebit").val($("#txtRemainCredit").val());
+                $("#btnReloadDeals").trigger("click");
+                $("#bootstrap").modal("hide");
+            }
+
+
+            var totalAfghaniDebit = 0;
+            var totalRupeDebit = 0;
+            var totalDollerDebit = 0;
+
+            function loadSingleDealerDeal(result) {
+
+                var afghaniDeals = "";
+                var rupeDeals = "";
+                var dollerDeals = "";
+
+                var allAfghaniCredit = 0;
+                var allAfghaniDebit = 0;
+
+                var allRupeCredit = 0;
+                var allRupeDebit = 0;
+
+                var allDollerCredit = 0;
+                var allDollerDebit = 0;
+
+                $.each(result, function (i, col) {
+
+                    if (col.currencyid == 1) {
+
+                        var detail = "";
+                        if (col.detail == null) {
+                            detail = "";
+
+                        } else {
+                            detail = col.detail;
+
+                        }
+
+                        afghaniDeals += " <tr>";
+                        afghaniDeals += "      <td> " + col.dealer + " </td>";
+                        afghaniDeals += "      <td> " + col.phone + " </td>";
+                        afghaniDeals += "      <td> " + col.credit + " </td>";
+                        afghaniDeals += "      <td> " + col.debit + " </td>";
+                        afghaniDeals += "      <td> " + col.type + " </td>";
+                        afghaniDeals += "      <td> " + detail + " </td>";
+                        afghaniDeals += "      <td> " + col.employee + "  </td>"; 
+                        afghaniDeals += "      <td>  " + col.date + " </td>";
+                        afghaniDeals += '      <td><button  class="btn btn-primary" onclick="EditRecord(' + col.dealerid + ',\'' + col.dealid + '\',\'' + col.currencyid + '\',\'' + col.debit + '\',\'' + col.credit + '\',\'' + col.type + '\',\'' + col.detail + '\')" ><i class="fa fa-edit" ></i></button> </td>';
+
+                        afghaniDeals += "      </tr>";
+                        allAfghaniCredit += col.credit;
+                        allAfghaniDebit += col.debit;
+                    }
+                    if (col.currencyid == 2) {
+
+                        var detail = "";
+                        if (col.detail == null) {
+                            detail = "";
+
+                        } else {
+                            detail = col.detail;
+
+                        }
+
+                        rupeDeals += " <tr>";
+                        rupeDeals += "      <td> " + col.dealer + " </td>";
+                        rupeDeals += "      <td> " + col.phone + " </td>";
+                        rupeDeals += "      <td> " + col.credit + " </td>";
+                        rupeDeals += "      <td> " + col.debit + " </td>";
+                        rupeDeals += "      <td> " + col.type + " </td>";
+                        rupeDeals += "      <td> " + detail + " </td>";
+                        rupeDeals += "      <td> " + col.employee + "  </td>";
+                        rupeDeals += "      <td>  " + col.date + " </td>";
+                        rupeDeals += '      <td><button  class="btn btn-primary" onclick="EditRecord(' + col.dealerid + ',\'' + col.dealid + '\',\'' + col.currencyid + '\',\'' + col.debit + '\',\'' + col.credit + '\',\'' + col.type + '\',\'' + col.detail + '\')" ><i class="fa fa-edit" ></i></button> </td>';
+
+                        rupeDeals += "      </tr>";
+                        allRupeCredit += col.credit;
+                        allRupeDebit += col.debit;
+                    }
+                    if (col.currencyid == 3) {
+
+                        var detail = "";
+                        if (col.detail == null) {
+                            detail = "";
+
+                        } else {
+                            detail = col.detail;
+
+                        }
+
+                        dollerDeals += " <tr>";
+                        dollerDeals += "      <td> " + col.dealer + " </td>";
+                        dollerDeals += "      <td> " + col.phone + " </td>";
+                        dollerDeals += "      <td> " + col.credit + " </td>";
+                        dollerDeals += "      <td> " + col.debit + " </td>";
+                        dollerDeals += "      <td> " + col.type + " </td>";
+                        dollerDeals += "      <td> " + detail + " </td>";
+                        dollerDeals += "      <td> " + col.employee + "  </td>";
+                        dollerDeals += "      <td>  " + col.date + " </td>";
+                        dollerDeals += '      <td><button  class="btn btn-primary" onclick="EditRecord(' + col.dealerid + ',\'' + col.dealid + '\',\'' + col.currencyid + '\',\'' + col.debit + '\',\'' + col.credit + '\',\'' + col.type + '\',\'' + col.detail + '\')" ><i class="fa fa-edit" ></i></button> </td>';
+
+                        dollerDeals += "      </tr>";
+                        allDollerCredit += col.credit;
+                        allDollerDebit += col.debit;
+                    }
+                })
+
+
+                
+
+                var table = $("#afghaniTable").dataTable();
+                table.fnDestroy();
+
+                var table = $("#dollerTable").dataTable();
+                table.fnDestroy();
+
+                var table = $("#rupeTable").dataTable();
+                table.fnDestroy();
+
+                $("#afghaniTable>tbody").html("").html(afghaniDeals);
+
+                $("#afghaniTable").dataTable({
+
+                    stateSave: true,
+                    responsive:true,
+                    dom: 'Blfrtip', buttons: ['excel', 'print', 'copy'],
+                    "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                    "pageLength": 5,
+                    "language": {
+                        "emptyTable": "په جدول کې معلومات شتون نه لري",
+                        "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                        "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                        "infoPostFix": "",
+
+                        "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                        "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                        "searchPlaceholder": "پلټنه",
+                        "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                        "paginate": {
+                            "first": "لومړۍ پاڼه",
+                            "previous": "مخکې",
+                            "next": "وروسته",
+                            "last": "پای"
+                        },
+                    },
+                });
+                $(".buttons-print").text("چاپ")
+                $(".buttons-copy").text("کاپي")
+                $(".buttons-excel").text("ایکسل")
+                $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+
+                $("#rupeTable>tbody").html('').html(rupeDeals);
+                $("#rupeTable").DataTable({
+                    responsive: true,
+                    stateSave: true,
+                    dom: 'Blfrtip', buttons: ['excel', 'print', 'copy'],
+                    "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                    "pageLength": 5,
+                    "language": {
+                        "emptyTable": "په جدول کې معلومات شتون نه لري",
+                        "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                        "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                        "infoPostFix": "",
+
+                        "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                        "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                        "searchPlaceholder": "پلټنه",
+                        "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                        "paginate": {
+                            "first": "لومړۍ پاڼه",
+                            "previous": "مخکې",
+                            "next": "وروسته",
+                            "last": "پای"
+                        },
+                    },
+
+                });
+                $(".buttons-print").text("چاپ")
+                $(".buttons-copy").text("کاپي")
+                $(".buttons-excel").text("ایکسل")
+                $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+
+                $("#dollerTable>tbody").html('').html(dollerDeals);
+                $("#dollerTable").DataTable({
+                    responsive: true,
+                    stateSave: true,
+                    dom: 'Blfrtip', buttons: ['excel', 'print', 'copy'],
+                    "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                    "pageLength": 5,
+                    "language": {
+                        "emptyTable": "په جدول کې معلومات شتون نه لري",
+                        "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                        "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                        "infoPostFix": "",
+
+                        "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                        "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                        "searchPlaceholder": "پلټنه",
+                        "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                        "paginate": {
+                            "first": "لومړۍ پاڼه",
+                            "previous": "مخکې",
+                            "next": "وروسته",
+                            "last": "پای"
+                        },
+                    },
+
+                });
+                $(".buttons-print").text("چاپ")
+                $(".buttons-copy").text("کاپي")
+                $(".buttons-excel").text("ایکسل")
+                $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+
+
+                $("#afghaniDebit").text(allAfghaniDebit.toFixed(2));
+                $("#afghaniCredit").text(allAfghaniCredit.toFixed(2));
+                $("#afghaniRemain").text((allAfghaniCredit - allAfghaniDebit).toFixed(2));
+
+                $("#rupeDebit").text(allRupeDebit.toFixed(2));
+                $("#rupeCredit").text(allRupeCredit.toFixed(2));
+                $("#rupeRemain").text((allRupeCredit - allRupeDebit).toFixed(2));
+
+                $("#dollerDebit").text(allDollerDebit.toFixed(2));
+                $("#dollerCredit").text(allDollerCredit.toFixed(2));
+                $("#dollerRemain").text((allDollerCredit - allDollerDebit).toFixed(2));
+
+                $("#totalAfghani").text((allAfghaniCredit - allAfghaniDebit).toFixed(2));
+                $("#totalRupe").text((allRupeCredit - allRupeDebit).toFixed(2));
+                $("#totalDoller").text((allDollerCredit - allDollerDebit).toFixed(2));
+
+                totalAfghaniDebit = (allAfghaniCredit - allAfghaniDebit).toFixed(2);
+                totalRupeDebit = (allRupeCredit - allRupeDebit).toFixed(2);
+                totalDollerDebit = (allDollerCredit - allDollerDebit).toFixed(2);
+
+            }
+
+            function EditRecord(dealer, dealid, currency, debit, credit, type, detail) {
+
+                $("#DealerID").val(dealer);
+                $("#DealId").val(dealid);
+                $("#CurrencyID").val(currency);
+                $("#Debit").val(debit);
+                $("#Credit").val(credit);
+                $("#Type").val(type);
+                $("#Detail").val(detail);
+
+                $("#bootstrap").modal("show");
+            }
+        </script>
+    }

@@ -1,0 +1,619 @@
+﻿@model AllViewModel
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#expenseActive").addClass("active")</script>
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorize
+
+@if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+
+    @await Html.PartialAsync("AccessDeniedPartial")
+
+
+    ViewBag.View = "d-none";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+
+@if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    ViewBag.View = "";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+{
+    ViewBag.View = "";
+    ViewBag.Insert = "";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+
+}
+
+@if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+{
+    ViewBag.View = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+{
+    ViewBag.View = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "";
+}
+
+
+<div class="row   @ViewBag.View">
+
+    <div class="col-md-12 row" style="max-width:100%">
+        <div class="col-md-2" style="text-align:right">
+            <button id="btnList" class="btn btn-info "> د مصارفو لیست </button>
+        </div>
+        <div class=" col-md-8">
+            <h2 class="text-center alert bg-info box-shadow-1">د مصارفو د ذخیره کولو فارم</h2>
+
+            <hr />
+        </div>
+
+        <div class="col-md-2" style="text-align:left">
+            <button id="btn" class="btn btn-info ">  د مصارفو نوع  <i class="fa fa-chevron-circle-down "></i> </button>
+        </div>
+    </div>
+
+
+    <div class="row col-md-12">
+        <div id="div1" class="card col-md-12">
+
+            <div id="divInput">
+                <form class="form" asp-action="SaveExpense" asp-controller="Expense" data-ajax="true" data-ajax-success="fnSuccessExpense(data)" id="frmExpense">
+                    <div class="row justify-content-md-center">
+                        <div class="col-md-6 @ViewBag.Insert">
+                            <div class="form-body">
+                                <input hidden asp-for="expense.ExpenseId" value="0" />
+                                <div class="row">
+                                    <div class="form-group col-12 mb-2">
+                                        <label class="" for="eventRegInput1" asp-for="expense.Expense"></label>
+                                        <input asp-for="expense.Expense" placeholder="مصرف شو پیسې" class="form-control">
+                                        <span asp-validation-for="expense.Expense" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-12 mb-2">
+                                        <label asp-for="expense.ECurrencyId" class=""></label>
+                                        <select asp-for="expense.ECurrencyId"  class="form-control">
+                                            <option value=""> انتخاب کړی</option>
+                                            <option value="1">افغانۍ</option>
+                                            <option value="2">کلدارې</option>
+                                            <option value="3">ډالر</option>
+                                        </select>
+                                        <span asp-validation-for="expense.ECurrencyId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-12 mb-2">
+                                        <label asp-for="expense.ExpenseTypeId" class=""></label>
+                                        <select asp-for="expense.ExpenseTypeId" class="form-control" asp-items="@ViewBag.ExpenseType">
+                                            <option value="">د مصرف نوع انتخاب کړی</option>
+                                        </select>
+                                        <span asp-validation-for="expense.ExpenseTypeId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-12 mb-2">
+                                        <label class="" asp-for="expense.ExpenseDate"></label>
+                                        <input asp-for="expense.ExpenseDate" asp-format="{0:yyyy-MM-dd}" type="datetime-local" placeholder="نیټه" class="form-control ">
+                                        <span asp-validation-for="expense.ExpenseDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-12 mb-2">
+                                        <label class="" asp-for="expense.Detail"></label>
+                                        <textarea asp-for="expense.Detail" placeholder="تفصیل " rows="3" class="form-control"></textarea>
+                                        <span asp-validation-for="expense.Detail" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions center " style="text-align:center;padding:10px">
+                        <button type="reset" id="btnreset" class="btn btn-warning mr-1">
+                            پاکول
+                        </button>
+                        <button type="submit" id="btnSubmitExpense" class="btn btn-primary">
+                            ‌ذخیره
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <section id="divTable" class="d-none">
+                <div class="col-md-12 dt-ext table-responsive">
+                    <table class=" table  table-striped table-condensed table-bordered dataTables_scrollHead " id="tblExpense">
+                        <thead class="scrollable-container ps--scrolling-x" style="width:100%">
+                            <tr role="row">
+                                <th class="col-md-1">#</th>
+                                <th class="col-md-3"> مصرف شوې پیسې</th>
+                                <th class="col-md-3"> پولې واحد</th>
+                                <th class="col-md-1"> د مصرف نوع </th>
+                                <th class="col-md-2"> د مصرف نیټه </th>
+                                <th class="col-md-3"> تفصیل </th>
+                                <th class="col-md-1 @ViewBag.Edit">  تغیرول</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th rowspan="1" colspan="1"></th>
+                                <th rowspan="1" colspan="1"></th>
+                                <th rowspan="1" colspan="1"></th>
+                                <th rowspan="1" colspan="1"></th>
+                                <th rowspan="1" colspan="1"></th>
+                                <th rowspan="1" colspan="1"></th>
+                                <th rowspan="1" colspan="1"></th>
+                            </tr>
+                        </tfoot>
+                        <tbody></tbody>
+
+                    </table>
+                </div>
+
+            </section>
+        </div>
+
+        <div id="div2" class="card col-md-4 " style="display:none">
+
+            <div class="card-header ">
+                <button type="button" id="btnAddExpenseType" class="btn  btn-info  @ViewBag.Insert" data-toggle="modal"
+                        data-target="#expense">
+                    د مصرف نوع اضافه کول
+                </button>
+            </div>
+
+            <table class="table table-striped table-condensed table-bordered dataTables_scrollHead " id="tblExpenseType">
+                <thead class="scrollable-container ps--scrolling-x">
+                    <tr role="row">
+                        <th style="max-width:20px;">#</th>
+                        <th class="col-md-4">د مصرف نوع</th>
+                        <th class="col-md-1 @ViewBag.Edit"> تغیرول </th>
+                        <th class="col-md-1 @ViewBag.Delete">  حذف</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="name" id="rowValue" value="" />
+
+@* modal for adding expensetype *@
+<div class="col-lg-4 col-md-6 col-sm-12">
+    <div class="form-group">
+
+        <div class="modal fade text-left" id="expense" tabindex="-1" role="dialog" aria-labelledby="myModalLabel10"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary white">
+                        <h4 class="modal-title" id="myModalLabel100">د مصرف نوع اضافه کول</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form data-ajax="true" asp-controller="Expense" asp-action="SaveExpenseType" data-ajax-success="funSuccessExpenseType(data)" data-ajax-method="post" id="frmExpenseType">
+                            <hr />
+                            <input hidden asp-for="expenseType.ExpenseTypeId" value="0" />
+                            <div class="form-group">
+                                <label asp-for="expenseType.ExpenseType" class=""></label>
+                                <input asp-for="expenseType.ExpenseType" placeholder="د مصرف نوع" class="form-control" />
+                                <span asp-validation-for="expenseType.ExpenseType" class="text-danger"></span>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn grey btn-outline-secondary" id="btnCloseExpenseType" data-dismiss="modal">بندول</button>
+                                <button type="submit" id="btnSubmitExpenseType" class="btn btn-outline-primary">ذخیره</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form data-ajax="true" asp-action="DeleteExpenseType" data-ajax-method="post" asp-controller="Expense" data-ajax-success="deleted(data)">
+    <input hidden id="deleteId" asp-for="expenseType.ExpenseTypeId" />
+    <button type="submit" class="d-none" id="btnDelete"></button>
+</form>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+
+    <script>
+        $(document).ready(function () {
+            loadExpense();
+
+        })
+    </script>
+
+    @* Expense script functions *@
+    <script>
+        var showEx = true;
+
+        function loadExpense() {
+
+            $.ajax({
+                url: "/Expense/LoadExpense/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    console.log(result)
+                    $.each(result, function (i, col) {
+                        tr += '<tr role="row">' +
+                            '<td>' + (i + 1) + '</td>' +
+                            ' <td>' + col.expenceAmount.toFixed(3) + '</td>' +
+                            ' <td>' + col.currency + '</td>' +
+                            ' <td>' + col.expenceType + '</td>' +
+                            ' <td>' + col.expenceDateShow + '</td>' +
+                            ' <td>' + col.detail + '</td>' +
+                            ' <td class="@ViewBag.Edit"><button type="button" onclick="EditExpense(' + col.expenceId + ',\'' + col.expenceAmount + '\',\'' + col.currencyId + '\',\'' + col.expenceTypeId + '\',\'' + col.categoryId + '\',\'' + col.expenceDate + '\',\'' + col.detail + '\')" class="btn btn-primary"><i class="fa fa-edit"></i></button></td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#tblExpense").dataTable();
+                    table.fnDestroy();
+                    $("#tblExpense>tbody").html("").html(tr);
+                   $("#tblExpense").dataTable({
+                       "footerCallback": function (row, data, start, end, display) {
+                           var api = this.api(),
+                               data;
+
+                           // Remove the formatting to get integer data for summation
+                           var intVal = function (i) {
+                               return typeof i === 'string' ?
+                                   i.replace(/[\$,]/g, '') * 1 :
+                                   typeof i === 'number' ?
+                                       i : 0;
+                           };
+
+                           // Total over all pages
+                           total = api
+                               .column(1)
+                               .data()
+                               .reduce(function (a, b) {
+                                   return intVal(a) + intVal(b);
+                               }, 0);
+
+                           // Total over this page
+                           pageTotal = api
+                               .column(1, {
+                                   page: 'current'
+                               })
+                               .data()
+                               .reduce(function (a, b) {
+                                   return intVal(a) + intVal(b);
+                               }, 0);
+
+                           // Update footer
+                           $(api.column(1).footer()).html(
+                               '( مصارف' + parseFloat(pageTotal).toFixed(2) + ' ټوټل)'
+                           );
+                       },
+                       dom: 'Blfrtip', buttons: [
+                           { extend: 'print', footer: true },
+                           { extend: 'excel', footer: true },
+                           { extend: 'copy', footer: true },
+                       ],
+                       stateSave: true,
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+                   });
+
+                    $(".buttons-print").text("چاپ")
+                    $(".buttons-copy").text("کاپي")
+                    $(".buttons-excel").text("ایکسل")
+                    $('.buttons-copy, .buttons-print, .buttons-excel').addClass('btn btn-primary ');
+                }
+            })
+        }
+
+        function fnSuccessExpense(data) {
+            loadExpense();
+
+            $("#frmExpense")[0].reset();
+
+
+            toast(data, 'success');
+            $("#btnSubmitExpense").text("ذخیره ");
+        }
+
+        function EditExpense(id, expense,currency, type,category, date, detail) {
+
+            $("#expense_ExpenseId").val(id);
+            $("#expense_Expense").val(expense);
+            $("#expense_ECurrencyId").val(currency);
+            $("#expense_ExpenseTypeId").val(type);
+            $("#expense_ExpenseDate").val(date);
+            $("#expense_Detail").val(detail);
+            $("#btnAddExpense").trigger("click");
+
+            $("#btnSubmitExpense").text("تغیرول");
+
+            $("#divInput").animate({
+                left: '250px',
+                opacity: '0.9',
+
+            }).show(400);
+
+
+            $("#divTable").animate({
+
+            }).hide(400);
+
+            $("#btnList").text("د مصارفو لیست ")
+            list = true;
+
+        }
+
+        function fnDeleteExpense(comId) {
+
+            swal({
+                title: "آیا غواړی چې نوموړی ریکارډ حذف شې؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+            }).then((isConfirm) => {
+                if (isConfirm) {
+
+                    $.ajax({
+                        url: "/Expense/DeleteExpense",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: '{cId:' + comId + '"}',
+                        dataType: "JSON",
+                        success: function (result) {
+                            swal("ریکارډ حذف شو.");
+                        }
+                    })
+                }
+            });
+        }
+    </script>
+
+
+    @* ExpenseType script functions *@
+    <script>
+        var showC = true;
+        var update = false;
+        function LoadExpenseType() {
+
+            $.ajax({
+                url: "/Expense/LoadExpenseType/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+
+                    var tr = "";
+                    console.log(result)
+                    $.each(result, function (i, col) {
+
+                        tr += '<tr class="odd" role="row">' +
+
+                            '<td>' + (i + 1) + '</td>' +
+                            ' <td id=' + i + '>' + col.expenceType1 + '</td>' +
+                            ' <td class="@ViewBag.Edit"><button type="button" onclick="EditExpenseType(' + col.expenceTypeId + ',\'' + col.expenceType1 + '\',\'' + i + '\')" class="btn btn-primary"><i class="fa fa-edit"></i></button></td>' +
+                            ' <td class="@ViewBag.Delete"><button type="button" onclick="fnDeleteExpenseType(' + col.expenceTypeId + ')" class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#tblExpenseType").dataTable();
+                    table.fnDestroy();
+
+                    $("#tblExpenseType>tbody").html("").html(tr);
+
+                        $("#tblExpenseType").DataTable({
+                            stateSave: true,
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+
+                            //dom: "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                        })
+                }
+            })
+        }
+
+        function funSuccessExpenseType(data) {
+            LoadExpenseType();
+            $("#frmExpenseType")[0].reset();
+            $("#btnCloseExpenseType").trigger("click");
+            toast(data, 'success');
+            $("#btnSubmitExpenseType").text("ذخیره ");
+        }
+
+        function EditExpenseType(id, name, rowid) {
+            $("#rowValue").val(rowid)
+            $("#expenseType_ExpenseType").val(name);
+            $("#expenseType_ExpenseTypeId").val(id);
+
+            $("#btnAddExpenseType").trigger("click");
+
+            $("#btnSubmitExpenseType").text("تغیرول");
+
+            update = true;
+
+        }
+        function fnDeleteExpenseType(comId) {
+
+            $("#deleteId").val(comId);
+            swal({
+                title: "آیا غواړی چې نوموړی ریکارډ حذف شې؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    $("#btnDelete").trigger("click");
+                }
+            });
+
+        }
+
+        function deleted(data) {
+
+            toast(data, 'success');
+            LoadExpenseType();
+
+        }
+    </script>
+
+    <script>
+        var type = true;
+        var list = true;
+
+        $("#btn").click(function () {
+            if (type) {
+
+                $("#div1").removeClass("col-md-12").addClass("col-md-7");
+                $("#div2").removeClass("d-none");
+                $("#div2").slideDown();
+                $("#div2").show().addClass("col-md-5 ml-0");
+                LoadExpenseType();
+                type = false;
+            } else {
+
+                $("#div1").removeClass("col-md-7 m-0").addClass("col-md-12");
+                $("#div2").addClass("d-none");
+                $("#div2").slideDown();
+                $("#div2").show().removeClass("col-md-5");
+                type = true;
+            }
+
+        });
+
+        $("#btnList").click(function () {
+            if (list) {
+
+                $("#divInput").animate({
+                    left: '250px',
+                    opacity: '0.9',
+
+                }).hide(400);
+
+
+                $("#divTable").animate({
+
+                }).show(400);
+                $("#divTable").removeClass("d-none")
+
+                $("#btnList").text("د مصارف ذخیره کول")
+
+                list = false;
+            } else {
+                $("#divInput").animate({
+                    left: '250px',
+                    opacity: '0.9',
+
+                }).show(400);
+
+
+                $("#divTable").animate({
+
+                }).hide(400);
+
+                $("#btnList").text("د مصارفو لیست ")
+                list = true;
+            }
+
+        });
+
+        $("#btnCloseExpenseType").click(function () {
+
+            $("#frmExpenseType")[0].reset();
+            $("#btnSubmitExpenseType").text("ذخیره")
+
+        })
+        $("#btnreset").click(function () {
+
+
+            $("#btnSubmitExpense").text("ذخیره")
+
+        })
+
+    </script>
+}

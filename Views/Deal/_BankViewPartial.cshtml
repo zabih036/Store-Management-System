@@ -1,0 +1,241 @@
+﻿
+@model BankDealViewModel
+
+
+
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorize
+
+@if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    @await Html.PartialAsync("AccessDeniedPartial")
+    ViewBag.view = "d-none";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+@if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "d-none";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+@if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Delete = "d-none";
+    ViewBag.Edit = "d-none";
+}
+@if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "d-none";
+}
+
+@if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+{
+    ViewBag.view = "";
+    ViewBag.Insert = "";
+    ViewBag.Edit = "";
+    ViewBag.Delete = "";
+}
+
+
+<div class="modal-content">
+    <div class="modal-header bg-primary white">
+        <h4 class="modal-title" id="myModalLabel100">مصارفو ذخیره کول</h4>
+    </div>
+    <div class="modal-body">
+        <form data-ajax="true" asp-action="AddBankDeal" asp-controller="Deal" data-ajax-success="fnSuccessBank(data)" data-ajax-method="post">
+            <div class="row  @ViewBag.Insert">
+
+
+                <div class="form-group col-md-2">
+                    <label class="">بانک / صراف:</label>
+                    <select asp-for="BankId" asp-items="@ViewBag.bank" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                        <option value=""> انتخاب کړئ</option>
+                    </select>
+                    <span asp-validation-for="BankId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class=""> پولې واحد:</label>
+                    <select asp-for="CurrencyId" class="form-control">
+                        <option value="">انتخاب کړئ</option>
+                        <option value="1">افعانۍ</option>
+                        <option value="2">کلدارې</option>
+                        <option value="3">ډالر</option>
+                    </select>
+                    <span asp-validation-for="CurrencyId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">جمع / اخستل:</label>
+                    <select asp-for="Type" class="form-control">
+                        <option value="">انتخاب کړئ</option>
+                        <option value="Credit">جمع</option>
+                        <option value="Debit">اخستل</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">پیسو اندازه:</label>
+                    <input asp-for="Amount" class="form-control " />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-1" style="text-align:center">
+                    <label class="">نغدې؟</label>
+                    <input type="checkbox" name="cash" class="form-control " />
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="">تفصیل:</label>
+                    <input asp-for="Detail" class="form-control " />
+                </div>
+
+                <div class="form-group col-md-2 " style="display:flex;align-items:flex-end">
+                    <button type="submit" class="btn btn-primary btn-icon-sm">ذخیره </button>&nbsp;&nbsp;
+                    <button type="reset" id="btnReset" class="btn btn-warning btn-icon-sm">پاکول </button>
+                </div>
+            </div>
+        </form>
+
+        <table class=" table table-responsive-md table-striped table-condensed table-bordered dataTables_scrollHead " id="tblBankDeal">
+            <thead class="scrollable-container ps--scrolling-x" style="width:100%">
+                <tr role="row">
+                    <th class="col-md-1">#</th>
+                    <th class="col-md-2"> نیټه</th>
+                    <th class="col-md-3"> تفصیل </th>
+                    <th class="col-md-3"> بانک / صراف نوم</th>
+                    <th class="col-md-3"> موبایل</th>
+                    <th class="col-md-3"> آدرس</th>
+                    <th class="col-md-1"> پولې واحد </th>
+                    <th class="col-md-1">  جمع </th>
+                    <th class="col-md-1">  اخستل </th>
+                    <th class="col-md-1">  موجود حساب </th>
+                    <th class="col-md-1"> حذف </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+
+
+<script>
+
+    $(function () {
+        $("#BankId").select2();
+        LoadBanksDeals();
+    })
+
+    function LoadBanksDeals() {
+        $.ajax({
+            url: "/Deal/BanksDealInfo/",
+            type: "POST",
+            contentType: "application/json",
+            datatype: "JSON",
+            success: function (result) {
+                console.log(result)
+                var trs = "";
+                $.each(result, function (i, col) {
+                    trs += '<tr role="row">' +
+                        '<td>' + (i + 1) + '</td>' +
+                        ' <td>' + col.date + '</td>' +
+                        ' <td>' + col.details + '</td>' +
+                        ' <td>' + col.name + '</td>' +
+                        ' <td>' + col.phone + '</td>' +
+                        ' <td>' + col.address + '</td>' +
+                        ' <td>' + col.currency + '</td>' +
+                        ' <td>' + col.credit + '</td>' +
+                        ' <td>' + col.debit + '</td>' +
+                        ' <td>' + col.balance + '</td>' +
+                        ' <td><button class="btn btn-outline-danger " onclick="DeleteDealRecord(\'' + col.dealid + '\')"><i class="fa fa-trash"></i></button></td>'+
+
+                        '</tr>';
+                })
+                var table = $("#tblBankDeal").dataTable();
+                table.fnDestroy();
+                $("#tblBankDeal>tbody").html("").html(trs);
+                $("#tblBankDeal").dataTable({
+
+                    stateSave: true,
+                    "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                    "pageLength": 5,
+                    "language": {
+                        "emptyTable": "په جدول کې معلومات شتون نه لري",
+                        "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                        "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                        "infoPostFix": "",
+
+                        "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                        "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                        "searchPlaceholder": "پلټنه",
+                        "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                        "paginate": {
+                            "first": "لومړۍ پاڼه",
+                            "previous": "مخکې",
+                            "next": "وروسته",
+                            "last": "پای"
+                        },
+                    },
+
+                });
+            }
+        })
+    }
+
+    function DeleteDealRecord(id) {
+
+        swal({
+            title: "آیا غواړی چې  ریکارډ حذف شې؟",
+            text: "",
+            icon: "warning",
+            buttons: {
+                cancel: {
+                    text: "نه",
+                    value: null,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "هو",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+
+        }).then((isConfirm) => {
+            if (isConfirm) {
+
+                $.ajax({
+                    url: '/Deal/DeletedBankDeal/?dealId=' + id + '',
+                    type: 'POST',
+                    contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (result) {
+                        toast(result, 'success');
+                        LoadBanksDeals();
+                    }
+                })
+            }
+        });
+    }
+
+    function fnSuccessBank(data) {
+        toast(data, 'success')
+        $("#btnReset").trigger("click");
+        LoadBanksDeals();
+    }
+
+</script>

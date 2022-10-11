@@ -1,0 +1,560 @@
+﻿
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#itemreport").addClass("active")</script>
+
+<style>
+    h2 {
+        font-size: 23px !important;
+    }
+
+    h3 {
+        direction: ltr;
+    }
+
+    .card-header {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .amountDiv {
+        justify-content: space-evenly;
+    }
+
+    .desc {
+        font-size: 19px !important;
+    }
+
+    .card {
+        border: 1px solid #22c2dc82;
+        box-shadow: 0 16px 28px 0 rgb(255 255 255), 0 25px 55px 0 #2dcee32b !important;
+    }
+</style>
+
+<section id="card-heading-color-options" class="">
+
+    <div class="col-md-12 col-sm-12 p-0">
+        <div class="card box-shadow-0 border-info">
+            <div class="card-header card-head-inverse bg-info">
+                <h2 class="text-center ">د اجناسو راپور</h2>
+                <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+                <div class="heading-elements">
+                    <ul class="list-inline mb-0">
+                        <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-content collapse show">
+                <dsiv class="card-body">
+
+                    <form data-ajax="true" asp-action="FetchItemInfo" asp-controller="Report" data-ajax-success="DataFetchedByDate(data)" data-ajax-method="post" id="frmDealerDeal">
+
+                        <div class="row" style="align-items: center; justify-content: center;">
+
+                            <div class="col-md-3  m-0 p-0" style="display: flex; align-items: center;">
+                                <label class="">جنس </label>
+                                <select id="ItemId" name="itemId" onchange="FetchItemInfo()" asp-items="@ViewBag.items" class="form-control select2 select2-container select2-container--default select2-container--above" style="width:100%">
+                                    <option value="">انتخاب کړئ</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3  m-0 p-0" style="display: flex; align-items: center;">
+                                <label class="col-md-4">د نیټې څخه</label>
+                                <input class="form-control" required name="fromDate" id="fromDate" type="date" style="height:45px;">
+                            </div>
+                            <div class="col-md-3  m-0 p-0" style="display: flex; align-items: center;">
+                                <label class="col-md-4">تر نیټې پورې</label>
+                                <input class="form-control" required name="toDate" id="toDate" type="date" style="height:45px;">
+                            </div>
+                            &nbsp; &nbsp;
+                            <div class="col-md-1  m-0 p-0" style="display: flex; align-items: center;">
+                                <button type="submit" class="btn btn-default  btn-info"> ښودل</button>
+                                &nbsp;
+                                <button type="reset" id="" onclick="ClearInputs()" class="btn btn-default  btn-warning">پاکول</button>
+
+                            </div>
+                        </div>
+                    </form>
+                </dsiv>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Purchase cash loan and all  -->
+    <div class="row">
+
+        <div class="col-md-6 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-purple">
+                    <h2 class="card-title"> خریداری تفصیل</h2>
+                </div>
+                <div class="card-content bg-purple bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afPurchase">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                عمده تعداد
+                            </h3>
+                            <h3 class="card-text" id="afOmda">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                پرچون تعداد
+                            </h3>
+                            <h3 class="card-text" id="afParchon">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkPurchase">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                عمده تعداد
+                            </h3>
+                            <h3 class="card-text" id="pkOmda">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                پرچون تعداد
+                            </h3>
+                            <h3 class="card-text" id="pkParchon">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usPurchase">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                عمده تعداد
+                            </h3>
+                            <h3 class="card-text" id="usOmda">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                پرچون تعداد
+                            </h3>
+                            <h3 class="card-text" id="usParchon">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-sm-12">
+            <div class="card box-shadow-2">
+                <div class="card-header card-head-inverse bg-danger">
+                    <h2 class="card-title">فروشاتو تفصیل</h2>
+                </div>
+                <div class="card-content bg-danger bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afSale">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                عمده تعداد
+                            </h3>
+                            <h3 class="card-text" id="afSaleOmda">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                پرچون تعداد
+                            </h3>
+                            <h3 class="card-text" id="afSaleParchon">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkSale">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                عمده تعداد
+                            </h3>
+                            <h3 class="card-text" id="pkSaleOmda">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                پرچون تعداد
+                            </h3>
+                            <h3 class="card-text" id="pkSaleParchon">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usSale">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                عمده تعداد
+                            </h3>
+                            <h3 class="card-text" id="usSaleOmda">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                پرچون تعداد
+                            </h3>
+                            <h3 class="card-text" id="usSaleParchon">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Sale cash loan and all  -->
+    <div class="row">
+
+        <div class="col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-blue">
+                    <h2 class="card-title">ټوټل ګټه</h2>
+                </div>
+                <div class="card-content bg-blue bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afBenifit">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkBenifit">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usBenifit">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-header card-head-inverse bg-blue-grey">
+                    <h2 class="card-title">  ګودام تفصیل</h2>
+                </div>
+                <div class="card-content bg-blue-grey bg-lighten-2 white collapse show">
+                    <div class="card-body ">
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                افغانۍ
+                            </h3>
+                            <h3 class="card-text" id="afStock">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                عمده تعداد
+                            </h3>
+                            <h3 class="card-text" id="afStockOmda">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                پرچون تعداد
+                            </h3>
+                            <h3 class="card-text" id="afStockParchon">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                کلدارې
+                            </h3>
+                            <h3 class="card-text" id="pkStock">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                عمده تعداد
+                            </h3>
+                            <h3 class="card-text" id="pkStockOmda">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                پرچون تعداد
+                            </h3>
+                            <h3 class="card-text" id="pkStockParchon">
+                            </h3>
+                        </div>
+                        <div class="row amountDiv">
+                            <h3 class="card-text">
+                                ډالر
+                            </h3>
+                            <h3 class="card-text" id="usStock">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                عمده تعداد
+                            </h3>
+                            <h3 class="card-text" id="usStockOmda">
+                            </h3>
+                            --
+                            <h3 class="card-text">
+                                پرچون تعداد
+                            </h3>
+                            <h3 class="card-text" id="usStockParchon">
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $(document).ready(function () {
+
+            $("#ItemId").select2();
+
+        })
+
+        function ClearInputs() {
+            $("#fromDate").val("")
+            $("#toDate").val("")
+            FetchItemInfo();
+        }
+
+        function FetchItemInfo() {
+
+            if ($("#fromDate").val() == "" && $("#toDate").val() == "" && $("#ItemId").val() != 0) {
+
+                $.ajax({
+                    url: "/Report/FetchItemInfo/?itemId=" + $("#ItemId :selected").val() + "",
+                    type: "GET",
+                    datatype: "JSON",
+                    success: function (data) {
+                        ShowDataInFields(data)
+                    }
+                })
+            }
+        }
+
+        function DataFetchedByDate(data) {
+            ShowDataInFields(data);
+        }
+
+        function ShowDataInFields(data) {
+
+            var afPurchase = 0.0;
+            var pkPurchase = 0.0;
+            var usPurchase = 0.0;
+
+            var afOmda = 0.0;
+            var pkOmda = 0.0;
+            var usOmda = 0.0;
+
+            var afParchon = 0.0;
+            var pkParchon = 0.0;
+            var usParchon = 0.0;
+
+            var afSale = 0.0;
+            var pkSale = 0.0;
+            var usSale = 0.0;
+
+            var afSaleOmda = 0.0;
+            var pkSaleOmda = 0.0;
+            var usSaleOmda = 0.0;
+
+            var afSaleParchon = 0.0;
+            var pkSaleParchon = 0.0;
+            var usSaleParchon = 0.0;
+
+            var afStock = 0.0;
+            var pkStock = 0.0;
+            var usStock = 0.0;
+
+            var afStockOmda = 0.0;
+            var pkStockOmda = 0.0;
+            var usStockOmda = 0.0;
+
+            var afStockParchon = 0.0;
+            var pkStockParchon = 0.0;
+            var usStockParchon = 0.0;
+
+            var afBenifit = 0.0;
+            var pkBenifit = 0.0;
+            var usBenifit = 0.0;
+
+            var afBankCredit = 0.0;
+            var pkBankCredit = 0.0;
+            var usBankCredit = 0.0;
+
+            var afBankDebit = 0.0;
+            var pkBankDebit = 0.0;
+            var usBankDebit = 0.0;
+
+            var afExpense = 0.0;
+            var pkExpense = 0.0;
+            var usExpense = 0.0;
+
+            var afBenifit = 0.0;
+            var pkBenifit = 0.0;
+            var usBenifit = 0.0;
+
+            console.log(data.sale)
+            /////  Purchase //////
+            $.each(data.purchase, function (i, col) {
+
+                if (col.currencyId == 1) {
+                    afPurchase += col.price
+                    afOmda += col.qty
+                    afParchon += col.qty2
+                } else if (col.currencyId == 2) {
+                    pkPurchase += col.price
+                    pkOmda += col.qty
+                    pkParchon += col.qty2
+                } else if (col.currencyId == 3) {
+                    usPurchase += col.price
+                    usOmda += col.qty
+                    usParchon += col.qty2
+                }
+
+
+            })
+
+            ///// Sale Item //////
+            $.each(data.sale, function (i, col) {
+                if (col.type == "عمده") {
+
+                    if (col.currencyId == 1) {
+                        afSale += col.price
+                        afSaleOmda += col.qty
+                    } else if (col.currencyId == 2) {
+                        pkSale += col.price
+                        pkSaleOmda += col.qty
+                    } else if (col.currencyId == 3) {
+                        usSale += col.price
+                        usSaleOmda += col.qty
+                    }
+                }
+
+                if (col.type == "پرچون") {
+
+                    if (col.currencyId == 1) {
+                        afSaleParchon += col.qty
+                    } else if (col.currencyId == 2) {
+                        pkSaleParchon += col.qty
+                    } else if (col.currencyId == 3) {
+                        usSaleParchon += col.qty
+                    }
+                }
+
+                if (col.currencyId == 1) {
+                    afBenifit += col.benifit
+                } else if (col.currencyId == 2) {
+                    pkBenifit += col.benifit
+                } else if (col.currencyId == 3) {
+                    usBenifit += col.benifit
+                }
+
+            })
+
+
+            ///// stock //////
+            $.each(data.stock, function (i, col) {
+
+                var qty = Math.floor(col.qty / col.inunit)
+                var qty2 = Math.ceil(col.qty % col.inunit)
+
+                if (col.currencyId == 1) {
+                    afStock += col.price
+                    afStockOmda += qty
+                    afStockParchon += qty2
+                } else if (col.currencyId == 2) {
+                    pkStock += col.price
+                    pkStockOmda += qty
+                    pkStockParchon += qty2
+                } else if (col.currencyId == 3) {
+                    usStock += col.price
+                    usStockOmda += qty
+                    usStockParchon += qty2
+                }
+
+
+            })
+
+
+            /// purchase show data ////
+            $("#afPurchase").text(parseFloat(afPurchase).toFixed(2))
+            $("#pkPurchase").text(parseFloat(pkPurchase).toFixed(2))
+            $("#usPurchase").text(parseFloat(usPurchase).toFixed(2))
+
+            $("#afOmda").text(parseFloat(afOmda).toFixed())
+            $("#pkOmda").text(parseFloat(pkOmda).toFixed())
+            $("#usOmda").text(parseFloat(usOmda).toFixed())
+
+            $("#afParchon").text(parseFloat(afParchon).toFixed())
+            $("#pkParchon").text(parseFloat(pkParchon).toFixed())
+            $("#usParchon").text(parseFloat(usParchon).toFixed())
+
+            /// sale show data ////
+            $("#afSale").text(parseFloat(afSale).toFixed(2))
+            $("#pkSale").text(parseFloat(pkSale).toFixed(2))
+            $("#usSale").text(parseFloat(usSale).toFixed(2))
+
+            $("#afSaleOmda").text(parseFloat(afSaleOmda).toFixed(2))
+            $("#pkSaleOmda").text(parseFloat(pkSaleOmda).toFixed(2))
+            $("#usSaleOmda").text(parseFloat(usSaleOmda).toFixed(2))
+
+            $("#afSaleParchon").text(parseFloat(afSaleParchon).toFixed(2))
+            $("#pkSaleParchon").text(parseFloat(pkSaleParchon).toFixed(2))
+            $("#usSaleParchon").text(parseFloat(usSaleParchon).toFixed(2))
+
+            /// benifit show data ////
+            $("#afBenifit").text(parseFloat(afBenifit).toFixed(2))
+            $("#pkBenifit").text(parseFloat(pkBenifit).toFixed(2))
+            $("#usBenifit").text(parseFloat(usBenifit).toFixed(2))
+
+              /// stock show data ////
+            $("#afStock").text(parseFloat(afStock).toFixed(2))
+            $("#pkStock").text(parseFloat(pkStock).toFixed(2))
+            $("#usStock").text(parseFloat(usStock).toFixed(2))
+
+            $("#afStockOmda").text(parseFloat(afStockOmda).toFixed(2))
+            $("#pkStockOmda").text(parseFloat(pkStockOmda).toFixed(2))
+            $("#usStockOmda").text(parseFloat(usStockOmda).toFixed(2))
+
+            $("#afStockParchon").text(parseFloat(afStockParchon).toFixed(2))
+            $("#pkStockParchon").text(parseFloat(pkStockParchon).toFixed(2))
+            $("#usStockParchon").text(parseFloat(usStockParchon).toFixed(2))
+
+        }
+
+    </script>
+}

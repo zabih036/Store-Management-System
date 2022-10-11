@@ -1,0 +1,390 @@
+﻿
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>$("#dashboardActive").addClass("active")</script>
+
+<script src="~/js/highcharts.js"></script>
+
+<div class="card">
+    <div style="width: 100%;">
+        <div id="line" class="height-550 echart-container col-md-12">
+        </div>
+        <progress id="animationProgress" max="1" value="0" style="width: 100%"></progress>
+    </div>
+</div>
+
+<div class="card row col-md-12 pt-1 m-0" style=" display: flex; flex-direction: row; justify-content: space-between;">
+    <div class="row col-md-5 m-0">
+        <div class="col-md-4">
+            <h2 class="text-center font-weight-bold">میاشت</h2>
+            <hr />
+            <div id="divMonth">
+                <h3 class="text-center"></h3>
+            </div>
+            <hr />
+            <div>
+                <h3 class="text-center font-weight-bold">ټوټل مجموعه</h3>
+            </div>
+        </div>
+        &nbsp;&nbsp;&nbsp;
+        <div class="col-md-6">
+            <h2 class="font-weight-bold">مصرف شوې پیسې</h2>
+            <hr />
+            <div id="divAmount">
+                <h3 class="text-center">0</h3>
+            </div>
+            <hr />
+            <div>
+                <h3 class="text-center font-weight-bold" id="totald">0</h3>
+            </div>
+        </div>
+    </div>
+    <div id="MonthlyReport" class="height-550 echart-container col-md-6 m-0 p-0">
+    </div>
+
+    <div style="display: flex; flex-wrap: nowrap;">
+        <div style="text-align:center"><a asp-action="Expense" asp-controller="Report" class="btn btn-primary col-md-12 mb-1" style="justify-content:center">د جزیاتو لپاره دلته کلیک وکړی</a></div>
+      &emsp;
+        <select id="CurrencyId" onchange="loadMonthlyExpenses()" class="form-control col-md-8">
+            <option value="1"> افغانۍ </option>
+            <option value="2"> کلدارې </option>
+            <option value="3"> ډالر</option>
+        </select>
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        $(document).ready(function () {
+
+            loadMonthlyExpenses();
+            loadMonthlyIncomes();
+        });
+
+        function loadMonthlyExpenses() {
+
+            var titleMessage = "د نن ورځې مصارف";
+
+            $.ajax({
+                type: "GET",
+                url: "/Home/MonthlyExpenses/?currencyId=" + $("#CurrencyId").val() + "",
+                contentType: "application/json",
+                dataType: "json",
+                success: function (result) {
+
+
+                    var divMonth = "";
+                    var divAmount = "";
+                    var keys = Object.keys(result);
+                    var monthlydata = new Array();
+                    var totalspent = 0.0;
+                    var amot = 0.0;
+                    var months = new Array();
+                    for (var i = 0; i < keys.length; i++) {
+                        amot += result[keys[i]];
+                        divMonth += '<h3 class="text-center">' + keys[i] + '</h3>';
+                        divAmount += '<h3 class="text-center">' + parseFloat(result[keys[i]]).toFixed(3) + '</h3>';
+                        var arrL = new Array();
+                        arrL.push(keys[i]);
+                        arrL.push(result[keys[i]]);
+                        totalspent += result[keys[i]];
+                        months += keys[i];
+                        monthlydata.push(arrL);
+
+                    }
+
+                    $("#divMonth").html(divMonth);
+                    $("#divAmount").html(divAmount);
+                    $("#totald").text(totalspent.toFixed(2));
+                    createCharts(monthlydata, titleMessage, totalspent.toFixed(3));
+
+
+                }
+            })
+        }
+
+        function createCharts(sum, titleText, totalspent) {
+            Highcharts.chart('MonthlyReport', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie',
+
+                },
+                legend: {
+                    useHTML: true,
+                    itemStyle: {
+                        fontSize: '23px'
+
+                    },
+
+                    onClick: function (event, legendItem) {
+                        log('onHover: ' + legendItem.text);
+                        alert(legendItem.text)
+                    },
+                },
+                title: {
+                    useHTML: true,
+                    style: {
+                        fontSize: '35px'
+
+                    },
+                    text: 'میاشتنې مصارفو مجموعه'
+                },
+
+                //tooltip: {
+                //    style: {
+                //        fontSize: '16px'
+
+                //    },
+                //    pointFormat: '<p> <b>{point.y:f}</b></p>',
+
+
+                //},
+                tooltip: {
+
+                    headerFormat: '<span style="font-size:20px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0"></td>' +
+                        '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true,
+
+                },
+                accessibility: {
+                    useHTML: true,
+                    point: {
+                        valueSuffix: '%',
+                        fontSize: '30px'
+                    },
+
+                },
+
+                plotOptions: {
+                    pie: {
+                        useHTML: true,
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            useHTML: true,
+                            enabled: true,
+                            style: {
+
+                                fontSize: '22px'
+                            },
+                        },
+
+                        showInLegend: true,
+
+
+                    },
+
+                },
+
+                series: [{
+
+                    style: {
+                        fontSize: '30px'
+
+                    },
+                    // name: 'میاشتې مصارف',
+                    colorByPoint: true,
+                    data: sum,
+                }],
+            });
+        }
+
+        function loadMonthlyIncomes() {
+
+            $.ajax({
+                type: "GET",
+                url: "/Home/MonthlyIncomes",
+                contentType: "application/json",
+                dataType: "json",
+                success: function (result) {
+
+
+
+                    var keys = Object.keys(result.afghani);
+                    var monthlyAfghani = new Array();
+                    var af = 0.0;
+                    var months = new Array();
+                    for (var i = 0; i < keys.length; i++) {
+                        var arrL = new Array();
+                        arrL.push(keys[i]);
+                        arrL.push(result.afghani[keys[i]]);
+                        af += result.afghani[keys[i]];
+                        months += keys[i];
+                        monthlyAfghani.push(arrL);
+
+                    }
+
+                    var keys = Object.keys(result.pk);
+                    var monthlyPk = new Array();
+                    var pk = 0.0;
+                    var months = new Array();
+                    for (var i = 0; i < keys.length; i++) {
+                        var arrL = new Array();
+                        arrL.push(keys[i]);
+                        arrL.push(result.pk[keys[i]]);
+                        pk += result.pk[keys[i]];
+                        months += keys[i];
+                        monthlyPk.push(arrL);
+
+                    }
+
+
+                    var keys = Object.keys(result.dollar);
+                    var monthlyDollar = new Array();
+                    var dollar = 0.0;
+                    var months = new Array();
+                    for (var i = 0; i < keys.length; i++) {
+                        var arrL = new Array();
+                        arrL.push(keys[i]);
+                        arrL.push(result.dollar[keys[i]]);
+                        dollar += result.dollar[keys[i]];
+                        months += keys[i];
+                        monthlyDollar.push(arrL);
+
+                    }
+
+                    createLineChart(monthlyAfghani, monthlyPk, monthlyDollar, af.toFixed(2), pk.toFixed(2), dollar.toFixed(2));
+
+
+                }
+            })
+        }
+
+        function createLineChart(afghani, pk, dollar, af, p, dol) {
+            Highcharts.chart('line', {
+                chart: {
+                    type: 'spline'
+                },
+                title: {
+                    useHTML: true,
+                    text: 'د شرکت میاشتنی عاید',
+                    style: {
+                        fontSize: '35px',
+
+                    },
+                },
+                subtitle: {
+                    useHTML: true,
+                    style: {
+                        fontSize: '20px',
+                        direction: 'ltr',
+                        useHTML: true,
+                    },
+                    text: '<h4 dir="ltr">' + af + ' افغانې  </h4>' + '<h4  dir="ltr"> ' + p + ' کلدارې  </h4>' + '<h4 dir="ltr"> ' + dol + '  ډالر </h4>',
+                },
+
+
+                xAxis: {
+                    type: 'category',
+
+                    labels: {
+                        useHTML: true,
+                        rotation: -15,
+
+                        style: {
+                            fontSize: '20px',
+                            fontFamily: 'Verdana, sans-serif'
+                        }
+                    }
+                },
+                yAxis: {
+                    title: {
+                        useHTML: true,
+                        text: 'د عوایدو مقدار',
+                        style: {
+                            fontSize: '25px'
+
+                        }
+                    },
+                    labels: {
+                        useHTML: true,
+                        style: {
+                            fontSize: '17px'
+
+                        },
+                        formatter: function () {
+                            return this.value;
+                        },
+
+                    }
+                },
+                //tooltip: {
+                //    crosshairs: true,
+                //    shared: true
+                //},
+                tooltip: {
+                    headerFormat: '<span style="font-size:17px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name} </td>' +
+                        '<td style="padding:0;font-size:15px;"><b>{point.y:.1f} </b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true,
+                    crosshairs: true,
+                    shared: true
+                },
+                legend: {
+                    useHTML: true,
+                    itemStyle: {
+                        fontSize: '23px'
+
+                    },
+
+
+                },
+                plotOptions: {
+
+                    spline: {
+                        marker: {
+                            radius: 6,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [{
+                    name: 'افغانۍ ',
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    data: afghani,
+
+                }, {
+                    name: 'کلدارې ',
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    data: pk
+                }
+                    , {
+                    name: 'ډالر ',
+                    fontSize: '25px',
+
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    data: dollar
+                }]
+                //series: [{
+                //    name: 'عاید',
+                //    marker: {
+                //        symbol: 'circle'
+                //    },
+                //    //color: true,
+                //    data: sum,
+                //    data: sum
+
+                //}]
+            });
+
+        }
+
+    </script>
+
+}

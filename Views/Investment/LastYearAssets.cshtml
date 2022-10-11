@@ -1,0 +1,227 @@
+﻿
+@model LastAssetsViewModel
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>$("#addAssetsActive").addClass("active")</script>
+
+    <div class="row">
+        <div class="col-md-12 ">
+            <h2 class="text-center alert bg-info box-shadow-1">د  سرمایه ثبت کولو فارم</h2>
+
+            <hr />
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body card-dashboard">
+                    <section>
+                        @Html.AntiForgeryToken()
+
+                        <br />  <br />  <br />
+                        <br />  <br />
+                        <form data-ajax="true" asp-controller="Investment" asp-action="AddAsset" data-ajax-success="frmSuccess(data)" data-ajax-method="post" id="frmnotes">
+                            <hr />
+                            <input hidden asp-for="AssetId"  value="0" />
+
+                            <div class="form-group">
+                                <label asp-for="AfAsset" class=""></label>
+                                <input asp-for="AfAsset" dir="rtl" class="form-control"/>
+                                <span asp-validation-for="AfAsset" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="PkAsset" class=""></label>
+                                <input asp-for="PkAsset" dir="rtl" class="form-control"/>
+                                <span asp-validation-for="PkAsset" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="UsAsset" class=""></label>
+                                <input asp-for="UsAsset" dir="rtl" class="form-control"/>
+                                <span asp-validation-for="UsAsset" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Date" class=""></label>
+                                <input asp-for="Date" asp-format="0:yyyy" type="number" min="2010" max="3000" step="1" value="" class="form-control" />
+                                <span asp-validation-for="Date" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="">تفصیل</label>
+                                <input asp-for="Desc" dir="rtl" class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <button type="reset" id="btnreset" class="btn btn-warning btn-icon-md">پاکول</button>
+                                <button type="submit" id="btnsubmit" class="btn btn-primary btn-icon-md">ذخیره</button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8 " style="margin:0px;">
+            <div class="card">
+                <div class="card-header ">
+                    <h4 class="card-title "><strong>د تیرو کلونو سرمایه</strong></h4>
+                </div>
+                <div class="card-content  collapse show">
+                    <div class="card-body dt-ext table-responsive">
+                        <table class="table   table-bordered dataex-fixh-basic dataTable" id="tbl">
+                            <thead class="">
+                                <tr role="row">
+                                    <th class="col-md-3">#</th>
+                                    <th class="col-md-3"> افغانۍ سرمایه</th>
+                                    <th class="col-md-3"> کلدراې سرمایه</th>
+                                    <th class="col-md-3"> ډالر سرمایه</th>
+                                    <th class="col-md-3">   کال</th>
+                                    <th class="col-md-2">  تفصیل</th>
+                                    <th class="col-md-3">  تغیرول</th>
+                                    <th class="col-md-3">  حذف </th>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @section Scripts{
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+<script>
+            $(document).ready(function () {
+                LoadAssets();
+
+                $("#Date").val((@DateTime.Now.Year-1))
+
+                $("#Date").attr("max",(@DateTime.Now.Year-1))
+
+
+            })
+            function LoadAssets() {
+                $.ajax({
+                    url: '/Investment/FetchAssets/',
+                    type: 'GET',
+                    contentType: "application/json",
+                    data: '{}',
+                    datatype: "JSON",
+                    success: function (customers) {
+                        var Cus = "";
+                        $.each(customers, function (i, col) {
+                            Cus += ' <tr>';
+                            Cus += '      <td class="col-md-3"> ' + (i + 1) + ' </td>';
+                            Cus += '      <td class="col-md-3"> ' + parseFloat(col.afasset).toFixed(2) + ' </td>';
+                            Cus += '      <td class="col-md-3"> ' + parseFloat(col.pkasset).toFixed(2) + ' </td>';
+                            Cus += '      <td class="col-md-3"> ' + parseFloat(col.usasset).toFixed(2) + ' </td>';
+                            Cus += '      <td  class="col-md-3"> ' + col.date + '</td>';
+                            Cus += '      <td  class="col-md-2">' + col.desc + '  </td>';
+                            Cus += '      <td  class="col-md-2"> <button class="btn btn-primary" onclick="passValue(' + col.id + ',\'' + col.afasset + '\',\'' + col.pkasset + '\',\'' + col.usasset + '\',\'' + col.date + '\',\'' + col.desc + '\')"><i class="ft-edit"></i></button></td>';
+                            Cus += "      <td><button type='button' onclick='fnDelete(" + col.id + ")' class='btn btn-danger'><i class='ft-trash'></i></button></form></td> ";
+                            Cus += '      </tr>';
+                        });
+
+                        var table = $("#tbl").dataTable();
+                        table.fnDestroy();
+
+                        $("#tbl>tbody").html("").html(Cus);
+
+                        $("#tbl").DataTable({
+                            stateSave: true,
+                            responsive:true,
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+                        });
+                    }
+                })
+            }
+
+            function passValue(id, afasset, pkasset, usasset, date, desc) {
+
+                $("#AssetId").val(id);
+                $("#AfAsset").val(afasset);
+                $("#PkAsset").val(pkasset);
+                $("#UsAsset").val(usasset);
+                $("#Date").val(date);
+                $("#Desc").val(desc);
+                $("#btnsubmit").text("تغیرول");
+            }
+
+            function frmSuccess(data) {
+
+                $("#btnsubmit").text("ذخیره");
+
+                toast(data, 'success');
+
+                $("#frmnotes")[0].reset();
+
+                LoadAssets();
+            }
+
+            function fnDelete(id) {
+
+                swal({
+                    title: "آیا غواړی چې  ریکارډ حذف شې؟",
+                    text: "",
+                    icon: "warning",
+                    buttons: {
+                        cancel: {
+                            text: "نه",
+                            value: null,
+                            visible: true,
+                            className: "",
+                            closeModal: true,
+                        },
+                        confirm: {
+                            text: "هو",
+                            value: true,
+                            visible: true,
+                            className: "",
+                            closeModal: true
+                        }
+                    }
+
+                }).then((isConfirm) => {
+                    if (isConfirm) {
+
+                        $.ajax({
+                            url: '/Investment/DeleteAsset/?assetId=' + id + '',
+                            type: 'POST',
+                            contentType: "application/json",
+                            datatype: "JSON",
+                            success: function (result) {
+                                toast(result, 'success');
+                                LoadAssets();
+                            }
+                        })
+                    }
+                });
+            }
+
+            $("#btnreset").click(function () {
+
+                $("#btnsubmit").text("ذخیره")
+
+            })
+
+</script>
+    }
+
+

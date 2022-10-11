@@ -1,0 +1,603 @@
+﻿@model AllViewModel
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>$("#investorActive").addClass("active")</script>
+
+    <style>
+        .camera {
+            background-color: antiquewhite;
+            color: whitesmoke;
+            position: absolute;
+            margin-top: 0px;
+            margin-left: 0px;
+            cursor: pointer;
+        }
+
+            .camera:hover {
+                margin-top: -5.90px;
+                margin-left: 54px;
+                border: 1.5px solid white;
+            }
+
+        .profileImage {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            margin-top: 0px;
+            margin-left: 100px;
+            left: 0px;
+            right: 0px;
+        }
+    </style>
+
+    @if (ViewBag.Alert != "empty")
+    {
+        <div class="alert alert-success alert-dismissible" role="alert" id="divAlert" style="text-align:center;padding-top:3px; font-size:28px;height:45px;">
+            @ViewBag.Alert
+        </div>
+    }
+
+
+    @using Microsoft.AspNetCore.Authorization
+    @inject IAuthorizationService authorize
+
+    @if (!(await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+    {
+
+        @await Html.PartialAsync("AccessDeniedPartial")
+
+
+        ViewBag.view = "d-none";
+        ViewBag.Insert = "d-none";
+        ViewBag.Delete = "d-none";
+        ViewBag.Edit = "d-none";
+    }
+
+
+    @if ((await authorize.AuthorizeAsync(User, "ViewRolePolicy")).Succeeded)
+    {
+        ViewBag.view = "";
+        ViewBag.Insert = "d-none";
+        ViewBag.Delete = "d-none";
+        ViewBag.Edit = "d-none";
+    }
+
+    @if ((await authorize.AuthorizeAsync(User, "InsertRolePolicy")).Succeeded)
+    {
+        ViewBag.view = "";
+        ViewBag.Insert = "";
+        ViewBag.Delete = "d-none";
+        ViewBag.Edit = "d-none";
+    }
+
+    @if ((await authorize.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+    {
+        ViewBag.view = "";
+        ViewBag.Insert = "";
+        ViewBag.Edit = "";
+        ViewBag.Delete = "d-none";
+    }
+
+    @if ((await authorize.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+    {
+        ViewBag.view = "";
+        ViewBag.Insert = "";
+        ViewBag.Edit = "";
+        ViewBag.Delete = "";
+    }
+
+
+    <div class=" row   ">
+        <div class="col-md-2" style="text-align:right">
+            <button id="btnList" class="btn btn-info "><strong>د شراکتیانو لیست</strong>  </button>
+        </div>
+        <div class="col-md-10" style="text-align:center">
+            <h2 class="text-center card-body bg-info white box-shadow-1" style="padding: 13px;">
+                د شراکتې د راجستر کولو فارم
+            </h2>
+
+            <hr />
+        </div>
+
+
+    </div>
+
+    <div class="container-fluid card   @ViewBag.view">
+
+        <div class="card col-md-12">
+
+
+            <section id="divInput" style="">
+
+                @Html.AntiForgeryToken()
+
+
+                <form asp-controller="Investment" asp-action="InvestorRegistration" enctype="multipart/form-data" data-ajax-success="funSuccessinvestor(data)" method="post" id="frminvestor">
+                    <div class="col-md-12 ">
+                        <input hidden asp-for="investor.oldEmail" value="'0'" />
+                        <input hidden asp-for="investor.defalut" value="0" />
+                        <input hidden asp-for="investor.InvestorId" value="0" />
+
+                        <div class="col-md-6 offset-md-3">
+                            <div class="form-group">
+                                <label asp-for="investor.Name" class=""></label>
+                                <input asp-for="investor.Name" placeholder="د شراکتې نوم" class="form-control" />
+                                <span asp-validation-for="investor.Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="investor.Phone" class=""></label>
+                                <input asp-for="investor.Phone" placeholder="موبایل نمبر" class="form-control" />
+                                <span asp-validation-for="investor.Phone" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="investor.Email" class=""></label>
+                                <input asp-for="investor.Email" placeholder="بریښنالیک" class="form-control" />
+                                <span asp-validation-for="investor.Email" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="investor.RegistrationDate" class=""></label>
+                                <input asp-for="investor.RegistrationDate" type="datetime-local" style="margin:0px;padding:8px;" placeholder="د راجستر نیټه" class="form-control" />
+                                <span asp-validation-for="investor.RegistrationDate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="investor.Description" class=""></label>
+                                <input asp-for="investor.Description" rows="1" placeholder="تفصیلات" class="form-control" />
+                            </div>
+                            <div class="form-group ">
+
+                                <div class="col-md-12 row" style="margin:0px;padding:0px;">
+                                    <div class="col-md-6" style="padding-right:0px;display:grid ">
+                                        <label asp-for="investor.Image" class=""></label>
+                                        <button type="button" class="btn btn-info btn-block " style="margin-top:0px;" id="browseBtn">د تصویر انتخابول  </button>
+                                        <button type="button" class="btn btn-danger btn-block " style="margin-top:52px;" id="browseCancel"> فسخ کول </button>
+                                    </div>
+
+                                    <div class="border col-md-6 text-center">
+                                        <input asp-for="investor.Image" class="d-none" accept="image/jpeg, image/jpg,image/png" name="img" style="border:1px solid" id="browseInput" />
+                                        <img src="~/images/StaticImages/browse.png" class=" profileImage" id="browseImg" style="height:175px; padding:0px;margin:0px;cursor:pointer;" />
+                                    </div>
+                                </div>
+
+                                <br />
+                                <div class="form-group  @ViewBag.Insert" style="margin-top:13px;  ">
+                                    <button type="reset" id="btnReset" class="btn btn-warning btn-icon-md">پاکول</button>
+                                    <button type="submit" id="btnSubmitinvestor" class="btn btn-primary btn-icon-md">ذخیره</button>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </form>
+
+            </section>
+
+            <section id="divTable" class="dt-ext table-responsive" style="display:none">
+
+                <table class="table table-responsive-md table-striped table-condensed table-bordered " id="tblinvestor">
+                    <thead class="scrollable-container ps--scrolling-x">
+                        <tr role="row">
+
+                            <th style="max-width:1%;">#</th>
+                            <th class="col-md-1">د شراکتې نوم</th>
+                            <th class="col-md-1"> موبایل نمبر</th>
+                            <th class="col-md-1">  بریښنالیک</th>
+                            <th class="col-md-1"> د راجستر نیټه</th>
+                            <th class="col-md-1">  تصویر</th>
+                            @*<th style="max-width:1%; " class=" @ViewBag.Edit">  اخستل شوې پیسې</th>*@
+                            <th style="max-width:1%; " class=" @ViewBag.Edit"> تغیرول </th>
+                            <th style="max-width:1%;" class=" @ViewBag.Delete">  حذف</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+            </section>
+
+
+        </div>
+    </div>
+
+    <form data-ajax="true" asp-action="DeleteInvestor" data-ajax-method="post" asp-controller="Investment" data-ajax-success="deleted(data)">
+        <input hidden id="deleteId" asp-for="investor.InvestorId" />
+        <input hidden id="deleteEmail" asp-for="investor.Email" />
+        <button type="submit" class="d-none" id="btnDelete"></button>
+    </form>
+
+
+    <form data-ajax="true" asp-action="LoadInvestorAllPayments" data-ajax-method="post" asp-controller="Investment" data-ajax-success="investorAllPayments(data)">
+        <input hidden id="investorId" asp-for="investor.InvestorId" />
+        <button type="submit" class="d-none" id="btnPayments"></button>
+    </form>
+
+
+
+    @* paid modal *@
+
+    <div class="modal fade text-left" id="large" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel17"> د شراکتې د اخستلو شویو پیسو تاریخچه</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body col-md-12">
+                    <div class="card">
+
+                        <table class="table table-responsive-md table-striped table-condensed  table-bordered dataTables_scrollHead" id="DataTables_Table_1">
+                            <thead class="scrollable-container ps--scrolling-x ">
+                                <tr role="row">
+
+                                    <th style="max-width:10px;">#</th>
+                                    <th class="col-md-1">اخستل شوې پیسې</th>
+                                    <th class="col-md-1">  پیسو ډول</th>
+                                    <th class="col-md-1">   نیټه</th>
+
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+
+                        </table>
+
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">بندول</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+        <script>
+            var show = true;
+            $(document).ready(function () {
+                loadinvestor();
+                $("#divAlert").delay(6000).fadeOut();
+                $("#frminvestor")[0].reset();
+                $("#browseImg").attr("src", "/images/StaticImages/browse.png");
+
+                $("#btnr").click(function () {
+
+                    $("#divDetails").printThis({
+                        debug: false,               // show the iframe for debugging
+                        //importCSS: true,            // import parent page css
+                        importStyle: true,         // import style tags
+                        printContainer: true,       // print outer container/$.selector
+                        loadCSS: "",                // path to additional css file - use an array [] for multiple
+                        pageTitle: "",              // add title to print page
+                        removeInline: false,        // remove inline styles from print elements
+                        removeInlineSelector: "*",  // custom selectors to filter inline styles. removeInline must be true
+                        // printDelay: 333,            // variable print delay
+                        // header: "<h1 style='text-content: center; margin-bottom: 5px;'>افغان فارما شرکت شراکتې معاش معلومات!</h1>" ,              // prefix to html
+                        // footer: "<h2 style='justify-content: center; margin-top: 5px;'>آدرس کندهار ولایت جواد حسن مارکیټ!</h2>",              // postfix to html
+                        base: false,                // preserve the BASE tag or accept a string for the URL
+                        formValues: true,           // preserve input/form values
+                        canvas: false,              // copy canvas content
+                        doctypeString: '...',       // enter a different doctype for older markup
+                        removeScripts: false,       // remove script tags from print content
+                        copyTagClasses: true,      // copy classes from the html & body tag
+                        beforePrintEvent: null,     // function for printEvent in iframe
+                        beforePrint: null,          // function called before iframe is filled
+                        afterPrint: null            // function called before iframe is removed
+                    });
+
+                })
+            })
+        </script>
+        @* image code *@
+        <script>
+            $("#browseBtn").click(function () {
+                $("#browseInput").trigger("click");
+            })
+            $("#browseImg").click(function () {
+                $("#browseInput").trigger("click");
+            })
+            $("#browseInput").change(function () {
+                if (this.files && this.files[0]) {
+                    var fileReader = new FileReader();
+                    fileReader.readAsDataURL(this.files[0]);
+
+                    fileReader.onload = function (x) {
+
+                        if (x != null)
+
+
+
+                            $("#browseImg").attr("src", x.target.result);
+                        $("#investor_defalut").val("0");
+
+
+                    }
+                }
+            })
+        </script>
+        @* investor script functions *@
+        <script>
+        function loadinvestor() {
+            $.ajax({
+                url: "/Investment/LoadInvestor/",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+                    var tr = "";
+                    console.log(result)
+                    $.each(result, function (i, col) {
+                        var date = new Date(col.registrationDate);
+
+                        tr += '<tr  role="row">' +
+                            '<td >' + (i + 1) + '</td>' +
+                            '<td >' + col.name + '</td>' +
+                            '<td>' + col.phone + '</td>' +
+                            '<td>' + col.email + '</td>' +
+                            ' <td>' + date.toLocaleDateString() + '</td>' +
+                            ' <td><img src=' + col.image + ' height="100" width="100"></td>' +
+                            //' <td  class="@ViewBag.Edit"><button type="button" onclick="fnLoadInvestorPayment(' + col.investorId + ')" class="btn btn-primary"><i class="fa fa-money"></i></button></td>' +
+                            ' <td  class="@ViewBag.Edit"><button type="button" onclick="fnEditinvestor(' + col.investorId + ',\'' + col.name + '\',\'' + col.phone + '\',\'' + col.email + '\',\'' + col.registrationDate + '\',\'' + col.image + '\')" class="btn btn-primary"><i class="fa fa-edit"></i></button></td>' +
+                            ' <td  class="@ViewBag.Delete"><button type="button" onclick="fnDeleteinvestor(' + col.investorId + ',\'' + col.email + '\')" class="btn btn-danger"><i class="fa fa-trash"></i></button></td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#tblinvestor").dataTable();
+                    table.fnDestroy();
+
+                    $("#tblinvestor>tbody").html("").html(tr);
+
+                        $("#tblinvestor").DataTable({
+
+                            stateSave: true,
+
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه."
+                                ,
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+                            });
+
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+                complete: function () {
+
+                }
+
+            })
+        }
+        function fnLoadInvestorPayment(invid) {
+            $.ajax({
+                url: "/Investment/LoadPaidMoney/?invid=" + invid+"",
+                type: "POST",
+                contentType: "application/json",
+                datatype: "JSON",
+                success: function (result) {
+
+                    var tr = "";
+                    console.log(result)
+                    $.each(result, function (i, col) {
+
+                        tr += '<tr class="odd" role="row">' +
+
+                            '<td>' + (i + 1) + '</td>' +
+                            ' <td class="col-md-4">' + col.amount + '</td>' +
+                            ' <td class="col-md-4">' + col.currency + '</td>' +
+                            ' <td class="col-md-4">' + col.date + '</td>' +
+                            '</tr>';
+
+                    })
+                    var table = $("#DataTables_Table_1").dataTable();
+                    table.fnDestroy();
+
+                    $("#DataTables_Table_1>tbody").html("").html(tr);
+
+                        $("#DataTables_Table_1").DataTable({
+
+                            stateSave: true,
+                            "lengthMenu": [[5, 10, 20, -1], [5, 15, 50, "ټول"]],
+                            "pageLength": 5,
+                            "language": {
+                                "emptyTable": "په جدول کې معلومات شتون نه لري",
+                                "info": "د <b>( _START_  )</b> تر <b>( _END_  )</b> د <b>( _TOTAL_ )</b> ریکاروډونو څخه.",
+                                "infoFiltered": "( <b>( _MAX_ )</b> ریکارډونه شتون لرې )",
+                                "infoPostFix": "",
+
+                                "lengthMenu": "ښودل_MENU_ ریکارډونو",
+                                "search": "پلټنه<span id='tblSearch' class='fa fa-search'></span> ",
+                                "searchPlaceholder": "پلټنه",
+                                "zeroRecords": "پدی نوم هیڅ ریکارډ پیدا نشو ",
+                                "paginate": {
+                                    "first": "لومړۍ پاڼه",
+                                    "previous": "مخکې",
+                                    "next": "وروسته",
+                                    "last": "پای"
+                                },
+                            },
+                        });
+                    $("#large").modal("show");
+
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+                complete: function () {
+
+                }
+
+            })
+
+        }
+        function funSuccessinvestor(data) {
+
+
+            loadinvestor();
+
+            $("#frminvestor")[0].reset();
+
+            toast(data, 'success');
+            $("#btnSubmitinvestor").text("ذخیره ");
+        }
+        var list = true;
+        function fnEditinvestor(id, name, phone, email, hireDate, pic) {
+            //  alert(id + "," + name + "," + latinname + "," + category)
+
+            $("#investor_InvestorId").val(id);
+            $("#investor_Name").val(name);
+            $("#investor_Phone").val(phone);
+            $("#investor_Email").val(email);
+            $("#investor_RegistrationDate").val(hireDate);
+            $("#browseImg").attr("src", pic);
+            $("#investor_defalut").val(pic);
+            $("#investor_oldEmail").val(email);
+            $("#btnSubmitinvestor").text("تغیرول");
+
+            $("#divInput").animate({
+                left: '250px',
+                opacity: '0.9',
+
+            }).show(400);
+
+
+            $("#divTable").animate({
+
+            }).hide(400);
+
+            $("#btnList").text("د شراکتېانو لیست ")
+            list = true;
+
+        }
+        function fnDeleteinvestor(comId,email) {
+            $("#deleteId").val(comId);
+            $("#deleteEmail").val(email);
+            swal({
+                title: "آیا غواړی چې نوموړی ریکارډ حذف شې؟",
+                text: "",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "نه",
+                        value: null,
+                        visible: true,
+                        className: "",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "هو",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    $("#btnDelete").trigger("click");
+                }
+            });
+
+        }
+        function deleted(data) {
+            toast(data, 'success');
+            loadinvestor();
+        }
+        </script>
+
+        @* show and hide tables code *@
+        <script>
+            $("#browseCancel").click(function () {
+
+                $("#browseImg").attr("src", "/images/StaticImages/browse.png");
+                $("#browseInput").val("");
+                $("#investor_defalut").val("/images/StaticImages/browse.png");
+
+
+            })
+            $("#btnReset").click(function () {
+
+                $("#browseImg").attr("src", "/images/StaticImages/browse.png");
+                $("#browseInput").val("");
+                $("#btnSubmitinvestor").text("ذخیره")
+                $("#frminvestor")[0].reset();
+
+
+            })
+            $("#btninvestorSalaryShow").click(function () {
+                $("#divInput").hide();
+                $("#divTable").hide();
+                $("#divTableSalary").show(300);
+                $("#divDetails").hide();
+                $("#btnr").hide();
+                LoadinvestorSalary();
+
+            })
+            $("#btnCloseSalaryPayment").click(function () {
+                $("#btnResetSalary").trigger("click");
+
+            })
+            $("#btnList").click(function () {
+                if (list) {
+
+                    $("#divInput").animate({
+                        left: '250px',
+                        opacity: '0.9',
+
+                    }).hide(400);
+
+
+                    $("#divTable").animate({
+
+                    }).show(400);
+                    $("#divTable").removeClass("d-none")
+
+                    $("#btnList").text("د شراکتې راجستر کول")
+                    list = false;
+
+                    $("#divTableSalary").hide();
+                    $("#divDetails").hide();
+                    $("#btnr").hide();
+
+                } else {
+                    $("#divInput").animate({
+                        left: '250px',
+                        opacity: '0.9',
+
+                    }).show(400);
+
+
+                    $("#divTable").animate({
+
+                    }).hide(400);
+
+                    $("#btnList").text("د شراکتیانو لیست ")
+                    list = true;
+                    $("#divTableSalary").hide();
+                    $("#divDetails").hide();
+                    $("#btnr").hide();
+                }
+
+            });
+        </script>
+
+    }

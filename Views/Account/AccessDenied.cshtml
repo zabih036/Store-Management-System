@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Access denied";
+}
+@using Microsoft.Extensions.Options
+@inject IOptions<SettingOptions> op
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title" style="text-align:center"><strong class="font-medium-4 text-danger"> تاسو دې صفحې ته د لاسرسئ اجازه نه لرۍ  .</strong></h3>
+    </div>
+    <hr>
+    <div class="card-content">
+        <div class="card-body">
+
+
+            <div class="tab-content px-1 pt-1">
+                <div role="tabpanel" class="tab-pane in active" id="active1" aria-labelledby="active-tab1" aria-expanded="true">
+                    <div class="col-lg-8 col-md-8 col-sm-12 offset-2">
+                        <div>
+                            <section>
+                                <div class="card border">
+
+                                    <div class="card-content  collapse show">
+                                        <div class="card-body">
+
+                                            <header class="text-center">
+                                                <h2 class="text-danger">د اجازت د اخیستلو لپاره ریس سره تماس ونیسئ</h2>
+                                                <p class="text-info"> <span class="fa fa-phone"> &nbsp;@op.Value.ChairmanPhone1   &nbsp; @op.Value.ChairmanPhone2</span> .</p>
+                                            </header>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
