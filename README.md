@@ -31,7 +31,7 @@ System Features:
 
 13 - Expenses and Expense Types
 
-14 - Much more ....
+14 - and more ....
 
 ![Capture1](https://user-images.githubusercontent.com/52412292/195088210-314b24b1-bba5-4c5c-97b0-e58de5186bad.PNG)
 
