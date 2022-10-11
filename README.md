@@ -1,3 +1,4 @@
+![Capture1](https://user-images.githubusercontent.com/52412292/195088210-314b24b1-bba5-4c5c-97b0-e58de5186bad.PNG)
 # Store-Management-System
 
 System Developed in C# Asp.Net Core MVC, Frontend HTML, CSS, JavaScript and jQuery, Backend Database Design MS SQL.
